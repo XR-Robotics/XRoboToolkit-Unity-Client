@@ -1,0 +1,81 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-964313208841962362
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 5
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: PicoCursorVisual
+  m_Shader: {fileID: 4800000, guid: f9e3479f25d8cc9458c0468b496c07cc, type: 3}
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 3050
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _BG_Max_Close: 0.65
+    - _BG_Max_Open: 1
+    - _BG_Min_Close: 0.294
+    - _BG_Min_Open: 0.5
+    - _ClickStrength: 0
+    - _Cursor_Max_Close: 0.5
+    - _Cursor_Max_Open: 0.8
+    - _Cursor_Min_Close: 0.35
+    - _Cursor_Min_Open: 0.6
+    - _InnerAlpha: 1
+    - _MaxClose: 1
+    - _MaxOpen: 0.679
+    - _Max_Close: 0.625
+    - _Max_Open: 1
+    - _MidMaxClose: 0.73
+    - _MidMaxOpen: 0.523
+    - _Mid_Max_Close: 0.476
+    - _Mid_Max_Open: 0.791
+    - _MinClose: 0.7
+    - _MinOpen: 0
+    - _Min_Close: 0
+    - _Min_Open: 0.412
+    - _QueueControl: 0
+    - _QueueOffset: 1
+    m_Colors:
+    - _BG_Color: {r: 0.0955588, g: 0.16988233, b: 0.36099997, a: 0.69803923}
+    - _Cursor_Color: {r: 0.627451, g: 0.8156863, b: 1, a: 1}
+    - _InnerColor: {r: 0.18431373, g: 0.23529412, b: 0.43529412, a: 1}
+    - _Inner_Color: {r: 0.62745106, g: 0.8156863, b: 1, a: 1}
+    - _OutColor: {r: 0.79079145, g: 0.84055406, b: 0.9245283, a: 1}
+    - _Out_Color: {r: 0.07058821, g: 0.12549016, b: 0.26666668, a: 0.4}
+  m_BuildTextureStacks: []

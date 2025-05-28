@@ -1,0 +1,160 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+
+class RobotMain {
+
+}
+
+class TcpHandler {
++ ReceiveFunctionMsg ReceiveFunctionEvent
++ReceiveMassage ReceiveEvent
++SocketState State
+-Queue<NetPacket> _receivePackages
+-Queue<SendData> _sendDatas
+- Socket _socket
+-Thread _sendThread
+-JsonData _trackingJsonData
+ +Connect(string address, int port)
+ +OnDataReceived(IAsyncResult ar)
+ -ReceivePacketHandle()
+ +SendFunctionValue(string function, string value)
+ +Send(byte cmd, string msg)
+ - OnSendThread()
+ -Reconnect()
+ +Close()
+}
+
+class ByteBuffer
+{
+byte[] data;
+ int readIndex ;
+ int writeIndex;
+ GetReadableCount()
+ GetRemainCapacity()
+  AddWriteIndex(int count)
+  AddReadIndex(int count)
+  RemoveReadedBytes()
+}
+
+class NetPacket
+{
+    bool Valid;
+    byte Cmd;
+    byte[] Data;
+    long TimeStamp;
+    SetData(byte cmd, byte[] body, long timeStamp)
+}
+
+class SendData{
+    byte Cmd;
+    string Content;
+    +SendData(byte cmd, string content)
+}
+enum SocketState 
+{
+    NONE,
+    CREATE,
+    CONNECTING,
+    WORKING,
+    CLOSE,
+    CONNECT_ERROR,
+}
+class NetCmd{
+ byte PACKET_CCMD_CONNECT = 0x19; 
+ PACKET_CMD__FUNCTION = 0x5F;
+ RECEIVE_PACKET_HEAD = 0xCF;
+ RECEIVE_PACKET_EDN = 0xA5;
+ SEND_PACKET_HEAD = 0x3F;
+ SEND_PACKET_EDN = 0xA5;
+  PACKET_CCMD_TO_FUNCTION = 0x6D;
+  PACKET_CCMD_CLIENT_HEARTBEAT = 0x23;
+  PACKET_CMD_TCPIP = 0x7E;
+   PACKET_CMD_MEDIAIP = 0x7F;
+ }
+
+class TrackingData{
+Get( head, HandMode ,  trackingType, ref JsonData )
+}
+
+TrackingData -->  PICOUnitySDK 
+enum HandMode
+{
+    Non = 0,
+    Controller = 1,
+    Hand = 2
+}
+
+enum TrackingType
+{
+    None = 0,
+    Body = 1,
+    Motion = 2
+}
+
+TrackingData -->  HandMode 
+TrackingData -->  TrackingType   
+ TcpHandler -->  TrackingData 
+TcpHandler -->  SocketState 
+TcpHandler -->  NetPacket 
+TcpHandler -->  SendData 
+TcpHandler -->  NetCmd 
+TcpHandler -->ByteBuffer
+
+
+Class UdpReceiver
+{
++ReceiveMassage ReceiveEvent;
+-UdpClient _udpClient;
+-Thread _receiveThread;
+-Queue<NetPacket> _receivePackages 
+
++ListenTo(int port)
+-ReceiveData()
+-ReceiveHandle(NetPacket packet)
++Close()
+}
+
+class UIRobot
+{
+   TcpHandler TcpHandler;
+    UdpReceiver UdpReceiver;
+    OnClickIP(string ip)
+    OnBodyModeDrop(int index)
+     OnHandDropdown(int index)
+      OnClickRecord()
+    OnWebviewBtn()
+}
+
+UIRobot -->UdpReceiver
+UIRobot -->TcpHandler
+UIRobot -->UICameraCtrl
+class UICameraCtrl
+{
+ OnNetReceive(string functionName, string value)
+ ResponsePcCamera()
+ OpenRecord()
+ GetCameraParams()
+ WriteLocalText(string content)
+}
+UICameraCtrl -->VRCameraLogic
+ 
+UICameraCtrl -->RemoteCameraWindow
+class RemoteCameraWindow
+{
+    StartListen( width,  height,  fps,  bitrate);
+}   
+class VRCameraLogic
+{
+    StartSendImage(remoteIp,remotePort,width,height,fps,bitrate,PXRCaptureRenderMode);
+    StartRecord(width,height,fps,bitrate,PXRCaptureRenderMode,onTrackingData)
+}  
+VRCameraLogic -->PICOUnitySDK
+
+VRCameraLogic -->FFmpage
+RemoteCameraWindow -->FFmpage
+
+
+
+
+@enduml
