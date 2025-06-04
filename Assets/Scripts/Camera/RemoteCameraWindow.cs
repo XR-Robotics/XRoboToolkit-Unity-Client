@@ -19,6 +19,7 @@ public class RemoteCameraWindow : MonoBehaviour
     private TcpClient _client;
     private NetworkStream _stream;
     private Texture2D _texture;
+    public Texture2D Texture => _texture;
     private byte[] _imageBuffer;
     private CancellationTokenSource _receiveImageTs = null;
     private Task _imageReceiveTask;

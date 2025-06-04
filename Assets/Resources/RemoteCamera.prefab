@@ -31,7 +31,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8362137610589798988}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
@@ -168,7 +167,6 @@ RectTransform:
   m_Children:
   - {fileID: 1509826188762980571}
   m_Father: {fileID: 6794232223561290217}
-  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -300,7 +298,6 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6794232223561290217}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -352,6 +349,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6794232222909173525}
   - component: {fileID: 6794232222909173523}
+  - component: {fileID: 3273960107523461874}
   m_Layer: 0
   m_Name: RemoteCamera
   m_TagString: Untagged
@@ -366,14 +364,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6794232222909173524}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.003, y: 0.003, z: 0.003}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6794232223561290217}
   m_Father: {fileID: 0}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6794232222909173523
 MonoBehaviour:
@@ -388,6 +386,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   RemoteCameraImage: {fileID: 4887141171940143076}
+--- !u!114 &3273960107523461874
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6794232222909173524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 82fceb499d6cd4c4c8bfa049c3277177, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CanvLE: {fileID: 0}
+  CanvRE: {fileID: 0}
+  remoteCameraWindow: {fileID: 6794232222909173523}
+  matLE: {fileID: 2100000, guid: f0b8a2be536e41e468cffe3539ea4b35, type: 2}
+  matRE: {fileID: 2100000, guid: 4c3fdd4176025204a988e540ce92f58e, type: 2}
 --- !u!1 &6794232223561290216
 GameObject:
   m_ObjectHideFlags: 0
@@ -422,7 +437,6 @@ RectTransform:
   - {fileID: 4887141171940143079}
   - {fileID: 8362137610589798988}
   m_Father: {fileID: 6794232222909173525}
-  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
@@ -446,7 +460,9 @@ Canvas:
   m_OverrideSorting: 0
   m_OverridePixelPerfect: 0
   m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
   m_AdditionalShaderChannelsFlag: 25
+  m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
