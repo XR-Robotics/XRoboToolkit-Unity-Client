@@ -25,9 +25,9 @@ public class RemoteCameraWindow : MonoBehaviour
     private Task _imageReceiveTask;
 
     private int _resolutionWidth = 2160;
-    private int _resolutionHeight = 2160 / 2;
+    private int _resolutionHeight = 2160 / 2*4/3;
     private int _videoFps = 60;
-    private int _bitrate = 10 * 1024 * 1024;
+    private int _bitrate = 40 * 1024 * 1024;
 
     private void Awake()
     {
