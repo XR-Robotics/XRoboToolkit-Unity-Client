@@ -60,14 +60,14 @@ Official SDK for PICO device integration:
 ## Project Configuration
 
 ### Environment Requirements
-- Unity 2021.3.15f1
+- Unity 2022.3.16f1+
 - Android Studio 4.2.2+
 - Android SDK 29
 - Android NDK 21.4.7075529
 - PICO Unity SDK 1.1.0 (Recommended)
 
 ⚠️ **Important Notes**:
-1. Use exact Unity version 2021.3.15f1 to avoid compatibility issues
+1. Use exact Unity version 2022.3.16f1 to avoid compatibility issues
 2. Verify Android SDK/NDK paths in Unity Preferences
 3. Ensure PICO SDK compatibility with Unity version
 4. Complete Android module installation during Unity setup
@@ -192,6 +192,22 @@ ProjectRoot/
   | Pose Data Packet Size       | 56 bytes/frame               |
   | Video Encoding Bitrate      | 2-8 Mbps (dynamic adjustment)|
   | Network Fault Tolerance     | 3 retries + FEC              |
+
+---
+
+### Q&A
+
+- Q: Can not sign the application
+
+![unable_to_sign.png](Docs/unable_to_sign.png)
+
+A: Please refer to this [link](https://developer-cn.picoxr.com/en/document/unity/number-of-apks-associated-with-a-key-exceeds-limit/) for the solution.
+
+- Q: No entitlement info ......
+
+![no_entitlement](Docs/no_entitlement.png)
+
+A: Connect the headset to public internet and run it.
 
 ---
 

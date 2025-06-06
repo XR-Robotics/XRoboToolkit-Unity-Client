@@ -38,21 +38,21 @@ PICO Unity官方SDK，官方下载地址：https://developer.picoxr.com/zh/resou
 
 ## 工程配置
 ### 环境配置
-- Unity 2021.3.15f1
+- Unity 2022.3.16f1+
 - Android Studio 4.2.2
 - Android SDK 29
 - Android NDK 21.4.7075529
 - PICO Unity SDK 1.1.0（推荐）
-（安装Unity 2021.3.15f1过程中，勾选Android配置下载，Unity即可自行完成环境构建）
+（安装Unity 2022.3.16f1过程中，勾选Android配置下载，Unity即可自行完成环境构建）
 
 ### 注意事项 
-- 请优先使用Unity 2021.3.15f1版本，其他版本可能会出现问题。
+- 请优先使用Unity 2022.3.16f1版本，其他版本可能会出现问题。
 - 请确保Android Studio和Android SDK的路径配置正确。
 - 请确保PICO Unity SDK的版本与Unity版本兼容。
 - 请确保PICO Unity SDK的路径配置正确。
 
 ### Unity打包导出APK步骤
-- 请确保Unity的版本为2021.3.15f1。
+- 请确保Unity的版本为2022.3.16f1。
 - 请确保Unity的导出设置为Android平台。
 - 请确保ProjectKey和KeyAlias的配置正确，首次打包请通过Keystore Manager -> Create New。
 - 通过File -> Build Settings中的Build按钮进行导出。(Mac)
