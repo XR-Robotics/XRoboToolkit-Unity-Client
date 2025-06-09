@@ -3,15 +3,58 @@
 ## Project Overview
 `XRoboToolkit-Unity-Client` is a Unity-based software developed for PICO devices to facilitate robot training and remote control. It works in conjunction with PC-side software to achieve robot training and control functionalities.
 
-## Features
-- **Local pose and stereo vision data collection**
-  Synchronously records stereo vision and pose data collected from the XR headset, stored in the device's `/Download` directory.
+## Feature list
 - **Pose sync between XR device and robot PC**
   Transmits pose data from the XR headset to the robot-side PC for robot teleoperation.
+- **Local pose and stereo vision data collection**
+  Synchronously records stereo vision and pose data collected from the XR headset, stored in the device's `/Download` directory.
 - **Remote stereo vision sync between two XR headsets**
   Transmits stereo vision from the robot-side headset to operator-side for 3D display.
 - **Remote stereo vision sync between PC camera and XR headset**
   Transmits stereo vision from the robot-side PC camera to operator-side headset for 3D display.
+## Feature instructions
+
+### Pose sync between XR device and robot PC
+1. Connect robot PC and Pico 4 Ultra under the same network
+2. On robot PC, run service:
+   - **Windows**: Run `C:\Program Files (x86)\PICO Business Suite\runService.bat`
+   - **Linux (Ubuntu/Debian x86)**: Run `/opt/apps/picobusinesssuite/runService.sh`
+3. Open app XR-Robotics-Toolkit-Unity-Sample on Pico 4 Ultra
+
+If the PC service is running successfully, when you open the app on Pico headset, you will receive a prompt window for server connection. Point to the IP address and click it with the trigger button on the controller.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/9b587237-7ae2-4ee9-b6e7-acc890058e05" alt="server_connection" width="387"/>
+</div>
+
+The main panel will display "Working" if connection is established.
+
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/b7fd42cd-6688-4ee9-8b66-a4c781f8a7eb" alt="unity_main_panel" width="394"/>
+</div>
+
+On the main panel, select preferred pose information to be synced, such as head tracking, controller tracking, or body tracking. If your headset and PC have established connection, then the pose data will be synced to PC when "Send Tracking Data" is toggled On. When "Control with A" option toggles On, you may also use "A" button on the right controller to toggle "Send Tracking Data" On or Off during data syncing.
+
+### Local pose and stereo vision data collection
+
+**Note:** At this moment, camera data collection still requires special approval through Pico's enterprise service.
+
+On the main panel, select preferred pose data to be collected, click camera button, and then click Record. You will see a brief blur effect on the screen, record button will turn red, and camera status will turn to 6. When you finish recording, press recording button again to end the collection session. The video files and pose files will be saved on your local headset. You may also click "SaveCameraParams" to save camera intrinsics and extrinsics for the local headset.
+
+### Remote stereo vision sync between two XR headsets
+
+1. Connect both XR headsets to the same network
+2. Make sure that the camera to be used as the camera source has VST camera permission (requires special approval)
+3. Open XR-Robotics-Toolkit-Unity-Sample on both devices
+
+In the display headset (headset 1), remember the IP displayed in the main panel, then click camera button on the bottom right, and hit ListenVRCamera. You will then see a floating big blank screen.
+
+After seeing the blank screen, go to the camera headset (headset 2), click camera button, and then click CameraSendTo. On the pop-up screen, input IP address of the display headset. Then you will see a brief blur effect on the screen, and camera status turns to 6.
+
+You should now be able to see the live camera feed of headset 2 on headset 1. Press B button on the right controller of headset 1 to switch between side-by-side views and stereo-3D views.
+
+### Remote stereo vision sync between PC camera and XR headset
+Soon to be updated.
 
 ## Directory Structure
 
