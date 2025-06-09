@@ -1,7 +1,27 @@
 # XRoboToolkit-Unity-Client Project Documentation
 
 ## Project Overview
-`XRoboToolkit-Unity-Client` is a Unity-based software developed for PICO devices to facilitate robot training and remote control. It works in conjunction with PC-side software to achieve robot training and control functionalities.
+`XRoboToolkit-Unity-Client` is a Unity-based software developed for PICO devices to facilitate robot training and remote teleoperation. It works in conjunction with PC-side software to achieve robot training and teleoperation functionalities.
+
+## Unity UI Main Panel Reference
+
+| Item | Description |
+|------|-------------|
+| SN | Display Serial number of the XR device, only functional with Pico 4 Ultra enterprise version |
+| Client IP | IP address of the XR device |
+| Connect | Connection status between robot and XR device |
+| Server IP | IP address of the robot PC |
+| Head Tracking | Toggle On/Off to send out head 6 DoF pose |
+| Controller | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream |
+| HandTracking | Toggle On/Off to parse hand tracking data in data stream |
+| BodyTracking | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream |
+| Send Tracking Data | Toggle On/Off to sync above selected poses between XR device and robot PC |
+| Control with the A | Toggle On/Off to rapid pause or resume sync with controller button A |
+| FPS | Data syncing frames per second |
+| ListenVRCamera | Open a connection and wait for camera feed from another headset (used on human operator side) |
+| CameraSendTo | Send out camera feed from the VR headset (used when the VR headset serves as robot eyes) |
+| RequestPCCamera | Open a connection and wait for camera feed from a PC camera (Used when a PC stereo camera serves as robot eyes) |
+| SaveCameraParams | Save camera intrinsics and extrinsics in local path |
 
 ## Feature list
 - **Pose sync between XR device and robot PC**
@@ -55,6 +75,7 @@ You should now be able to see the live camera feed of headset 2 on headset 1. Pr
 
 ### Remote stereo vision sync between PC camera and XR headset
 Soon to be updated.
+
 
 ## Directory Structure
 
@@ -233,9 +254,9 @@ ProjectRoot/
 - **Key Performance Metrics**:
   | Metric                     | Value                        |
   |----------------------------|------------------------------|
-  | End-to-End Latency          | <150ms (720P@30FPS)          |
+  | End-to-End Latency          | ~100ms (720P *2 @60FPS)          |
   | Pose Data Packet Size       | 56 bytes/frame               |
-  | Video Encoding Bitrate      | 2-8 Mbps (dynamic adjustment)|
+  | Video Encoding Bitrate      | 5 Mbps                      |
   | Network Fault Tolerance     | 3 retries + FEC              |
 
 ---
