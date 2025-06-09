@@ -4,12 +4,14 @@
 `XRoboToolkit-Unity-Client` is a Unity-based software developed for PICO devices to facilitate robot training and remote control. It works in conjunction with PC-side software to achieve robot training and control functionalities.
 
 ## Features
-- **Training Data Recording**
-  Synchronously records VST images and pose data into MP4 files stored in the device's `/Download` directory.
-- **Robot Remote Control**
-  Transmits device pose data to the PC-side robot for remote control operations.
-- **Image Encoding/Decoding**
-  Encodes VST images from the device for transmission and decodes PC-side images for display.
+- **Local pose and stereo vision data collection**
+  Synchronously records stereo vision and pose data collected from the XR headset, stored in the device's `/Download` directory.
+- **Pose sync between XR device and robot PC**
+  Transmits pose data from the XR headset to the robot-side PC for robot teleoperation.
+- **Remote stereo vision sync between two XR headsets**
+  Transmits stereo vision from the robot-side headset to operator-side for 3D display.
+- **Remote stereo vision sync between PC camera and XR headset**
+  Transmits stereo vision from the robot-side PC camera to operator-side headset for 3D display.
 
 ## Directory Structure
 
