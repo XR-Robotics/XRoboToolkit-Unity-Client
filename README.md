@@ -37,8 +37,8 @@
 ### Pose sync between XR device and robot PC
 1. Connect robot PC and Pico 4 Ultra under the same network
 2. On robot PC, run service:
-   - **Windows**: Run `C:\Program Files (x86)\PICO Business Suite\runService.bat`
-   - **Linux (Ubuntu/Debian x86)**: Run `/opt/apps/picobusinesssuite/runService.sh`
+   - **Windows**: Run `\Program Files (x86)\roboticsservice\runService.bat`
+   - **Linux (Ubuntu/Debian x86)**: Run `/opt/apps/roboticsservice/runService.sh`
 3. Open app XR-Robotics-Toolkit-Unity-Sample on Pico 4 Ultra
 
 If the PC service is running successfully, when you open the app on Pico headset, you will receive a prompt window for server connection. Point to the IP address and click it with the trigger button on the controller.
