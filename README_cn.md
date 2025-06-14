@@ -123,3 +123,7 @@ PICO Unity官方SDK，官方下载地址：https://developer.picoxr.com/zh/resou
 - 位姿数据包大小：56字节/帧
 - 视频编码比特率：动态调整（2-8Mbps）
 - 网络容错：3次重传+前向纠错
+
+### TIP
+### 必要软件
+- PICO企业设置（如遇USB网络分享问题，请联系我们）
