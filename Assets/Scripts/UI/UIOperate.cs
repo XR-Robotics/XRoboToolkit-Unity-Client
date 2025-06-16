@@ -58,6 +58,8 @@ public class UIOperate : MonoBehaviour
         ReconnectBtn.onClick.AddListener(OnReconnectBtn);
         //The shared network function is only available on B-end devices.
         NetshareTog.gameObject.SetActive(false);
+        // Bypass SN checking to enable enterprise service
+        SetDeviceSN("TestDevice");
         bool intEnterprise = PXR_Enterprise.InitEnterpriseService();
         Debug.Log("---InitEnterpriseService :" + intEnterprise);
         PXR_Enterprise.BindEnterpriseService(OnBindEnterpriseService);

@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e08befb1867d8945b4f1ddac43e65c5, type: 3}
   m_Name: PXR_SDKSettingAsset
   m_EditorClassIdentifier: 
-  ignoreSDKSetting: 0
+  ignoreSDKSetting: 1
   doNotShowBuildWarning: 0
   appIDChecked: 0
