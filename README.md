@@ -275,6 +275,10 @@ A: Please refer to this [link](https://developer-cn.picoxr.com/en/document/unity
 
 A: Connect the headset to public internet and run it.
 
+- Q: Failed to connect on Linux.
+
+A: Ensure the PC and headset are in the same WiFi network. Run the 3D application first and then run the Headset App.
+
 ---
 
 For technical support or documentation updates, contact the development team.
