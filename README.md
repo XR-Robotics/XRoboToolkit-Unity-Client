@@ -44,13 +44,13 @@
 If the PC service is running successfully, when you open the app on Pico headset, you will receive a prompt window for server connection. Point to the IP address and click it with the trigger button on the controller.
 
 <div align="center">
-  <img src="Docs/vr_1.png" alt="server_connection" width="387"/>
+  <img src="Docs/server_connection.png" alt="server_connection" width="387"/>
 </div>
 
 The main panel will display "Working" if connection is established.
 
 <div align="center">
-  <img src="Docs/vr_2.png" alt="unity_main_panel" width="394"/>
+  <img src="Docs/unity_main_panel.png" alt="unity_main_panel" width="394"/>
 </div>
 
 On the main panel, select preferred pose information to be synced, such as head tracking, controller tracking, or body tracking. If your headset and PC have established connection, then the pose data will be synced to PC when "Send Tracking Data" is toggled On. When "Control with A" option toggles On, you may also use "A" button on the right controller to toggle "Send Tracking Data" On or Off during data syncing.
