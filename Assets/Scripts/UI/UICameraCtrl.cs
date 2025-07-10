@@ -16,6 +16,11 @@ public partial class UICameraCtrl : MonoBehaviour
     public CustomButton RecordBtn;
     public CustomButton ListenCameraBtn;
     public CustomButton CameraSendToBtn;
+    
+    public CustomButton ListenPCCameraBtn;
+    public Dropdown cameraDropdown;
+
+    public SetLERE setLere;
 
     private JsonData _recordJson;
     public Text CameraStatusText;
@@ -25,8 +30,22 @@ public partial class UICameraCtrl : MonoBehaviour
         RecordBtn.OnChange += OnRecordBtn;
         CameraSendToBtn.OnChange += OnCameraSendToBtn;
         ListenCameraBtn.OnChange += OnListenCameraBtnBtn;
+        ListenPCCameraBtn.OnChange += ListenPCCameraBtnOnOnChange;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
         CameraHandle.AddStateListener(OnCameraStateChanged);
+    }
+    
+    private void ListenPCCameraBtnOnOnChange(bool on)
+    {
+        if (on)
+        {
+            ListenPCCamera();
+        }
+        else
+        {
+            RemoteCameraWindowObj.SetActive(false);
+        }
+        ListenPCCameraBtn.SetOn(on);
     }
 
     private void OnCameraStateChanged(int state)
@@ -77,6 +96,35 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         RemoteCameraWindowObj.SetActive(true);
         RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(1920, 1920 / 2, 60, 20 * 1024 * 1024, 12345);
+        // update shader parameters
+        setLere.ResetRatios();
+    }
+    
+    void UpdateShaderParams()
+    {
+        // default is vr's
+        var visibleRatio = 0.555f;
+        var contentRatio = 1.8f;
+        switch (cameraDropdown.value)
+        {
+            case 0:
+                // zed
+                visibleRatio = 0.4394638240337372f;
+                contentRatio = 1.7048496007919312f;
+                break;
+            default:
+                break;
+        }
+        // Update
+        setLere.UpdateRatios(visibleRatio, contentRatio);
+    }
+    
+    public void ListenPCCamera()
+    {
+        RemoteCameraWindowObj.SetActive(true);
+        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(2560, 720, 60, 4 * 1000 * 1000, 12345);
+        // update shader parameters
+        UpdateShaderParams();
     }
 
     private void OnRecordBtn(bool on)

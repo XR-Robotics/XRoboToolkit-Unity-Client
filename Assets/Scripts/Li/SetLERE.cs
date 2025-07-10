@@ -17,6 +17,20 @@ public class SetLERE : MonoBehaviour
     //private float contentRatio = 0.88f;
     private float visibleRatio = 0.555f;
     private float contentRatio = 1.8f;
+    
+    public void ResetRatios()
+    {
+        visibleRatio = 0.555f;
+        contentRatio = 1.8f;
+        Debug.Log($"Reset - visibleRatio: {visibleRatio} - contentRatio: {contentRatio}");
+    }
+    
+    public void UpdateRatios(float visible, float content)
+    {
+        visibleRatio = visible;
+        contentRatio = content;
+        Debug.Log($"Updated - visibleRatio: {visibleRatio} - contentRatio: {contentRatio}");
+    }
 
     void Update()
     {
