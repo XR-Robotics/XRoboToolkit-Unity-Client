@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.IO;
 using LitJson;
 using Robot;
 using Robot.Conf;
+using Robot.V2.Network;
 using Unity.XR.PICO.TOBSupport;
 using UnityEngine;
 using UnityEngine.UI;
@@ -28,7 +30,10 @@ public partial class UICameraCtrl : MonoBehaviour
 
     public CustomButton listenBtn;
     public VideoSourceManager videoSourceManager;
-
+    
+    public TcpManager tcpManager;
+    private string logTag => "UICameraCtrl";
+    
     private void Awake()
     {
         RecordBtn.OnChange += OnRecordBtn;
@@ -40,6 +45,44 @@ public partial class UICameraCtrl : MonoBehaviour
 
         // Refactoring
         listenBtn.OnChange += OnListenCameraBtn;
+        
+        // Bind event
+        tcpManager.OnServerReceived += OnServerReceived;
+        tcpManager.OnClientReceived += OnClientReceived;
+    }
+    
+    private void OnServerReceived(string s)
+    {
+        // run command based on s
+        Utils.WriteLog(logTag, $"OnServerReceived: {s}");
+        var cmd = TcpCommand.GetCommand(s);
+        switch (cmd)
+        {
+            case Command.StartRobotCameraStream:
+                StartRobotCameraStream();
+                break;
+            case Command.StopRobotCameraStream:
+                StopRobotCameraStream();
+                break;
+            default:
+                break;
+        }
+    }
+    
+    void StartRobotCameraStream()
+    {
+        SendVRCameraToVR(confManager.CONF.peerIP);
+        Utils.WriteLog(logTag, $"StartRobotCameraStream: {confManager.CONF.peerIP}");
+    }
+
+    void StopRobotCameraStream()
+    {
+        Utils.WriteLog(logTag, $"StopRobotCameraStream");
+    }
+    
+    private void OnClientReceived(string msg)
+    {
+        Utils.WriteLog(logTag, $"OnClientReceived: {msg}");
     }
     
     public void OnListenCameraBtn(bool on)
@@ -54,14 +97,9 @@ public partial class UICameraCtrl : MonoBehaviour
         
             // Update camera source, including shaders, etc.
             videoSourceManager.UpdateVideoSource(cameraSource);
-        
-            // Get camera parameters
-            var camPara = VideoSourceConfigManager.Instance.CameraParameters;
-            // start listening to the camera
-            RemoteCameraWindowObj.SetActive(true);
-            // Show camera parameters for debugging
-            Debug.Log($"Listening to camera: {cameraSource}, Width: {camPara.width}, Height: {camPara.height}, FPS: {camPara.fps}, Bitrate: {camPara.bitrate}");
-            RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(camPara.width, camPara.height, camPara.fps, camPara.bitrate, 12345);
+            
+            // send video stream request to the server
+            CameraSendInputDialog.Show(RequestCameraStream);
         }
         else
         {
@@ -69,6 +107,48 @@ public partial class UICameraCtrl : MonoBehaviour
         }
         // Update button
         listenBtn.SetOn(on);
+    }
+
+    public void RequestCameraStream(string ip)
+    {
+        // Close TcpServer
+        TcpManager.Instance.StopServer();
+        // initialize TcpClient
+        TcpManager.Instance.StartClient(ip);
+        
+        // Get camera parameters
+        var camPara = VideoSourceConfigManager.Instance.CameraParameters;
+            
+        // start listening to the camera
+        RemoteCameraWindowObj.SetActive(true);
+        // Show camera parameters for debugging
+        Debug.Log($"Listening to camera: {cameraDropdown.options[cameraDropdown.value].text}, Width: {camPara.width}, Height: {camPara.height}, FPS: {camPara.fps}, Bitrate: {camPara.bitrate}");
+        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(camPara.width, camPara.height, camPara.fps, camPara.bitrate, 12345);
+    }
+    
+    IEnumerator RequestCameraStreamCoroutine(string ip)
+    {
+        // Close TcpServer
+        TcpManager.Instance.StopServer();
+
+        yield return new WaitForSeconds(0.1f);
+        
+        // Get camera parameters
+        var camPara = VideoSourceConfigManager.Instance.CameraParameters;
+        
+        // Start listening to the camera
+        RemoteCameraWindowObj.SetActive(true);
+        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(camPara.width, camPara.height, camPara.fps, camPara.bitrate, 12345);
+        
+        yield return new WaitForSeconds(0.2f);
+        
+        // initialize TcpClient
+        TcpManager.Instance.StartClient(ip);
+        
+        yield return new WaitForSeconds(0.2f);
+        
+        // Send request to the server
+        TcpManager.Instance.ClientSend(TcpCommand.GetString(Command.StartRobotCameraStream));
     }
     
     private void ListenPCCameraBtnOnOnChange(bool on)
