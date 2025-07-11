@@ -36,15 +36,33 @@ namespace Robot.Conf
             // Update video source
             videoSourceConfigManager.SetVideoSource(videoSource);
 
-            // update rect transform size
-            rawImageRect.sizeDelta = new Vector2(videoSourceConfigManager.Width, videoSourceConfigManager.Height);
+            // Get camera parameters
+            var cameraParams = videoSourceConfigManager.CameraParameters;
+            Debug.Log($"Updating video source to: {videoSource.name}");
+            Debug.Log($"Camera Parameters: {cameraParams}");
 
+            // update rect transform size
+            rawImageRect.sizeDelta =
+                new Vector2(videoSourceConfigManager.RectWidth, videoSourceConfigManager.RectHeight);
+            
+            // log rect transform size for debugging
+            Debug.Log($"RawImage RectTransform Size: {rawImageRect.sizeDelta}");
+
+            // Update shader properties
             matLE.SetFloat("_visibleRatio", videoSourceConfigManager.VisibleRatio);
             matRE.SetFloat("_visibleRatio", videoSourceConfigManager.VisibleRatio);
             matLE.SetFloat("_contentRatio", videoSourceConfigManager.ContentRatio);
             matRE.SetFloat("_contentRatio", videoSourceConfigManager.ContentRatio);
             matLE.SetFloat("_heightCompressionFactor", videoSourceConfigManager.HeightCompressionFactor);
             matRE.SetFloat("_heightCompressionFactor", videoSourceConfigManager.HeightCompressionFactor);
+            
+            // log shader properties for debugging
+            Debug.Log($"Shader Properties - Visible Ratio: {videoSourceConfigManager.VisibleRatio}, " +
+                      $"Content Ratio: {videoSourceConfigManager.ContentRatio}, " +
+                      $"Height Compression Factor: {videoSourceConfigManager.HeightCompressionFactor}");
+
+            // Log camera settings for debugging
+            Debug.Log($"Camera Settings - Width: {cameraParams.width}, Height: {cameraParams.height}, FPS: {cameraParams.fps}, Bitrate: {cameraParams.BitrateInMbps:F1}Mbps");
         }
 
         private void OnGUI()

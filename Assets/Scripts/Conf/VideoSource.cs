@@ -91,4 +91,23 @@ public class VideoSource
     {
         return properties.Select(p => p.name).ToList();
     }
+
+    /// <summary>
+    /// Get camera parameters from this video source
+    /// </summary>
+    /// <returns>CameraParameters object with camera settings</returns>
+    public CameraParameters GetCameraParameters()
+    {
+        return CameraParameters.FromVideoSource(this);
+    }
+
+    /// <summary>
+    /// Get a property value as int (common use case)
+    /// </summary>
+    /// <param name="propertyName">Name of the property</param>
+    /// <returns>The int value or 0 if not found</returns>
+    public int GetIntProperty(string propertyName)
+    {
+        return GetPropertyValue<int>(propertyName);
+    }
 }

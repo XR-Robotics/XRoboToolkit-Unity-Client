@@ -19,8 +19,23 @@
       type: "string"
       description: "Size of the RawImage rectangle for the stereo view"
       value: "585.6x282.6"
-
-
+    - name: "CamWidth"
+      type: "int"
+      description: "Camera width for the video stream"
+      value: 1920
+    - name: "CamHeight"
+      type: "int"
+      description: "Camera height for the video stream"
+      value: 960
+    - name: "CamFPS"
+      type: "int"
+      description: "Frame rate of the video stream in FPS"
+      value: 60
+    - name: "CamBitrate"
+      type: "int"
+      description: "Bitrate of the video stream in Kbps"
+      value: 20971520 # 20 x 1024 x 1024
+  
 - name: "ZEDMINI"
   type: "ZED"
   description: "ZED MINI Video Stream Source"
@@ -41,3 +56,19 @@
       type: "string"
       description: "Size of the RawImage rectangle for the stereo view"
       value: "600x168.75"
+    - name: "CamWidth"
+      type: "int"
+      description: "Camera width for the video stream"
+      value: 2560
+    - name: "CamHeight"
+      type: "int"
+      description: "Camera height for the video stream"
+      value: 720
+    - name: "CamFPS"
+      type: "int"
+      description: "Frame rate of the video stream in FPS"
+      value: 60
+    - name: "CamBitrate"
+      type: "int"
+      description: "Bitrate of the video stream in Kbps"
+      value: 4000000 # 20 x 1024 x 1024

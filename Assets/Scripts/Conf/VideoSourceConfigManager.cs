@@ -6,7 +6,8 @@ using UnityEngine;
 
 public class VideoSourceConfigManager : MonoBehaviour
 {
-    [Header("Configuration")] [SerializeField]
+    [Header("Configuration")]
+    [SerializeField]
     private string yamlFileName = "video_source.yml";
 
     private Dictionary<string, VideoSource> videoSources;
@@ -217,12 +218,29 @@ public class VideoSourceConfigManager : MonoBehaviour
         Debug.Log($"PICO4U.contentRatio: {GetFloatProperty("PICO4U.contentRatio")}");
         Debug.Log($"PICO4U.heightCompressionFactor: {GetFloatProperty("PICO4U.heightCompressionFactor")}");
         Debug.Log($"PICO4U.RawImageRectSize: {GetStringProperty("PICO4U.RawImageRectSize")}");
+        Debug.Log($"PICO4U.CamWidth: {GetIntProperty("PICO4U.CamWidth")}");
+        Debug.Log($"PICO4U.CamHeight: {GetIntProperty("PICO4U.CamHeight")}");
+        Debug.Log($"PICO4U.CamFPS: {GetIntProperty("PICO4U.CamFPS")}");
+        Debug.Log($"PICO4U.CamBitrate: {GetIntProperty("PICO4U.CamBitrate")}");
 
         // Test accessing ZEDMINI properties
         Debug.Log($"ZEDMINI.visibleRatio: {GetFloatProperty("ZEDMINI.visibleRatio")}");
         Debug.Log($"ZEDMINI.contentRatio: {GetFloatProperty("ZEDMINI.contentRatio")}");
         Debug.Log($"ZEDMINI.heightCompressionFactor: {GetFloatProperty("ZEDMINI.heightCompressionFactor")}");
         Debug.Log($"ZEDMINI.RawImageRectSize: {GetStringProperty("ZEDMINI.RawImageRectSize")}");
+        Debug.Log($"ZEDMINI.CamWidth: {GetIntProperty("ZEDMINI.CamWidth")}");
+        Debug.Log($"ZEDMINI.CamHeight: {GetIntProperty("ZEDMINI.CamHeight")}");
+        Debug.Log($"ZEDMINI.CamFPS: {GetIntProperty("ZEDMINI.CamFPS")}");
+        Debug.Log($"ZEDMINI.CamBitrate: {GetIntProperty("ZEDMINI.CamBitrate")}");
+
+        // Test camera parameters
+        SetVideoSource("PICO4U");
+        var pico4uCamParams = CameraParameters;
+        Debug.Log($"PICO4U Camera Parameters: {pico4uCamParams}");
+
+        SetVideoSource("ZEDMINI");
+        var zedminiCamParams = CameraParameters;
+        Debug.Log($"ZEDMINI Camera Parameters: {zedminiCamParams}");
 
         // Test checking if properties exist
         Debug.Log($"Has PICO4U.visibleRatio: {HasProperty("PICO4U.visibleRatio")}");
@@ -269,8 +287,33 @@ public class VideoSourceConfigManager : MonoBehaviour
     public float ContentRatio => CurrentVideoSource?.GetFloatProperty("contentRatio") ?? 0f;
     public float HeightCompressionFactor => CurrentVideoSource?.GetFloatProperty("heightCompressionFactor") ?? 0f;
     public string RawImageRectSize => CurrentVideoSource?.GetStringProperty("RawImageRectSize") ?? string.Empty;
-    
-    public float Width
+
+    /// <summary>
+    /// Get camera parameters from the current video source
+    /// </summary>
+    public CameraParameters CameraParameters => CurrentVideoSource?.GetCameraParameters() ?? new CameraParameters();
+
+    /// <summary>
+    /// Get camera width from the current video source
+    /// </summary>
+    public int CamWidth => CurrentVideoSource?.GetIntProperty("CamWidth") ?? 1920;
+
+    /// <summary>
+    /// Get camera height from the current video source
+    /// </summary>
+    public int CamHeight => CurrentVideoSource?.GetIntProperty("CamHeight") ?? 1080;
+
+    /// <summary>
+    /// Get camera FPS from the current video source
+    /// </summary>
+    public int CamFPS => CurrentVideoSource?.GetIntProperty("CamFPS") ?? 30;
+
+    /// <summary>
+    /// Get camera bitrate from the current video source
+    /// </summary>
+    public int CamBitrate => CurrentVideoSource?.GetIntProperty("CamBitrate") ?? 5000000;
+
+    public float RectWidth
     {
         get
         {
@@ -285,7 +328,7 @@ public class VideoSourceConfigManager : MonoBehaviour
         }
     }
 
-    public float Height
+    public float RectHeight
     {
         get
         {
