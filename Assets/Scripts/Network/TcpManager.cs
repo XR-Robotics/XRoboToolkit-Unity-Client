@@ -14,9 +14,10 @@ namespace Robot.V2.Network
         private string serverTag = "TcpManager - TcpServer(C#)";
         private string clientTag = "TcpManager - TcpClient(C#)";
 
-        public System.Action<string> OnServerReceived;
+        // public System.Action<string> OnServerReceived;
+        public System.Action<byte[]> OnServerReceived;
         public System.Action<string> OnClientReceived;
-        
+
         public static TcpManager Instance { get; private set; }
 
         private void Awake()
@@ -48,9 +49,11 @@ namespace Robot.V2.Network
             tcpClient.OnDisconnected += TcpClientOnOnDisconnected;
             tcpClient.OnDataReceived += TcpClientOnOnDataReceived;
             tcpClient.OnError += TcpClientOnOnError;
-            
+
+#if !UNITY_EDITOR
             // Start server by default
             StartServer();
+#endif
         }
 
         private void OnDestroy()
@@ -74,15 +77,32 @@ namespace Robot.V2.Network
             Utils.WriteLog(serverTag, msg);
         }
 
+        // private void OnDataReceived(byte[] data, int length)
+        // {
+        //     var s = Encoding.UTF8.GetString(data);
+        //
+        //     // Refer: https://github.com/googleads/googleads-mobile-unity/blob/master/samples/HelloWorld/Assets/Scripts/GoogleAdMobController.cs#L63
+        //     // Use EventExecutor to schedule these calls on the next Update() loop.
+        //     EventExecutor.ExecuteInUpdate(() => { OnServerReceived.Invoke(s); });
+        //
+        //     Utils.WriteLog(serverTag, $"data: {s} length: {length}");
+        // }
+
         private void OnDataReceived(byte[] data, int length)
         {
-            var s = Encoding.UTF8.GetString(data);
-
             // Refer: https://github.com/googleads/googleads-mobile-unity/blob/master/samples/HelloWorld/Assets/Scripts/GoogleAdMobController.cs#L63
             // Use EventExecutor to schedule these calls on the next Update() loop.
-            EventExecutor.ExecuteInUpdate(() => { OnServerReceived.Invoke(s); });
 
-            Utils.WriteLog(serverTag, $"data: {s} length: {length}");
+            try
+            {
+                EventExecutor.ExecuteInUpdate(() => { OnServerReceived.Invoke(data); });
+
+                Utils.WriteLog(serverTag, $"data: {data.Length} length: {length}");
+            }
+            catch (Exception e)
+            {
+                Utils.WriteLog(serverTag, $"exception: {e.Message} {e.StackTrace}");
+            }
         }
 
         private void OnClientDisconnected()
@@ -155,6 +175,12 @@ namespace Robot.V2.Network
         {
             Utils.WriteLog(clientTag, $"Send: {s}");
             TcpClient.Send(Encoding.UTF8.GetBytes(s));
+        }
+
+        public void ClientSend(byte[] data)
+        {
+            Utils.WriteLog(clientTag, $"Send: {data.Length} bytes");
+            TcpClient.Send(data);
         }
 
         #endregion

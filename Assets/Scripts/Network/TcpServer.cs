@@ -45,7 +45,7 @@ namespace Robot.V2.Network
 
         public static void StopServer()
         {
-            GetJavaObject().Call("stopTCPServer");
+            GetJavaObject().Call("stopServer");
         }
 
         // JNI callback methods
