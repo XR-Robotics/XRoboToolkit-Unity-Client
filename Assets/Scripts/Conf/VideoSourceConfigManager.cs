@@ -6,8 +6,8 @@ using UnityEngine;
 
 public class VideoSourceConfigManager : MonoBehaviour
 {
-    [Header("Configuration")]
-    [SerializeField] private string yamlFileName = "video_source.yml";
+    [Header("Configuration")] [SerializeField]
+    private string yamlFileName = "video_source.yml";
 
     private Dictionary<string, VideoSource> videoSources;
     private bool isInitialized = false;
@@ -105,7 +105,8 @@ public class VideoSourceConfigManager : MonoBehaviour
         string[] parts = propertyPath.Split('.');
         if (parts.Length != 2)
         {
-            Debug.LogWarning($"Invalid property path format: {propertyPath}. Expected format: 'VideoSourceName.PropertyName'");
+            Debug.LogWarning(
+                $"Invalid property path format: {propertyPath}. Expected format: 'VideoSourceName.PropertyName'");
             return default(T);
         }
 
@@ -226,5 +227,76 @@ public class VideoSourceConfigManager : MonoBehaviour
         // Test checking if properties exist
         Debug.Log($"Has PICO4U.visibleRatio: {HasProperty("PICO4U.visibleRatio")}");
         Debug.Log($"Has PICO4U.nonExistentProperty: {HasProperty("PICO4U.nonExistentProperty")}");
+    }
+
+    public VideoSource PICO4U
+    {
+        get => GetVideoSource("PICO4U");
+    }
+
+    public VideoSource ZEDMINI
+    {
+        get => GetVideoSource("ZEDMINI");
+    }
+
+    private VideoSource _currentVideoSource;
+
+    public VideoSource CurrentVideoSource
+    {
+        get
+        {
+            // If no current video source is set, default to PICO4U
+            if (_currentVideoSource == null && isInitialized)
+            {
+                _currentVideoSource = GetVideoSource("PICO4U");
+            }
+
+            return _currentVideoSource;
+        }
+    }
+
+    public void SetVideoSource(VideoSource videoSource)
+    {
+        _currentVideoSource = videoSource;
+    }
+
+    public void SetVideoSource(string videoSourceName)
+    {
+        _currentVideoSource = GetVideoSource(videoSourceName);
+    }
+
+    public float VisibleRatio => CurrentVideoSource?.GetFloatProperty("visibleRatio") ?? 0f;
+    public float ContentRatio => CurrentVideoSource?.GetFloatProperty("contentRatio") ?? 0f;
+    public float HeightCompressionFactor => CurrentVideoSource?.GetFloatProperty("heightCompressionFactor") ?? 0f;
+    public string RawImageRectSize => CurrentVideoSource?.GetStringProperty("RawImageRectSize") ?? string.Empty;
+    
+    public float Width
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(RawImageRectSize))
+                return 0f;
+
+            string[] parts = RawImageRectSize.Split('x');
+            if (parts.Length < 2 || !float.TryParse(parts[0], out float width))
+                return 0f;
+
+            return width;
+        }
+    }
+
+    public float Height
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(RawImageRectSize))
+                return 0f;
+
+            string[] parts = RawImageRectSize.Split('x');
+            if (parts.Length < 2 || !float.TryParse(parts[1], out float height))
+                return 0f;
+
+            return height;
+        }
     }
 }

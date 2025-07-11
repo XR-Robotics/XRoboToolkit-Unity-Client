@@ -435,10 +435,77 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 284952129}
   m_CullTransparentMesh: 1
+--- !u!1 &310954446
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 310954447}
+  - component: {fileID: 310954449}
+  - component: {fileID: 310954450}
+  m_Layer: 0
+  m_Name: Conf
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &310954447
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310954446}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &310954449
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310954446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa97833daa9f443458d469250d214754, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  yamlFileName: video_source.yml
+--- !u!114 &310954450
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 310954446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e9a55ec5231140a2b2baf80c06e93522, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rawImageRect: {fileID: 318734919}
+  matLE: {fileID: 2100000, guid: f0b8a2be536e41e468cffe3539ea4b35, type: 2}
+  matRE: {fileID: 2100000, guid: 4c3fdd4176025204a988e540ce92f58e, type: 2}
+  videoSourceConfigManager: {fileID: 310954449}
 --- !u!1 &316090399 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7299773526600324663, guid: dd642571209dae844a5e4c97fee0654b, type: 3}
   m_PrefabInstance: {fileID: 1808284588}
+  m_PrefabAsset: {fileID: 0}
+--- !u!224 &318734919 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 4887141171940143079, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
+  m_PrefabInstance: {fileID: 950193329985917559}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &517948296
 GameObject:
@@ -2271,6 +2338,14 @@ PrefabInstance:
       propertyPath: CanvRE
       value: 
       objectReference: {fileID: 1215458335}
+    - target: {fileID: 4887141171940143079, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 600
+      objectReference: {fileID: 0}
+    - target: {fileID: 4887141171940143079, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 168.75
+      objectReference: {fileID: 0}
     - target: {fileID: 6794232222909173524, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
       propertyPath: m_Name
       value: RemoteCamera
@@ -2958,3 +3033,4 @@ SceneRoots:
   - {fileID: 2067931205}
   - {fileID: 1438736238}
   - {fileID: 1215458336}
+  - {fileID: 310954447}

@@ -86,8 +86,9 @@ Shader "Custom/SampleRT"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _HeightCompressionFactor ("Height Compression", Range(0.8, 1.5)) = 1.25
-        _visibleRatio ("Visible Ratio", Range(0.0, 1.0)) = 1.0
+        _visibleRatio ("Visible Ratio", Range(0.0, 2.0)) = 1.0
+        _contentRatio ("Content Ratio", Range(0.0, 2.0)) = 0.555
+        _heightCompressionFactor ("Height Compression", Range(0.0, 2.0)) = 1.25
     }
     SubShader
     {
@@ -115,7 +116,7 @@ Shader "Custom/SampleRT"
             int _isLE;
             float _contentRatio;
             float _visibleRatio;
-            float _HeightCompressionFactor;
+            float _heightCompressionFactor;
             
             v2f vert (appdata v)
             {
@@ -162,7 +163,7 @@ Shader "Custom/SampleRT"
                 float2 new_uv = i.uv;
                 
                 // Apply height compression
-                new_uv.y = (new_uv.y - 0.5) * _HeightCompressionFactor + 0.5;
+                new_uv.y = (new_uv.y - 0.5) * _heightCompressionFactor + 0.5;
                 
                 if(_isLE == 1) // Left eye
                 {
