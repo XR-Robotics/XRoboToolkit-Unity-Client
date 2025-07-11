@@ -1,0 +1,43 @@
+﻿# Video Stream Source Configuration
+- name: "PICO4U"
+  type: "VR"
+  description: "PICO4U Video Stream Source"
+  properties:
+    - name: "visibleRatio"
+      type: "float"
+      description: "Visible ratio for the shader"
+      value: 0.555
+    - name: "contentRatio"
+      type: "float"
+      description: "Content ratio for the shader"
+      value: 1.8
+    - name: "heightCompressionFactor"
+      type: "float"
+      description: "Height compression factor for the shader"
+      value: 1.333333 # 4/3
+    - name: "RawImageRectSize"
+      type: "string"
+      description: "Size of the RawImage rectangle for the stereo view"
+      value: "585.6x282.6"
+
+
+- name: "ZEDMINI"
+  type: "ZED"
+  description: "ZED MINI Video Stream Source"
+  properties:
+    - name: "visibleRatio"
+      type: "float"
+      description: "Visible ratio for the shader"
+      value: 0.439464
+    - name: "contentRatio"
+      type: "float"
+      description: "Content ratio for the shader"
+      value: 1.704850
+    - name: "heightCompressionFactor"
+      type: "float"
+      description: "Frame rate of the video stream in FPS"
+      value: 1.777778 # 16/9
+    - name: "RawImageRectSize"
+      type: "string"
+      description: "Size of the RawImage rectangle for the stereo view"
+      value: "600x168.75"

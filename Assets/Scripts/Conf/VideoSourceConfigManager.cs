@@ -1,0 +1,230 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+
+public class VideoSourceConfigManager : MonoBehaviour
+{
+    [Header("Configuration")]
+    [SerializeField] private string yamlFileName = "video_source.yml";
+
+    private Dictionary<string, VideoSource> videoSources;
+    private bool isInitialized = false;
+
+    /// <summary>
+    /// Singleton instance
+    /// </summary>
+    public static VideoSourceConfigManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+            Initialize();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    /// <summary>
+    /// Initialize the configuration manager by loading and parsing the YAML file
+    /// </summary>
+    public void Initialize()
+    {
+        try
+        {
+            videoSources = new Dictionary<string, VideoSource>();
+
+            // Construct the path to the YAML file
+            string yamlPath = Path.Combine(Application.streamingAssetsPath, "Conf", yamlFileName);
+
+            // If not in StreamingAssets, try Assets/Scripts/Conf
+            if (!File.Exists(yamlPath))
+            {
+                yamlPath = Path.Combine(Application.dataPath, "Scripts", "Conf", yamlFileName);
+            }
+
+            // Parse the YAML file
+            var parsedVideoSources = VideoSourceYamlParser.ParseYamlFile(yamlPath);
+
+            // Convert to dictionary for fast lookup
+            foreach (var videoSource in parsedVideoSources)
+            {
+                if (!string.IsNullOrEmpty(videoSource.name))
+                {
+                    videoSources[videoSource.name.ToUpper()] = videoSource;
+                }
+            }
+
+            isInitialized = true;
+            Debug.Log($"VideoSourceConfigManager initialized successfully. Loaded {videoSources.Count} video sources.");
+
+            // Log loaded video sources
+            foreach (var kvp in videoSources)
+            {
+                Debug.Log($"Loaded video source: {kvp.Key} with {kvp.Value.properties.Count} properties");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to initialize VideoSourceConfigManager: {e.Message}");
+            isInitialized = false;
+        }
+    }
+
+    /// <summary>
+    /// Get a video source by name
+    /// </summary>
+    /// <param name="name">Name of the video source (case-insensitive)</param>
+    /// <returns>VideoSource object or null if not found</returns>
+    public VideoSource GetVideoSource(string name)
+    {
+        if (!isInitialized || string.IsNullOrEmpty(name))
+            return null;
+
+        string upperName = name.ToUpper();
+        return videoSources.ContainsKey(upperName) ? videoSources[upperName] : null;
+    }
+
+    /// <summary>
+    /// Get a property value using dot notation (e.g., "PICO4U.visibleRatio")
+    /// </summary>
+    /// <typeparam name="T">The type to convert to</typeparam>
+    /// <param name="propertyPath">Property path in format "VideoSourceName.PropertyName"</param>
+    /// <returns>The typed value or default if not found</returns>
+    public T GetProperty<T>(string propertyPath)
+    {
+        if (!isInitialized || string.IsNullOrEmpty(propertyPath))
+            return default(T);
+
+        string[] parts = propertyPath.Split('.');
+        if (parts.Length != 2)
+        {
+            Debug.LogWarning($"Invalid property path format: {propertyPath}. Expected format: 'VideoSourceName.PropertyName'");
+            return default(T);
+        }
+
+        string videoSourceName = parts[0];
+        string propertyName = parts[1];
+
+        var videoSource = GetVideoSource(videoSourceName);
+        if (videoSource == null)
+        {
+            Debug.LogWarning($"Video source not found: {videoSourceName}");
+            return default(T);
+        }
+
+        return videoSource.GetPropertyValue<T>(propertyName);
+    }
+
+    /// <summary>
+    /// Get a float property using dot notation
+    /// </summary>
+    /// <param name="propertyPath">Property path in format "VideoSourceName.PropertyName"</param>
+    /// <returns>The float value or 0 if not found</returns>
+    public float GetFloatProperty(string propertyPath)
+    {
+        return GetProperty<float>(propertyPath);
+    }
+
+    /// <summary>
+    /// Get a string property using dot notation
+    /// </summary>
+    /// <param name="propertyPath">Property path in format "VideoSourceName.PropertyName"</param>
+    /// <returns>The string value or empty string if not found</returns>
+    public string GetStringProperty(string propertyPath)
+    {
+        return GetProperty<string>(propertyPath) ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Get an int property using dot notation
+    /// </summary>
+    /// <param name="propertyPath">Property path in format "VideoSourceName.PropertyName"</param>
+    /// <returns>The int value or 0 if not found</returns>
+    public int GetIntProperty(string propertyPath)
+    {
+        return GetProperty<int>(propertyPath);
+    }
+
+    /// <summary>
+    /// Check if a property exists using dot notation
+    /// </summary>
+    /// <param name="propertyPath">Property path in format "VideoSourceName.PropertyName"</param>
+    /// <returns>True if the property exists</returns>
+    public bool HasProperty(string propertyPath)
+    {
+        if (!isInitialized || string.IsNullOrEmpty(propertyPath))
+            return false;
+
+        string[] parts = propertyPath.Split('.');
+        if (parts.Length != 2)
+            return false;
+
+        string videoSourceName = parts[0];
+        string propertyName = parts[1];
+
+        var videoSource = GetVideoSource(videoSourceName);
+        return videoSource?.HasProperty(propertyName) ?? false;
+    }
+
+    /// <summary>
+    /// Get all video source names
+    /// </summary>
+    /// <returns>List of video source names</returns>
+    public List<string> GetVideoSourceNames()
+    {
+        return isInitialized ? videoSources.Keys.ToList() : new List<string>();
+    }
+
+    /// <summary>
+    /// Get all property names for a video source
+    /// </summary>
+    /// <param name="videoSourceName">Name of the video source</param>
+    /// <returns>List of property names</returns>
+    public List<string> GetPropertyNames(string videoSourceName)
+    {
+        var videoSource = GetVideoSource(videoSourceName);
+        return videoSource?.GetPropertyNames() ?? new List<string>();
+    }
+
+    /// <summary>
+    /// Reload the configuration from the YAML file
+    /// </summary>
+    public void Reload()
+    {
+        Initialize();
+    }
+
+    // Example usage methods for testing
+    [ContextMenu("Test Configuration")]
+    private void TestConfiguration()
+    {
+        if (!isInitialized)
+        {
+            Debug.LogWarning("Configuration not initialized");
+            return;
+        }
+
+        // Test accessing PICO4U properties
+        Debug.Log($"PICO4U.visibleRatio: {GetFloatProperty("PICO4U.visibleRatio")}");
+        Debug.Log($"PICO4U.contentRatio: {GetFloatProperty("PICO4U.contentRatio")}");
+        Debug.Log($"PICO4U.heightCompressionFactor: {GetFloatProperty("PICO4U.heightCompressionFactor")}");
+        Debug.Log($"PICO4U.RawImageRectSize: {GetStringProperty("PICO4U.RawImageRectSize")}");
+
+        // Test accessing ZEDMINI properties
+        Debug.Log($"ZEDMINI.visibleRatio: {GetFloatProperty("ZEDMINI.visibleRatio")}");
+        Debug.Log($"ZEDMINI.contentRatio: {GetFloatProperty("ZEDMINI.contentRatio")}");
+        Debug.Log($"ZEDMINI.heightCompressionFactor: {GetFloatProperty("ZEDMINI.heightCompressionFactor")}");
+        Debug.Log($"ZEDMINI.RawImageRectSize: {GetStringProperty("ZEDMINI.RawImageRectSize")}");
+
+        // Test checking if properties exist
+        Debug.Log($"Has PICO4U.visibleRatio: {HasProperty("PICO4U.visibleRatio")}");
+        Debug.Log($"Has PICO4U.nonExistentProperty: {HasProperty("PICO4U.nonExistentProperty")}");
+    }
+}
