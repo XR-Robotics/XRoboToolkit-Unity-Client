@@ -13,6 +13,14 @@ namespace Robot.Conf
 
         public VideoSourceConfigManager videoSourceConfigManager;
 
+        public void UpdateVideoSource(string videoSourceName)
+        {
+            var videoSource = videoSourceConfigManager.GetVideoSource(videoSourceName);
+            if (videoSource == null) return;
+            
+            UpdateVideoSource(videoSource);
+        }
+
         public void UpdateVideoSource(VideoSource videoSource)
         {
             if (videoSourceConfigManager == null)

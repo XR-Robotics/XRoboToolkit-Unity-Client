@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using LitJson;
 using Robot;
+using Robot.Conf;
 using Unity.XR.PICO.TOBSupport;
 using UnityEngine;
 using UnityEngine.UI;
@@ -25,6 +26,9 @@ public partial class UICameraCtrl : MonoBehaviour
     private JsonData _recordJson;
     public Text CameraStatusText;
 
+    public CustomButton listenBtn;
+    public VideoSourceManager videoSourceManager;
+
     private void Awake()
     {
         RecordBtn.OnChange += OnRecordBtn;
@@ -33,6 +37,38 @@ public partial class UICameraCtrl : MonoBehaviour
         ListenPCCameraBtn.OnChange += ListenPCCameraBtnOnOnChange;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
         CameraHandle.AddStateListener(OnCameraStateChanged);
+
+        // Refactoring
+        listenBtn.OnChange += OnListenCameraBtn;
+    }
+    
+    public void OnListenCameraBtn(bool on)
+    {
+        if (on)
+        {
+            // check if the dropdown is updated
+            if (cameraDropdown.options == null || cameraDropdown.options.Count == 0) return;
+        
+            // get the camera source from the dropdown
+            var cameraSource = cameraDropdown.options[cameraDropdown.value].text;
+        
+            // Update camera source, including shaders, etc.
+            videoSourceManager.UpdateVideoSource(cameraSource);
+        
+            // Get camera parameters
+            var camPara = VideoSourceConfigManager.Instance.CameraParameters;
+            // start listening to the camera
+            RemoteCameraWindowObj.SetActive(true);
+            // Show camera parameters for debugging
+            Debug.Log($"Listening to camera: {cameraSource}, Width: {camPara.width}, Height: {camPara.height}, FPS: {camPara.fps}, Bitrate: {camPara.bitrate}");
+            RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(camPara.width, camPara.height, camPara.fps, camPara.bitrate, 12345);
+        }
+        else
+        {
+            RemoteCameraWindowObj.SetActive(false);
+        }
+        // Update button
+        listenBtn.SetOn(on);
     }
     
     private void ListenPCCameraBtnOnOnChange(bool on)

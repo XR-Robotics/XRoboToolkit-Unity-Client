@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Robot;
+using Robot.Conf;
 using Unity.XR.PICO.TOBSupport;
 using Unity.XR.PXR;
 using UnityEngine;
@@ -33,6 +34,13 @@ public class UIOperate : MonoBehaviour
     public GameObject IpInputDialog;
     public GameObject ExtDevPanel;
     public InputActionProperty SendDataAction;
+
+    [Space(30)]
+    [Header("Refactoring")]
+    public VideoSourceManager videoSource;
+    public VideoSourceConfigManager sourceConfig => videoSource.videoSourceConfigManager;
+
+    public Dropdown videoSourceDropdown;
 
     // Start is called before the first frame update
     private void Awake()
@@ -73,6 +81,18 @@ public class UIOperate : MonoBehaviour
 #if UNITY_EDITOR
         SetDeviceSN("TestDevice");
 #endif
+        // Refactoring
+        sourceConfig.OnInitialized += OnSourceConfigOnOnInitialized;
+        // Reload because of the component loading order
+        sourceConfig.Reload();
+    }
+
+    private void OnSourceConfigOnOnInitialized()
+    {
+        // Update videoSourceDropdown options
+        print("OnSourceConfigOnOnInitialized");
+        videoSourceDropdown.ClearOptions();
+        videoSourceDropdown.AddOptions(sourceConfig.GetVideoSourceNames());
     }
 
     private void OnAndroidCallBack(string key, string value)

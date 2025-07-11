@@ -447,7 +447,7 @@ GameObject:
   - component: {fileID: 310954449}
   - component: {fileID: 310954450}
   m_Layer: 0
-  m_Name: Conf
+  m_Name: CameraSource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2029,7 +2029,7 @@ GameObject:
   - component: {fileID: 1941150743}
   - component: {fileID: 1941150745}
   m_Layer: 5
-  m_Name: ListenPCCamera
+  m_Name: Listen
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2534,6 +2534,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 6009550096432242020}
     - target: {fileID: 1639825708, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
+      propertyPath: listenBtn
+      value: 
+      objectReference: {fileID: 1941150745}
+    - target: {fileID: 1639825708, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: cameraDropdown
       value: 
       objectReference: {fileID: 1353258512}
@@ -2541,6 +2545,10 @@ PrefabInstance:
       propertyPath: ListenPCCameraBtn
       value: 
       objectReference: {fileID: 1941150745}
+    - target: {fileID: 1639825708, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
+      propertyPath: videoSourceManager
+      value: 
+      objectReference: {fileID: 310954450}
     - target: {fileID: 1639825708, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: RemoteCameraWindowObj
       value: 
@@ -2593,29 +2601,33 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2192582808336293037, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 136.61
       objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 0
+      value: 36.4
       objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 72.07
       objectReference: {fileID: 0}
     - target: {fileID: 2336977272659034523, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -118.37001
       objectReference: {fileID: 0}
     - target: {fileID: 3127640432959340674, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
       propertyPath: m_AnchorMax.y
@@ -3001,7 +3013,7 @@ PrefabInstance:
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 1457360020, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}
-      insertIndex: 2
+      insertIndex: -1
       addedObject: {fileID: 1285338312}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: af427df38a331e64ca24c6265de5fdbb, type: 3}

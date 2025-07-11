@@ -12,6 +12,9 @@ public class VideoSourceConfigManager : MonoBehaviour
 
     private Dictionary<string, VideoSource> videoSources;
     private bool isInitialized = false;
+    
+    // Event
+    public event Action OnInitialized;
 
     /// <summary>
     /// Singleton instance
@@ -43,6 +46,11 @@ public class VideoSourceConfigManager : MonoBehaviour
 
             // Construct the path to the YAML file
             string yamlPath = Path.Combine(Application.streamingAssetsPath, "Conf", yamlFileName);
+            
+            // Load file from Application folder on Android
+            #if !UNITY_EDITOR
+                yamlPath = Path.Combine(Application.persistentDataPath, yamlFileName);
+            #endif
 
             // If not in StreamingAssets, try Assets/Scripts/Conf
             if (!File.Exists(yamlPath))
@@ -70,6 +78,8 @@ public class VideoSourceConfigManager : MonoBehaviour
             {
                 Debug.Log($"Loaded video source: {kvp.Key} with {kvp.Value.properties.Count} properties");
             }
+            
+            OnInitialized?.Invoke();
         }
         catch (Exception e)
         {
