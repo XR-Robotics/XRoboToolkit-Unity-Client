@@ -61,18 +61,14 @@ public partial class UICameraCtrl : MonoBehaviour
         Utils.WriteLog(logTag, $"Received camera config: {cameraConfig}");
 
         // The stream only works for the VR headset
-        if (cameraConfig.type.Equals("VR"))
-        {
-            // Dispatch on main thread for Unity components
-            UnityMainThreadDispatcher.Instance().Enqueue(() =>
-            {
-                CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
-                    cameraConfig.bitrate, cameraConfig.enableMvHevc,
-                    cameraConfig.renderMode,
-                    () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
-                CameraSendToBtn.SetOn(true);
-            });
-        }
+        // if (cameraConfig.type.Equals("VR"))
+        // {
+            CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
+                cameraConfig.bitrate, cameraConfig.enableMvHevc,
+                cameraConfig.renderMode,
+                () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
+            CameraSendToBtn.SetOn(true);
+        // }
     }
 
     private void OnClientReceived(string msg)
@@ -127,10 +123,12 @@ public partial class UICameraCtrl : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        // initialize TcpClient
+        // initialize TcpClient, server IP is the video source IP
         TcpManager.Instance.StartClient(ip);
 
         yield return new WaitForSeconds(0.5f);
+
+        var localIP = Utils.GetLocalIPv4();
 
         // Send request to the server
         var customConfig = CameraRequestSerializer.FromCameraParameters(
@@ -138,7 +136,7 @@ public partial class UICameraCtrl : MonoBehaviour
             0,
             2, // (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D
             VideoSourceConfigManager.Instance.CurrentVideoSource.type,
-            ip,
+            localIP, // local ip
             streamingPort);
 
         var data = CameraRequestSerializer.Serialize(customConfig);
