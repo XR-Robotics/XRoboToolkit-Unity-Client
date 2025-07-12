@@ -48,6 +48,7 @@ namespace Robot.Conf
             var cameraParams = videoSourceConfigManager.CameraParameters;
             Debug.Log($"Updating video source to: {videoSource.name}");
             Debug.Log($"Camera Parameters: {cameraParams}");
+            Debug.Log($"type: {videoSource.camera}");
 
             // update rect transform size
             rawImageRect.sizeDelta =

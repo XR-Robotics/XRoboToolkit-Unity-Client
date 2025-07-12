@@ -94,7 +94,7 @@ public class VideoSourceConfigExample : MonoBehaviour
         VideoSource pico4u = configManager.GetVideoSource("PICO4U");
         if (pico4u != null)
         {
-            Debug.Log($"VideoSource: {pico4u.name}, Type: {pico4u.type}, Description: {pico4u.description}");
+            Debug.Log($"VideoSource: {pico4u.name}, Type: {pico4u.camera}, Description: {pico4u.description}");
             Debug.Log($"Properties count: {pico4u.properties.Count}");
 
             foreach (var property in pico4u.properties)
@@ -107,7 +107,7 @@ public class VideoSourceConfigExample : MonoBehaviour
         VideoSource zedmini = configManager.GetVideoSource("ZEDMINI");
         if (zedmini != null)
         {
-            Debug.Log($"VideoSource: {zedmini.name}, Type: {zedmini.type}, Description: {zedmini.description}");
+            Debug.Log($"VideoSource: {zedmini.name}, Type: {zedmini.camera}, Description: {zedmini.description}");
 
             // Test property search
             var visibleRatioProperty = zedmini.GetProperty("visibleRatio");

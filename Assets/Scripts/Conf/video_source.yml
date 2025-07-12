@@ -1,6 +1,6 @@
 ﻿# Video Stream Source Configuration
 - name: "PICO4U"
-  type: "VR"
+  camera: "VR"
   description: "PICO4U Video Stream Source"
   properties:
     - name: "visibleRatio"
@@ -37,7 +37,7 @@
       value: 20971520 # 20 x 1024 x 1024
   
 - name: "ZEDMINI"
-  type: "ZED"
+  camera: "ZED"
   description: "ZED MINI Video Stream Source"
   properties:
     - name: "visibleRatio"

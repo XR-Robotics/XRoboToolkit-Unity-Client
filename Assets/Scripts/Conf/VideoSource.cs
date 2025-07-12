@@ -6,7 +6,7 @@ using System.Linq;
 public class VideoSource
 {
     public string name;
-    public string type;
+    public string camera;
     public string description;
     public List<VideoSourceProperty> properties;
 
@@ -15,10 +15,10 @@ public class VideoSource
         properties = new List<VideoSourceProperty>();
     }
 
-    public VideoSource(string name, string type, string description)
+    public VideoSource(string name, string camera, string description)
     {
         this.name = name;
-        this.type = type;
+        this.camera = camera;
         this.description = description;
         this.properties = new List<VideoSourceProperty>();
     }

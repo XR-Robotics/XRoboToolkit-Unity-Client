@@ -16,11 +16,11 @@ namespace Robot.Network
         public int bitrate;
         public int enableMvHevc;
         public int renderMode;
-        public string type;
+        public string camera;
         public string ip;
         public int port;
 
-        public CameraRequestData(int width, int height, int fps, int bitrate, int enableMvHevc, int renderMode, string type, string ip, int port)
+        public CameraRequestData(int width, int height, int fps, int bitrate, int enableMvHevc, int renderMode, string camera, string ip, int port)
         {
             this.width = width;
             this.height = height;
@@ -28,14 +28,14 @@ namespace Robot.Network
             this.bitrate = bitrate;
             this.enableMvHevc = enableMvHevc;
             this.renderMode = renderMode;
-            this.type = type ?? string.Empty;
+            this.camera = camera ?? string.Empty;
             this.ip = ip ?? string.Empty;
             this.port = port;
         }
 
         public override string ToString()
         {
-            return $"Camera[{width}x{height}@{fps}fps, {bitrate}bps, HEVC:{enableMvHevc}, Mode:{renderMode}, Type:{type}, {ip}:{port}]";
+            return $"Camera[{width}x{height}@{fps}fps, {bitrate}bps, HEVC:{enableMvHevc}, Mode:{renderMode}, Type:{camera}, {ip}:{port}]";
         }
     }
 
@@ -75,7 +75,7 @@ namespace Robot.Network
                 writer.Write(data.port);
 
                 // Write strings with length prefixes for efficient parsing
-                WriteCompactString(writer, data.type);
+                WriteCompactString(writer, data.camera);
                 WriteCompactString(writer, data.ip);
 
                 return stream.ToArray();
@@ -116,10 +116,10 @@ namespace Robot.Network
                 var port = reader.ReadInt32();
 
                 // Read strings
-                var type = ReadCompactString(reader);
+                var camera = ReadCompactString(reader);
                 var ip = ReadCompactString(reader);
 
-                return new CameraRequestData(width, height, fps, bitrate, enableMvHevc, renderMode, type, ip, port);
+                return new CameraRequestData(width, height, fps, bitrate, enableMvHevc, renderMode, camera, ip, port);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Robot.Network
         public static int GetEstimatedSize(CameraRequestData data)
         {
             int fixedSize = 3 + (7 * 4); // Magic(2) + Version(1) + 7 integers(28)
-            int stringSize = GetCompactStringSize(data.type) + GetCompactStringSize(data.ip);
+            int stringSize = GetCompactStringSize(data.camera) + GetCompactStringSize(data.ip);
             return fixedSize + stringSize;
         }
 
@@ -141,17 +141,17 @@ namespace Robot.Network
         /// <param name="cameraParams">Camera parameters from config</param>
         /// <param name="enableMvHevc">HEVC encoding flag</param>
         /// <param name="renderMode">Render mode</param>
-        /// <param name="type">Camera type</param>
+        /// <param name="camera">Camera type</param>
         /// <param name="ip">Target IP address</param>
         /// <param name="port">Target port</param>
         /// <returns>Complete camera request data</returns>
         public static CameraRequestData FromCameraParameters(
             CameraParameters cameraParams,
-            int enableMvHevc = 0,
-            int renderMode = 0,
-            string type = "",
-            string ip = "",
-            int port = 0)
+            int enableMvHevc,
+            int renderMode,
+            string camera,
+            string ip,
+            int port)
         {
             if (cameraParams == null)
                 cameraParams = new CameraParameters();
@@ -163,7 +163,7 @@ namespace Robot.Network
                 cameraParams.bitrate,
                 enableMvHevc,
                 renderMode,
-                type ?? string.Empty,
+                camera ?? string.Empty,
                 ip ?? string.Empty,
                 port
             );
@@ -225,7 +225,7 @@ namespace Robot.Network
             try
             {
                 // Check string lengths
-                if (!string.IsNullOrEmpty(data.type) && Encoding.UTF8.GetByteCount(data.type) > 255)
+                if (!string.IsNullOrEmpty(data.camera) && Encoding.UTF8.GetByteCount(data.camera) > 255)
                     return false;
 
                 if (!string.IsNullOrEmpty(data.ip) && Encoding.UTF8.GetByteCount(data.ip) > 255)

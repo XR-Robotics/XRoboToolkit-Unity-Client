@@ -85,9 +85,9 @@ public static class VideoSourceYamlParser
                     continue;
 
                 // Parse video source attributes
-                if (trimmedLine.StartsWith("type:"))
+                if (trimmedLine.StartsWith("camera:"))
                 {
-                    currentVideoSource.type = ExtractQuotedValue(trimmedLine);
+                    currentVideoSource.camera = ExtractQuotedValue(trimmedLine);
                 }
                 else if (trimmedLine.StartsWith("description:"))
                 {

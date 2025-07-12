@@ -61,14 +61,14 @@ public partial class UICameraCtrl : MonoBehaviour
         Utils.WriteLog(logTag, $"Received camera config: {cameraConfig}");
 
         // The stream only works for the VR headset
-        // if (cameraConfig.type.Equals("VR"))
-        // {
+        if (cameraConfig.camera.Equals("VR"))
+        {
             CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
                 cameraConfig.bitrate, cameraConfig.enableMvHevc,
                 cameraConfig.renderMode,
                 () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
             CameraSendToBtn.SetOn(true);
-        // }
+        }
     }
 
     private void OnClientReceived(string msg)
@@ -135,10 +135,11 @@ public partial class UICameraCtrl : MonoBehaviour
             camPara,
             0,
             2, // (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D
-            VideoSourceConfigManager.Instance.CurrentVideoSource.type,
+            VideoSourceConfigManager.Instance.CurrentVideoSource.camera,
             localIP, // local ip
             streamingPort);
-
+        
+        Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
         TcpManager.Instance.ClientSend(data);
     }
