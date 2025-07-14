@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.IO;
 using LitJson;
+using Network;
 using Robot;
 using Robot.Conf;
 using Robot.Network;
@@ -9,6 +10,7 @@ using Robot.V2.Network;
 using Unity.XR.PICO.TOBSupport;
 using UnityEngine;
 using UnityEngine.UI;
+using XRoboToolkit.Network;
 
 public partial class UICameraCtrl : MonoBehaviour
 {
@@ -57,18 +59,42 @@ public partial class UICameraCtrl : MonoBehaviour
     private void OnServerReceived(byte[] data)
     {
         // Deserialize camera configuration
-        var cameraConfig = CameraRequestSerializer.Deserialize(data);
-        Utils.WriteLog(logTag, $"Received camera config: {cameraConfig}");
-
-        // The stream only works for the VR headset
-        if (cameraConfig.camera.Equals("VR"))
+        // var cameraConfig = CameraRequestSerializer.Deserialize(data);
+        // Utils.WriteLog(logTag, $"Received camera config: {cameraConfig}");
+        //
+        // // The stream only works for the VR headset
+        // if (cameraConfig.camera.Equals("VR"))
+        // {
+        //     CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
+        //         cameraConfig.bitrate, cameraConfig.enableMvHevc,
+        //         cameraConfig.renderMode,
+        //         () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
+        //     CameraSendToBtn.SetOn(true);
+        // }
+        // apply protocol
+        Utils.WriteLog(logTag, $"OnServerReceived: {data.Length} bytes");
+        // if (NetworkDataProtocolSerializer.TryDeserialize(data, out NetworkDataProtocol deserialized))
+        // {
+        //     Debug.Log($"Deserialized command: {deserialized.command}, data length: {deserialized.length}");
+        //     NetworkCommander.Instance.Processor.ProcessCommand(deserialized);
+        // }
+        EventExecutor.ExecuteInUpdate(() =>
         {
-            CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
-                cameraConfig.bitrate, cameraConfig.enableMvHevc,
-                cameraConfig.renderMode,
-                () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
-            CameraSendToBtn.SetOn(true);
-        }
+            try
+            {
+                Utils.WriteLog(logTag, $"A");
+                // NetworkCommander.Instance.Processor.ProcessSerializedCommand(data);
+                var protocol = NetworkDataProtocolSerializer.Deserialize(data);
+                Utils.WriteLog(logTag, $"B");
+                Utils.WriteLog(logTag, $"OnServerReceived: {protocol.command}  {protocol.data.Length} bytes");
+            }
+            catch (Exception e)
+            {
+                Utils.WriteLog(logTag, $"B+");
+                Utils.WriteLog(logTag, $"Error processing command: {e.Message} {e.StackTrace}");
+            }
+            Utils.WriteLog(logTag, $"C");
+        });
     }
 
     private void OnClientReceived(string msg)
@@ -139,9 +165,12 @@ public partial class UICameraCtrl : MonoBehaviour
             localIP, // local ip
             streamingPort);
         
-        Utils.WriteLog(logTag, $"send camera config: {customConfig}");
+        // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
-        TcpManager.Instance.ClientSend(data);
+        // TcpManager.Instance.ClientSend(data);
+        
+        // Use network commander
+        NetworkCommander.Instance.OpenCamera(data);
     }
 
     private void ListenPCCameraBtnOnOnChange(bool on)

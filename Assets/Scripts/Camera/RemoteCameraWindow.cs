@@ -4,6 +4,7 @@ using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
 using LitJson;
+using Network;
 using Robot;
 using UnityEngine.UI;
 
@@ -54,7 +55,9 @@ public class RemoteCameraWindow : MonoBehaviour
 
     public void OnCloseBtn()
     {
-        gameObject.SetActive(false);
+        // gameObject.SetActive(false);
+        // send close event to server
+        NetworkCommander.Instance.CloseCamera();
     }
 
     public IEnumerator OnStartListen(int port)
