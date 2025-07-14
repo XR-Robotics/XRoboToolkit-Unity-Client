@@ -12,13 +12,14 @@ namespace Network
         public const string OPEN_CAMERA = "OPEN_CAMERA";
         public const string CLOSE_CAMERA = "CLOSE_CAMERA";
     }
+
     public class NetworkCommander : MonoBehaviour
     {
         private NetworkDataProcessor processor;
         private TcpManager tcpManager;
-        
+
         private string logTag = "NetworkCommander";
-        
+
         public static NetworkCommander Instance { get; private set; }
 
         private void Awake()
@@ -36,7 +37,7 @@ namespace Network
 
         public NetworkDataProcessor Processor
         {
-            get{return processor;}
+            get { return processor; }
         }
 
         private void Start()
@@ -83,16 +84,16 @@ namespace Network
         }
 
         #endregion
-        
+
         private class OpenCameraHandler : ICommandHandler
         {
             public void HandleCommand(byte[] data)
             {
                 Debug.Log("Handling OPEN_CAMERA command with data: " + BitConverter.ToString(data));
                 // Add logic to open camera
-                
+
                 var cameraConfig = CameraRequestSerializer.Deserialize(data);
-                Utils.WriteLog("OpenCameraHandler",$"Received camera config: {cameraConfig}");
+                Utils.WriteLog("OpenCameraHandler", $"Received camera config: {cameraConfig}");
 
                 // The stream only works for the VR headset
                 if (cameraConfig.camera.Equals("VR"))
@@ -111,7 +112,8 @@ namespace Network
             public void HandleCommand(byte[] data)
             {
                 Debug.Log("Handling CLOSE_CAMERA command with data: " + BitConverter.ToString(data));
-                // Add logic to close camera
+                // Stop the camera preview
+                CameraHandle.StopPreview();
             }
         }
     }

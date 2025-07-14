@@ -41,7 +41,10 @@ namespace XRoboToolkit.Network
             offset += INT_SIZE;
 
             // Write command
-            commandBytes.CopyTo(result, offset);
+            if (commandBytes.Length > 0)
+            {
+                commandBytes.CopyTo(result, offset);
+            }
             offset += commandLength;
 
             // Write data length
@@ -49,7 +52,10 @@ namespace XRoboToolkit.Network
             offset += INT_SIZE;
 
             // Write data
-            data.CopyTo(result, offset);
+            if (data.Length > 0)
+            {
+                data.CopyTo(result, offset);
+            }
 
             return result;
         }
@@ -65,36 +71,56 @@ namespace XRoboToolkit.Network
                 throw new ArgumentNullException(nameof(buffer));
 
             if (buffer.Length < INT_SIZE * 2)
-                throw new ArgumentException("Buffer too small to contain valid protocol data");
+                throw new ArgumentException($"Buffer too small to contain valid protocol data. Buffer length: {buffer.Length}, minimum required: {INT_SIZE * 2}");
 
-            int offset = 0;
+            try
+            {
+                int offset = 0;
 
-            // Read command length
-            int commandLength = BitConverter.ToInt32(buffer, offset);
-            offset += INT_SIZE;
+                // Read command length
+                int commandLength = BitConverter.ToInt32(buffer, offset);
+                offset += INT_SIZE;
 
-            if (commandLength < 0 || offset + commandLength > buffer.Length)
-                throw new ArgumentException("Invalid command length in buffer");
+                if (commandLength < 0)
+                    throw new ArgumentException($"Invalid command length: {commandLength} (cannot be negative)");
 
-            // Read command
-            string command = Encoding.UTF8.GetString(buffer, offset, commandLength);
-            offset += commandLength;
+                if (offset + commandLength > buffer.Length)
+                    throw new ArgumentException($"Invalid command length: {commandLength}, buffer length: {buffer.Length}, offset: {offset}");
 
-            if (offset + INT_SIZE > buffer.Length)
-                throw new ArgumentException("Buffer too small to contain data length");
+                // Read command
+                string command = string.Empty;
+                if (commandLength > 0)
+                {
+                    command = Encoding.UTF8.GetString(buffer, offset, commandLength);
+                }
+                offset += commandLength;
 
-            // Read data length
-            int dataLength = BitConverter.ToInt32(buffer, offset);
-            offset += INT_SIZE;
+                if (offset + INT_SIZE > buffer.Length)
+                    throw new ArgumentException($"Buffer too small to contain data length. Buffer length: {buffer.Length}, offset: {offset}");
 
-            if (dataLength < 0 || offset + dataLength > buffer.Length)
-                throw new ArgumentException("Invalid data length in buffer");
+                // Read data length
+                int dataLength = BitConverter.ToInt32(buffer, offset);
+                offset += INT_SIZE;
 
-            // Read data
-            byte[] data = new byte[dataLength];
-            Array.Copy(buffer, offset, data, 0, dataLength);
+                if (dataLength < 0)
+                    throw new ArgumentException($"Invalid data length: {dataLength} (cannot be negative)");
 
-            return new NetworkDataProtocol(command, dataLength, data);
+                if (offset + dataLength > buffer.Length)
+                    throw new ArgumentException($"Invalid data length: {dataLength}, buffer length: {buffer.Length}, offset: {offset}");
+
+                // Read data
+                byte[] data = new byte[dataLength];
+                if (dataLength > 0)
+                {
+                    Buffer.BlockCopy(buffer, offset, data, 0, dataLength);
+                }
+
+                return new NetworkDataProtocol(command, dataLength, data);
+            }
+            catch (Exception ex) when (!(ex is ArgumentException))
+            {
+                throw new ArgumentException($"Error deserializing buffer: {ex.Message}", ex);
+            }
         }
 
         /// <summary>
@@ -155,6 +181,59 @@ namespace XRoboToolkit.Network
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Debug helper method to analyze buffer contents
+        /// </summary>
+        /// <param name="buffer">The buffer to analyze</param>
+        /// <returns>String containing debug information about the buffer</returns>
+        public static string DebugBufferContents(byte[] buffer)
+        {
+            if (buffer == null)
+                return "Buffer is null";
+
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"Buffer length: {buffer.Length}");
+
+            if (buffer.Length == 0)
+                return sb.ToString();
+
+            // Show first 32 bytes in hex
+            int displayBytes = Math.Min(buffer.Length, 32);
+            sb.AppendLine($"First {displayBytes} bytes (hex): {BitConverter.ToString(buffer, 0, displayBytes)}");
+
+            if (buffer.Length >= INT_SIZE)
+            {
+                int cmdLen = BitConverter.ToInt32(buffer, 0);
+                sb.AppendLine($"Command length (first 4 bytes): {cmdLen}");
+
+                if (cmdLen >= 0 && cmdLen < 1000 && buffer.Length >= INT_SIZE + cmdLen)
+                {
+                    try
+                    {
+                        string cmd = Encoding.UTF8.GetString(buffer, INT_SIZE, cmdLen);
+                        sb.AppendLine($"Command string: '{cmd}'");
+
+                        if (buffer.Length >= INT_SIZE + cmdLen + INT_SIZE)
+                        {
+                            int dataLen = BitConverter.ToInt32(buffer, INT_SIZE + cmdLen);
+                            sb.AppendLine($"Data length: {dataLen}");
+                            sb.AppendLine($"Expected total size: {INT_SIZE + cmdLen + INT_SIZE + dataLen}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        sb.AppendLine($"Error reading command: {ex.Message}");
+                    }
+                }
+                else
+                {
+                    sb.AppendLine($"Invalid command length: {cmdLen}");
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

@@ -58,42 +58,57 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnServerReceived(byte[] data)
     {
-        // Deserialize camera configuration
-        // var cameraConfig = CameraRequestSerializer.Deserialize(data);
-        // Utils.WriteLog(logTag, $"Received camera config: {cameraConfig}");
-        //
-        // // The stream only works for the VR headset
-        // if (cameraConfig.camera.Equals("VR"))
-        // {
-        //     CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
-        //         cameraConfig.bitrate, cameraConfig.enableMvHevc,
-        //         cameraConfig.renderMode,
-        //         () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
-        //     CameraSendToBtn.SetOn(true);
-        // }
         // apply protocol
         Utils.WriteLog(logTag, $"OnServerReceived: {data.Length} bytes");
-        // if (NetworkDataProtocolSerializer.TryDeserialize(data, out NetworkDataProtocol deserialized))
-        // {
-        //     Debug.Log($"Deserialized command: {deserialized.command}, data length: {deserialized.length}");
-        //     NetworkCommander.Instance.Processor.ProcessCommand(deserialized);
-        // }
+
+        // Log first few bytes for debugging
+        if (data.Length > 0)
+        {
+            string hexDump = BitConverter.ToString(data, 0, Math.Min(data.Length, 32));
+            Utils.WriteLog(logTag, $"First bytes (hex): {hexDump}");
+        }
+
         EventExecutor.ExecuteInUpdate(() =>
         {
             try
             {
-                Utils.WriteLog(logTag, $"A");
-                // NetworkCommander.Instance.Processor.ProcessSerializedCommand(data);
+                Utils.WriteLog(logTag, $"Processing data...");
+
+                // Check if it's a complete message first
+                if (!NetworkDataProtocolSerializer.IsCompleteMessage(data))
+                {
+                    Utils.WriteLog(logTag, $"Incomplete message received");
+                    return;
+                }
+
                 var protocol = NetworkDataProtocolSerializer.Deserialize(data);
-                Utils.WriteLog(logTag, $"B");
-                Utils.WriteLog(logTag, $"OnServerReceived: {protocol.command}  {protocol.data.Length} bytes");
+                Utils.WriteLog(logTag, $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
+
+                // Process the command
+                if (NetworkCommander.Instance == null)
+                {
+                    Utils.WriteLog(logTag, $"NetworkCommander.Instance is null");
+                    return;
+                }
+
+                if (NetworkCommander.Instance.Processor == null)
+                {
+                    Utils.WriteLog(logTag, $"NetworkCommander.Instance.Processor is null");
+                    return;
+                }
+
+                bool handled = NetworkCommander.Instance.Processor.ProcessCommand(protocol);
+                Utils.WriteLog(logTag, $"Command processed: {handled}");
             }
             catch (Exception e)
             {
-                Utils.WriteLog(logTag, $"B+");
-                Utils.WriteLog(logTag, $"Error processing command: {e.Message} {e.StackTrace}");
+                Utils.WriteLog(logTag, $"Error processing command: {e.Message}");
+                Utils.WriteLog(logTag, $"Stack trace: {e.StackTrace}");
+
+                // Log detailed buffer analysis
+                string bufferDebug = NetworkDataProtocolSerializer.DebugBufferContents(data);
+                Utils.WriteLog(logTag, $"Buffer analysis:\n{bufferDebug}");
             }
-            Utils.WriteLog(logTag, $"C");
         });
     }
 
@@ -164,11 +179,11 @@ public partial class UICameraCtrl : MonoBehaviour
             VideoSourceConfigManager.Instance.CurrentVideoSource.camera,
             localIP, // local ip
             streamingPort);
-        
+
         // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
         // TcpManager.Instance.ClientSend(data);
-        
+
         // Use network commander
         NetworkCommander.Instance.OpenCamera(data);
     }
