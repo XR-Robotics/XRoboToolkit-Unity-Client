@@ -166,6 +166,11 @@ public partial class UICameraCtrl : MonoBehaviour
             camPara.bitrate, streamingPort);
 
         yield return new WaitForSeconds(0.2f);
+        
+        // Reset LERE
+        setLere.ResetCanvases();
+
+        yield return new WaitForSeconds(0.1f);
 
         if (TcpClient.Status != ClientStatus.Connected)
         {
