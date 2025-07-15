@@ -55,9 +55,9 @@ public class RemoteCameraWindow : MonoBehaviour
 
     public void OnCloseBtn()
     {
-        // gameObject.SetActive(false);
         // send close event to server
         NetworkCommander.Instance.CloseCamera();
+        gameObject.SetActive(false);
     }
 
     public IEnumerator OnStartListen(int port)
