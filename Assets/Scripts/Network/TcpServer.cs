@@ -5,6 +5,12 @@ using System.Threading.Tasks;
 
 namespace Robot.V2.Network
 {
+    public enum ServerStatus
+    {
+        None,
+        Started,
+        Stopped,
+    }
     public class TcpServer : AndroidJavaProxy
     {
 
@@ -19,9 +25,12 @@ namespace Robot.V2.Network
         public event Action OnServerStopped;
 
         private string logTag = "TcpServer(C#)";
+        
+        public static ServerStatus Status { get; private set; } = ServerStatus.None;
 
         public TcpServer() : base("com.picovr.robotassistantlib.TcpServer$ServerCallback")
         {
+            
         }
 
         private static AndroidJavaObject _javaObj = null;
@@ -41,11 +50,13 @@ namespace Robot.V2.Network
             _callbackProxy.OnServerStarted = onServerStarted;
 
             GetJavaObject().Call("startTCPServer", port, _callbackProxy);
+            Status = ServerStatus.Started;
         }
 
         public static void StopServer()
         {
             GetJavaObject().Call("stopServer");
+            Status = ServerStatus.Stopped;
         }
 
         // JNI callback methods

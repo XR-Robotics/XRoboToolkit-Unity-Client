@@ -19,6 +19,9 @@ namespace Robot.V2.Network
         public System.Action<string> OnClientReceived;
 
         public static TcpManager Instance { get; private set; }
+        
+        public TcpServer TCPServer => tcpServer;
+        public TcpClient TCPClient => tcpClient;
 
         private void Awake()
         {

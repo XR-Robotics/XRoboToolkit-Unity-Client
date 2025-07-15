@@ -149,8 +149,11 @@ public partial class UICameraCtrl : MonoBehaviour
 
     IEnumerator RequestCameraStreamCoroutine(string ip)
     {
-        // Close TcpServer
-        TcpManager.Instance.StopServer();
+        if (TcpServer.Status == ServerStatus.Started)
+        {
+            // Close TcpServer first
+            TcpManager.Instance.StopServer();   
+        }
 
         yield return new WaitForSeconds(0.1f);
 
@@ -164,8 +167,11 @@ public partial class UICameraCtrl : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        // initialize TcpClient, server IP is the video source IP
-        TcpManager.Instance.StartClient(ip);
+        if (TcpClient.Status != ClientStatus.Connected)
+        {
+            // initialize TcpClient, server IP is the video source IP
+            TcpManager.Instance.StartClient(ip);
+        }
 
         yield return new WaitForSeconds(0.5f);
 

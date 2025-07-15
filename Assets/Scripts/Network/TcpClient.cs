@@ -3,6 +3,12 @@ using System;
 
 namespace Robot.V2.Network
 {
+    public enum ClientStatus
+    {
+        None,
+        Connected,
+        Disconnected,
+    }
     public class TcpClient : AndroidJavaProxy
     {
         private static TcpClient _callbackProxy = new TcpClient();
@@ -15,6 +21,8 @@ namespace Robot.V2.Network
         public event Action<string, Exception> OnError;
 
         private string logTag = "TcpClient(C#)";
+        
+        public static ClientStatus Status { get; private set; } = ClientStatus.None;
 
         public TcpClient() : base("com.picovr.robotassistantlib.TcpClient$ClientCallback")
         {
@@ -37,6 +45,7 @@ namespace Robot.V2.Network
         {
             _callbackProxy.OnConnected = onConnected;
             GetJavaObject().Call("connectToServer", ip, port, _callbackProxy);
+            Status = ClientStatus.Connected;
         }
 
         public static void Send(byte[] data)
@@ -47,6 +56,7 @@ namespace Robot.V2.Network
         public static void Disconnect()
         {
             GetJavaObject().Call("disconnect");
+            Status = ClientStatus.Disconnected;
         }
 
         public void onConnected()
