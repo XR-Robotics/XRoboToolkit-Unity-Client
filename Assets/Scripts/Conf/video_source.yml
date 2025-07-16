@@ -71,4 +71,4 @@
     - name: "CamBitrate"
       type: "int"
       description: "Bitrate of the video stream in Kbps"
-      value: 4000000 # 20 x 1024 x 1024
+      value: 4000000

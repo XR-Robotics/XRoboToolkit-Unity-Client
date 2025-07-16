@@ -2753,6 +2753,7 @@ MonoBehaviour:
   rawImageRect: {fileID: 318734919}
   matLE: {fileID: 2100000, guid: f0b8a2be536e41e468cffe3539ea4b35, type: 2}
   matRE: {fileID: 2100000, guid: 4c3fdd4176025204a988e540ce92f58e, type: 2}
+  setLere: {fileID: 6009550096432242020}
   videoSourceConfigManager: {fileID: 310954449}
 --- !u!1 &316090399 stripped
 GameObject:

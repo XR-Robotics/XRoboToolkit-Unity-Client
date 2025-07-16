@@ -7,9 +7,8 @@ namespace Robot.Conf
     public class VideoSourceManager : MonoBehaviour
     {
         public RectTransform rawImageRect;
-
-        public Material matLE;
-        public Material matRE;
+        
+        public SetLERE setLere;
 
         public VideoSourceConfigManager videoSourceConfigManager;
 
@@ -34,13 +33,7 @@ namespace Robot.Conf
                 Debug.LogError("RawImage RectTransform is not set.");
                 return;
             }
-
-            if (matLE == null || matRE == null)
-            {
-                Debug.LogError("Materials are not set.");
-                return;
-            }
-
+            
             // Update video source
             videoSourceConfigManager.SetVideoSource(videoSource);
 
@@ -56,14 +49,10 @@ namespace Robot.Conf
             
             // log rect transform size for debugging
             Debug.Log($"RawImage RectTransform Size: {rawImageRect.sizeDelta}");
-
-            // Update shader properties
-            matLE.SetFloat("_visibleRatio", videoSourceConfigManager.VisibleRatio);
-            matRE.SetFloat("_visibleRatio", videoSourceConfigManager.VisibleRatio);
-            matLE.SetFloat("_contentRatio", videoSourceConfigManager.ContentRatio);
-            matRE.SetFloat("_contentRatio", videoSourceConfigManager.ContentRatio);
-            matLE.SetFloat("_heightCompressionFactor", videoSourceConfigManager.HeightCompressionFactor);
-            matRE.SetFloat("_heightCompressionFactor", videoSourceConfigManager.HeightCompressionFactor);
+            
+            // Update SetLERE component
+            setLere.UpdateParameters(videoSourceConfigManager.VisibleRatio, 
+                videoSourceConfigManager.ContentRatio, videoSourceConfigManager.HeightCompressionFactor);
             
             // log shader properties for debugging
             Debug.Log($"Shader Properties - Visible Ratio: {videoSourceConfigManager.VisibleRatio}, " +

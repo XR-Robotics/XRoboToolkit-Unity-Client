@@ -43,8 +43,6 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         RecordBtn.OnChange += OnRecordBtn;
         CameraSendToBtn.OnChange += OnCameraSendToBtn;
-        // ListenCameraBtn.OnChange += OnListenCameraBtnBtn;
-        // ListenPCCameraBtn.OnChange += ListenPCCameraBtnOnOnChange;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
         CameraHandle.AddStateListener(OnCameraStateChanged);
 
@@ -193,24 +191,9 @@ public partial class UICameraCtrl : MonoBehaviour
 
         // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
-        // TcpManager.Instance.ClientSend(data);
 
         // Use network commander
         NetworkCommander.Instance.OpenCamera(data);
-    }
-
-    private void ListenPCCameraBtnOnOnChange(bool on)
-    {
-        if (on)
-        {
-            ListenPCCamera();
-        }
-        else
-        {
-            RemoteCameraWindowObj.SetActive(false);
-        }
-
-        ListenPCCameraBtn.SetOn(on);
     }
 
     private void OnCameraStateChanged(int state)
@@ -243,55 +226,6 @@ public partial class UICameraCtrl : MonoBehaviour
             (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D,
             () => { CameraHandle.StartSendImage(ip, 12345); });
         CameraSendToBtn.SetOn(true);
-    }
-
-    private void OnListenCameraBtnBtn(bool on)
-    {
-        if (on)
-        {
-            ListenVRCamera();
-        }
-        else
-        {
-            RemoteCameraWindowObj.SetActive(false);
-        }
-    }
-
-    public void ListenVRCamera()
-    {
-        RemoteCameraWindowObj.SetActive(true);
-        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>()
-            .StartListen(1920, 1920 / 2, 60, 20 * 1024 * 1024, 12345);
-        // update shader parameters
-        setLere.ResetRatios();
-    }
-
-    void UpdateShaderParams()
-    {
-        // default is vr's
-        var visibleRatio = 0.555f;
-        var contentRatio = 1.8f;
-        switch (cameraDropdown.value)
-        {
-            case 0:
-                // zed
-                visibleRatio = 0.4394638240337372f;
-                contentRatio = 1.7048496007919312f;
-                break;
-            default:
-                break;
-        }
-
-        // Update
-        setLere.UpdateRatios(visibleRatio, contentRatio);
-    }
-
-    public void ListenPCCamera()
-    {
-        RemoteCameraWindowObj.SetActive(true);
-        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(2560, 720, 60, 4 * 1000 * 1000, 12345);
-        // update shader parameters
-        UpdateShaderParams();
     }
 
     private void OnRecordBtn(bool on)

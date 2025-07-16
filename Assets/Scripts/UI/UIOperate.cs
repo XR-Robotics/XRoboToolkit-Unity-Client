@@ -51,7 +51,7 @@ public class UIOperate : MonoBehaviour
             Simulator.SetActive(true);
         }
 #endif
-        ReconnectBtn.gameObject.SetActive(false);
+        // ReconnectBtn.gameObject.SetActive(false);
 
         bodyModeDrop.onValueChanged.AddListener(OnBodyModeDrop);
         HeadTog.onValueChanged.AddListener(OnHeadTog);
