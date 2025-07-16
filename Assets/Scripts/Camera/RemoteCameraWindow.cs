@@ -26,10 +26,10 @@ public class RemoteCameraWindow : MonoBehaviour
     private Task _imageReceiveTask;
 
     private int _resolutionWidth = 2160;
-    private int _resolutionHeight = 2160 / 2*4/3;
+    private int _resolutionHeight = 2160 / 2 * 4 / 3;
     private int _videoFps = 60;
     private int _bitrate = 40 * 1024 * 1024;
-    
+
     public CustomButton listenBtn;
 
     private void Awake()
@@ -73,7 +73,7 @@ public class RemoteCameraWindow : MonoBehaviour
         yield return null;
 
         MediaDecoder.initialize((int)_texture.GetNativeTexturePtr(), _resolutionWidth, _resolutionHeight);
-        MediaDecoder.startTCPServer(port, true);
+        MediaDecoder.startServer(port, true);
         yield return null;
 
         JsonData cameraParam = new JsonData();

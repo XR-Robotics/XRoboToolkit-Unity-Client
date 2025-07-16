@@ -1,8 +1,8 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MediaDecoder
+public class MediaDecoderUDP
 {
     private static AndroidJavaObject _javaObj = null;
 
@@ -10,7 +10,7 @@ public class MediaDecoder
     {
         if (_javaObj == null)
         {
-            _javaObj = new AndroidJavaObject("com.picovr.robotassistantlib.MediaDecoder");
+            _javaObj = new AndroidJavaObject("com.picovr.robotassistantlib.MediaDecoderUDP");
         }
 
         return _javaObj;
