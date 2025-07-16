@@ -5,23 +5,29 @@
 
 ## Unity UI Main Panel Reference
 
-| Item | Description |
-|------|-------------|
-| SN | Display Serial number of the XR device, only functional with Pico 4 Ultra enterprise version |
-| Client IP | IP address of the XR device |
-| Connect | Connection status between robot and XR device |
-| Server IP | IP address of the robot PC |
-| Head Tracking | Toggle On/Off to send out head 6 DoF pose |
-| Controller | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream |
-| HandTracking | Toggle On/Off to parse hand tracking data in data stream |
-| BodyTracking | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream |
-| Send Tracking Data | Toggle On/Off to sync above selected poses between XR device and robot PC |
-| Control with the A | Toggle On/Off to rapid pause or resume sync with controller button A |
-| FPS | Data syncing frames per second |
-| ListenVRCamera | Open a connection and wait for camera feed from another headset (used on human operator side) |
-| CameraSendTo | Send out camera feed from the VR headset (used when the VR headset serves as robot eyes) |
-| RequestPCCamera | Open a connection and wait for camera feed from a PC camera (Used when a PC stereo camera serves as robot eyes) |
-| SaveCameraParams | Save camera intrinsics and extrinsics in local path |
+![ui.png](Docs/ui.png)
+
+| Item                                           | Description                                                                                              |
+|------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| Network - SN                                   | Display Serial number of the XR device, only functional with Pico 4 Ultra enterprise version             |
+| Network - IP                                   | IP address of the XR device                                                                              |
+| Network - FPS                                  | Data syncing frames per second                                                                           |
+| Network - Status                               | Connection status between robot and XR device                                                            |
+| Network - PC Service                           | IP address of the PC running PC service                                                                  |
+| Network - Enter                                | Manually input the PC service's IP                                                                       |
+| Tracking - Head                                | Toggle On/Off to send out head 6 DoF pose                                                                |
+| Tracking - Controller                          | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream                       |
+| Tracking - Hand                                | Toggle On/Off to parse hand tracking data in data stream                                                 |
+| Tracking - Body Tracking - Mode                | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream          |
+| Tracking - Body Tracking - TrackerNum          | Number of the trackers                                                                                   |
+| Tracking - Data & Control - Send               | Toggle On/Off to sync above selected poses between XR device and robot PC                                |
+| Tracking - Data & Control - Switch w/ A Button | Toggle On/Off to rapid pause or resume sync with  the right-hand controller button A                     |
+| Tracking - Info                                | Panel to show tracking related information                                                               |
+| Camera - Dropdown (Video Source)               | Select a supported video source (configured in the `video_source.yml` file)                              |
+| Camera - Listen                                | Open a connection to receive the video stream to the selected video source (used on human operator side) |
+| Camera - Save Camera Parameters                | Save camera intrinsic and extrinsic parameters in local path                                             |
+| Camera - Record                                | Record data                                                                                              |
+| Camera - Camera State                          | Panel to show the camera status (available on the VR headset serving as robot eyes)                      |
 
 ## Feature list
 - **Pose sync between XR device and robot PC**
@@ -44,37 +50,49 @@
 If the PC service is running successfully, when you open the app on Pico headset, you will receive a prompt window for server connection. Point to the IP address and click it with the trigger button on the controller.
 
 <div align="center">
-  <img src="Docs/server_connection.png" alt="server_connection" width="387"/>
+  <img src="Docs/pc_service_connection.png" alt="pc_service_connection" width="387"/>
 </div>
 
-The main panel will display "Working" if connection is established.
+The main panel will display "WORKING" if connection is established.
 
 <div align="center">
-  <img src="Docs/unity_main_panel.png" alt="unity_main_panel" width="394"/>
+  <img src="Docs/pc_service_connected.png" alt="pc_service_connected" width="394"/>
 </div>
 
-On the main panel, select preferred pose information to be synced, such as head tracking, controller tracking, or body tracking. If your headset and PC have established connection, then the pose data will be synced to PC when "Send Tracking Data" is toggled On. When "Control with A" option toggles On, you may also use "A" button on the right controller to toggle "Send Tracking Data" On or Off during data syncing.
+On the main panel, select preferred pose information to be synced, such as head tracking, controller tracking, or body tracking. If your headset and PC have established connection, then the pose data will be synced to PC when "Send" is toggled On. When "Switch w/ A Button" option toggles On, you may also use "A" button on the right controller to toggle "Send" On or Off during data syncing.
 
 ### Local pose and stereo vision data collection
 
 **Note:** At this moment, camera data collection still requires special approval through Pico's enterprise service.
 
-On the main panel, select preferred pose data to be collected, click camera button, and then click Record. You will see a brief blur effect on the screen, record button will turn red, and camera status will turn to 6. When you finish recording, press recording button again to end the collection session. The video files and pose files will be saved on your local headset. You may also click "SaveCameraParams" to save camera intrinsics and extrinsics for the local headset.
+On the main panel, select preferred pose data to be collected, click Record. You will see a brief blur effect on the screen, record button will turn red, and camera status will turn to 6. When you finish recording, press recording button again to end the collection session. The video files and pose files will be saved on your local headset. You may also click "Save Camera Parameters" to save camera intrinsic and extrinsic parameters for the local headset.
 
 ### Remote stereo vision sync between two XR headsets
 
-1. Connect both XR headsets to the same network
-2. Make sure that the camera to be used as the camera source has VST camera permission (requires special approval)
-3. Open XR-Robotics-Toolkit-Unity-Sample on both devices
+1. Connect both XR headsets to the same network.
+2. Make sure that the camera to be used as the camera source has VST camera permission (requires special approval).
+3. Open **XRRoboToolkit** on both headsets.
+> **Note:** The headset serving as robot eyes (H1) should have the camera permission enabled, while the other headset (H2) is for the human operator side.
+4. H1: Remember the IP of the VR headset and **DON'T DO ANYTHING**.
+5. H2: On the Camera panel, Select **PICO4U** as the video source, Click Listen, input H1's IP, and click Confirm.
+6. H2: You should now be able to see the live camera. Press B button on the right-hand controller to switch between side-by-side views and stereo-3D views.
+7. H2: If you close the live camera window, you can simply repeat Step 5.
+8. If you want to stop the camera streaming, quit **XRRoboToolkit** on H1 and H2.
 
-In the display headset (headset 1), remember the IP displayed in the main panel, then click camera button on the bottom right, and hit ListenVRCamera. You will then see a floating big blank screen.
+### Remote stereo vision sync between ZED camera (Orin) and XR headset
 
-After seeing the blank screen, go to the camera headset (headset 2), click camera button, and then click CameraSendTo. On the pop-up screen, input IP address of the display headset. Then you will see a brief blur effect on the screen, and camera status turns to 6.
-
-You should now be able to see the live camera feed of headset 2 on headset 1. Press B button on the right controller of headset 1 to switch between side-by-side views and stereo-3D views.
-
-### Remote stereo vision sync between PC camera and XR headset
-Soon to be updated.
+1. Clone [XRoboToolkit-Orin-Video-Sender](https://github.com/XR-Robotics/XRoboToolkit-Orin-Video-Sender.git) on Orin.
+2. Build 
+3. Run the following command on Orin:
+   ```bash
+   ./OrinVideoSender --listen <IP of Orin>:13579
+   ```
+4. Open **XRRoboToolkit** on the XR headset.
+5. On the Camera panel, select "ZEDMINI" as the video source.
+6. Click "Listen", input the IP of Orin, and click Confirm.
+7. You should now be able to see the live camera. Press B button on the right-hand controller to switch between side-by-side views and stereo-3D views.
+8. If you close the live camera window, you can simply repeat Step 6.
+9. If you want to stop the camera streaming, quit **XRRoboToolkit** on the XR headset and stop the OrinVideoSender on Orin.
 
 
 ## Directory Structure
