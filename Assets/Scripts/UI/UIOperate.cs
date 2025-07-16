@@ -72,10 +72,10 @@ public class UIOperate : MonoBehaviour
         Debug.Log("---InitEnterpriseService :" + intEnterprise);
         PXR_Enterprise.BindEnterpriseService(OnBindEnterpriseService);
 
-        if (CameraObj != null)
-        {
-            CameraObj.SetActive(false);
-        }
+        // if (CameraObj != null)
+        // {
+        //     CameraObj.SetActive(false);
+        // }
 
         AndroidProxy.CallBack += OnAndroidCallBack;
 #if UNITY_EDITOR
@@ -120,7 +120,7 @@ public class UIOperate : MonoBehaviour
 
     public void TcpConnect(string ip)
     {
-        TargetIP.text = "To:" + ip;
+        TargetIP.text = "PC Service: " + ip;
         ReconnectBtn.gameObject.SetActive(true);
         TcpHandler.Connect(ip);
         ConnectSuccess();
@@ -128,7 +128,7 @@ public class UIOperate : MonoBehaviour
 
     public void ConnectSuccess()
     {
-        TargetIP.text = "To:" + TcpHandler.GetTargetIP;
+        TargetIP.text = "PC Service: " + TcpHandler.GetTargetIP;
     }
 
     private void OnBindEnterpriseService(bool bind)
@@ -149,8 +149,8 @@ public class UIOperate : MonoBehaviour
     private void SetDeviceSN(string sn)
     {
         TcpHandler.SetDeviceSn(sn);
-        Debug.Log("SN:" + sn);
-        SN.text = "SN:" + sn;
+        Debug.Log("SN: " + sn);
+        SN.text = "SN: " + sn;
     }
 
     private void OnNetShareTog(bool ison)
