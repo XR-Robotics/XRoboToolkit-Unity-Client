@@ -29,6 +29,8 @@ public class RemoteCameraWindow : MonoBehaviour
     private int _resolutionHeight = 2160 / 2*4/3;
     private int _videoFps = 60;
     private int _bitrate = 40 * 1024 * 1024;
+    
+    public CustomButton listenBtn;
 
     private void Awake()
     {
@@ -55,6 +57,8 @@ public class RemoteCameraWindow : MonoBehaviour
 
     public void OnCloseBtn()
     {
+        // Reset listen button
+        listenBtn.SetOn(false);
         // send close event to server
         NetworkCommander.Instance.CloseCamera();
         gameObject.SetActive(false);

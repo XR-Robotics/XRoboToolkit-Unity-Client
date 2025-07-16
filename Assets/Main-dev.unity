@@ -19154,6 +19154,7 @@ MonoBehaviour:
   secondCamera: {fileID: 517948298}
   nearClipValueA: 0.1
   nearClipValueB: 0.35
+  remoteCameraWindow: {fileID: 6009550096432242019}
 --- !u!1 &2071147983
 GameObject:
   m_ObjectHideFlags: 0
@@ -20609,6 +20610,10 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 168.75
       objectReference: {fileID: 0}
+    - target: {fileID: 6794232222909173523, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
+      propertyPath: listenBtn
+      value: 
+      objectReference: {fileID: 1941150745}
     - target: {fileID: 6794232222909173524, guid: 92b6da76bbc09624fafe23d8a708eadd, type: 3}
       propertyPath: m_Name
       value: RemoteCamera
