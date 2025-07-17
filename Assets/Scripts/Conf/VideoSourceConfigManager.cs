@@ -1,18 +1,19 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class VideoSourceConfigManager : MonoBehaviour
 {
-    [Header("Configuration")]
-    [SerializeField]
+    [Header("Configuration")] [SerializeField]
     private string yamlFileName = "video_source.yml";
 
     private Dictionary<string, VideoSource> videoSources;
     private bool isInitialized = false;
-    
+
     // Event
     public event Action OnInitialized;
 
@@ -27,12 +28,38 @@ public class VideoSourceConfigManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            Initialize();
         }
         else
         {
             Destroy(gameObject);
         }
+    }
+
+    private void LoadConfiguration(string path)
+    {
+        videoSources = new Dictionary<string, VideoSource>();
+        // Parse the YAML file
+        var parsedVideoSources = VideoSourceYamlParser.ParseYamlFile(path);
+
+        // Convert to dictionary for fast lookup
+        foreach (var videoSource in parsedVideoSources)
+        {
+            if (!string.IsNullOrEmpty(videoSource.name))
+            {
+                videoSources[videoSource.name.ToUpper()] = videoSource;
+            }
+        }
+
+        isInitialized = true;
+        Debug.Log($"VideoSourceConfigManager initialized successfully. Loaded {videoSources.Count} video sources.");
+
+        // Log loaded video sources
+        foreach (var kvp in videoSources)
+        {
+            Debug.Log($"Loaded video source: {kvp.Key} with {kvp.Value.properties.Count} properties");
+        }
+
+        OnInitialized?.Invoke();
     }
 
     /// <summary>
@@ -42,49 +69,100 @@ public class VideoSourceConfigManager : MonoBehaviour
     {
         try
         {
-            videoSources = new Dictionary<string, VideoSource>();
+            string yamlPath;
 
-            // Construct the path to the YAML file
-            string yamlPath = Path.Combine(Application.streamingAssetsPath, "Conf", yamlFileName);
-            
-            // Load file from Application folder on Android
-            #if !UNITY_EDITOR
-                yamlPath = Path.Combine(Application.persistentDataPath, yamlFileName);
-            #endif
+#if UNITY_EDITOR
+            // In editor, use the file directly from Resources folder
+            yamlPath = Path.Combine(Application.dataPath, "StreamingAssets", yamlFileName);
 
-            // If not in StreamingAssets, try Assets/Scripts/Conf
-            if (!File.Exists(yamlPath))
+            if (File.Exists(yamlPath))
             {
-                yamlPath = Path.Combine(Application.dataPath, "Scripts", "Conf", yamlFileName);
+                LoadConfiguration(yamlPath);
             }
-
-            // Parse the YAML file
-            var parsedVideoSources = VideoSourceYamlParser.ParseYamlFile(yamlPath);
-
-            // Convert to dictionary for fast lookup
-            foreach (var videoSource in parsedVideoSources)
+            else
             {
-                if (!string.IsNullOrEmpty(videoSource.name))
-                {
-                    videoSources[videoSource.name.ToUpper()] = videoSource;
-                }
+                Debug.Log($"Please ensure video_source.yml exists in Assets/StreamingAssets/");
             }
+#else
+            // In build, check persistentDataPath first, then copy from Resources if needed
+            yamlPath = Path.Combine(Application.persistentDataPath, yamlFileName);
 
-            isInitialized = true;
-            Debug.Log($"VideoSourceConfigManager initialized successfully. Loaded {videoSources.Count} video sources.");
-
-            // Log loaded video sources
-            foreach (var kvp in videoSources)
+            if (File.Exists(yamlPath))
             {
-                Debug.Log($"Loaded video source: {kvp.Key} with {kvp.Value.properties.Count} properties");
+                LoadConfiguration(yamlPath);
+                Debug.Log($"Load video_source.yml from {yamlPath}");
+            } else {
+                // Copy from StreamingAssets
+                CopyYamlFromStreamingAssets(yamlPath);
             }
-            
-            OnInitialized?.Invoke();
+#endif
         }
         catch (Exception e)
         {
-            Debug.LogError($"Failed to initialize VideoSourceConfigManager: {e.Message}");
+            Debug.Log($"Failed to initialize VideoSourceConfigManager: {e.Message}");
             isInitialized = false;
+        }
+    }
+
+    /// <summary>
+    /// Copy the YAML file from StreamingAssets to persistentDataPath
+    /// </summary>
+    /// <param name="targetPath">The target path where the file should be copied</param>
+    private void CopyYamlFromStreamingAssets(string targetPath)
+    {
+        try
+        {
+#if UNITY_ANDROID && !UNITY_EDITOR
+            // Load from StreamingAssets
+            string streamingAssetsPath = Path.Combine(Application.streamingAssetsPath, yamlFileName);
+            // On Android, StreamingAssets are in a JAR file, use UnityWebRequest
+            StartCoroutine(LoadFromStreamingAssetsCoroutine(streamingAssetsPath, targetPath));
+#endif
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Failed to copy video_source.yml file: {e.Message}");
+            throw;
+        }
+    }
+
+    /// <summary>
+    /// Coroutine to load YAML file from StreamingAssets on Android
+    /// </summary>
+    private System.Collections.IEnumerator LoadFromStreamingAssetsCoroutine(string streamingAssetsPath,
+        string targetPath)
+    {
+        using (UnityWebRequest www = UnityWebRequest.Get(streamingAssetsPath))
+        {
+            yield return www.SendWebRequest();
+
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                try
+                {
+                    // Ensure the directory exists
+                    string directory = Path.GetDirectoryName(targetPath);
+                    if (!Directory.Exists(directory))
+                    {
+                        Directory.CreateDirectory(directory);
+                    }
+
+                    // Write the content to the target path
+                    File.WriteAllText(targetPath, www.downloadHandler.text);
+                    Debug.Log($"Successfully copied video_source.yml from StreamingAssets to {targetPath}");
+
+                    // Load it
+                    LoadConfiguration(targetPath);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogError($"Failed to write YAML file from StreamingAssets: {e.Message}");
+                }
+            }
+            else
+            {
+                Debug.Log($"Failed to load video_source.yml from StreamingAssets: {www.error}");
+            }
         }
     }
 
@@ -203,14 +281,6 @@ public class VideoSourceConfigManager : MonoBehaviour
     {
         var videoSource = GetVideoSource(videoSourceName);
         return videoSource?.GetPropertyNames() ?? new List<string>();
-    }
-
-    /// <summary>
-    /// Reload the configuration from the YAML file
-    /// </summary>
-    public void Reload()
-    {
-        Initialize();
     }
 
     // Example usage methods for testing

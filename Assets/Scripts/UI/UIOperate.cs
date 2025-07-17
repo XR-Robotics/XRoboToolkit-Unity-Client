@@ -83,8 +83,8 @@ public class UIOperate : MonoBehaviour
 #endif
         // Refactoring
         sourceConfig.OnInitialized += OnSourceConfigOnOnInitialized;
-        // Reload because of the component loading order
-        sourceConfig.Reload();
+        // Initialize video source configuration
+        sourceConfig.Initialize();
     }
 
     private void OnSourceConfigOnOnInitialized()
