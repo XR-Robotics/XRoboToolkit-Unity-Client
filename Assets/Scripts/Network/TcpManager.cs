@@ -19,7 +19,7 @@ namespace Robot.V2.Network
         public System.Action<string> OnClientReceived;
 
         public static TcpManager Instance { get; private set; }
-        
+
         public TcpServer TCPServer => tcpServer;
         public TcpClient TCPClient => tcpClient;
 
@@ -176,14 +176,20 @@ namespace Robot.V2.Network
 
         public void ClientSend(string s)
         {
-            Utils.WriteLog(clientTag, $"Send: {s}");
-            TcpClient.Send(Encoding.UTF8.GetBytes(s));
+            if (TcpClient.Status == ClientStatus.Connected)
+            {
+                Utils.WriteLog(clientTag, $"Send: {s}");
+                TcpClient.Send(Encoding.UTF8.GetBytes(s));
+            }
         }
 
         public void ClientSend(byte[] data)
         {
-            Utils.WriteLog(clientTag, $"Send: {data.Length} bytes");
-            TcpClient.Send(data);
+            if (TcpClient.Status == ClientStatus.Connected)
+            {
+                Utils.WriteLog(clientTag, $"Send: {data.Length} bytes");
+                TcpClient.Send(data);
+            }
         }
 
         #endregion

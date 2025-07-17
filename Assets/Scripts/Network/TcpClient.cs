@@ -61,13 +61,15 @@ namespace Robot.V2.Network
 
         public void onConnected()
         {
-            Utils.WriteLog(logTag, "Java TcpClient: Connected");;
+            Utils.WriteLog(logTag, "Java TcpClient: Connected");
+            Status = ClientStatus.Connected;
             OnConnected?.Invoke();
         }
 
         public void onDisconnected()
         {
             Utils.WriteLog(logTag, "Java TcpClient: Disconnected");
+            Status = ClientStatus.Disconnected;
             OnDisconnected?.Invoke();
         }
 

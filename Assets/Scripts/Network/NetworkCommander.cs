@@ -98,10 +98,10 @@ namespace Network
                 // The stream only works for the VR headset
                 if (cameraConfig.camera.Equals("VR"))
                 {
-                    CameraHandleUDP.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
+                    CameraHandle.StartCameraPreview(cameraConfig.width, cameraConfig.height, cameraConfig.fps,
                         cameraConfig.bitrate, cameraConfig.enableMvHevc,
                         cameraConfig.renderMode,
-                        () => { CameraHandleUDP.StartSendImage(cameraConfig.ip, cameraConfig.port); });
+                        () => { CameraHandle.StartSendImage(cameraConfig.ip, cameraConfig.port); });
                     // CameraSendToBtn.SetOn(true);
                 }
             }
@@ -113,7 +113,7 @@ namespace Network
             {
                 Debug.Log("Handling CLOSE_CAMERA command with data: " + BitConverter.ToString(data));
                 // Stop the camera preview
-                CameraHandleUDP.StopPreview();
+                CameraHandle.StopPreview();
             }
         }
     }
