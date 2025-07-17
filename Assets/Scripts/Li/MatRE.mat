@@ -68,7 +68,7 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HeightCompressionFactor: 1.33
+    - _HeightCompressionFactor: 1.777778
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
@@ -78,6 +78,8 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
+    - _contentRatio: 1.8
+    - _heightCompressionFactor: 1.333333
     - _visibleRatio: 0.555
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

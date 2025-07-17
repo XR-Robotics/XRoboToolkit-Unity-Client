@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,19 +18,23 @@ public class SetLERE : MonoBehaviour
     //private float contentRatio = 0.88f;
     private float visibleRatio = 0.555f;
     private float contentRatio = 1.8f;
-    
-    public void ResetRatios()
+    private float heightCompressionFactor = 1.333333f; // 4:3 aspect ratio
+
+    public void UpdateParameters(float visible, float content, float heightCompression)
     {
-        visibleRatio = 0.555f;
-        contentRatio = 1.8f;
-        Debug.Log($"Reset - visibleRatio: {visibleRatio} - contentRatio: {contentRatio}");
-    }
-    
-    public void UpdateRatios(float visible, float content)
-    {
+        // Adjust the ratios based on the height compression factor
         visibleRatio = visible;
         contentRatio = content;
-        Debug.Log($"Updated - visibleRatio: {visibleRatio} - contentRatio: {contentRatio}");
+        heightCompressionFactor = heightCompression;
+
+        // Log the updated values
+        Debug.Log($"Updated Ratios - visible: {visibleRatio}, content: {contentRatio}, heightCompression: {heightCompressionFactor}");
+    }
+    
+    public void ResetCanvases()
+    {
+        CanvLE.SetActive(false);
+        CanvRE.SetActive(false);
     }
 
     void Update()
@@ -49,6 +54,8 @@ public class SetLERE : MonoBehaviour
             matRE.SetFloat("_visibleRatio", visibleRatio);
             matLE.SetFloat("_contentRatio", contentRatio);
             matRE.SetFloat("_contentRatio", contentRatio);
+            matLE.SetFloat("_heightCompressionFactor", heightCompressionFactor);
+            matRE.SetFloat("_heightCompressionFactor", heightCompressionFactor);
         }
 
         if (Input.GetKeyDown(KeyCode.Q))

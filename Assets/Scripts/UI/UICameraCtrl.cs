@@ -1,10 +1,16 @@
 using System;
+using System.Collections;
 using System.IO;
 using LitJson;
+using Network;
 using Robot;
+using Robot.Conf;
+using Robot.Network;
+using Robot.V2.Network;
 using Unity.XR.PICO.TOBSupport;
 using UnityEngine;
 using UnityEngine.UI;
+using XRoboToolkit.Network;
 
 public partial class UICameraCtrl : MonoBehaviour
 {
@@ -16,7 +22,7 @@ public partial class UICameraCtrl : MonoBehaviour
     public CustomButton RecordBtn;
     public CustomButton ListenCameraBtn;
     public CustomButton CameraSendToBtn;
-    
+
     public CustomButton ListenPCCameraBtn;
     public Dropdown cameraDropdown;
 
@@ -25,27 +31,168 @@ public partial class UICameraCtrl : MonoBehaviour
     private JsonData _recordJson;
     public Text CameraStatusText;
 
+    public CustomButton listenBtn;
+    public VideoSourceManager videoSourceManager;
+
+    public TcpManager tcpManager;
+    private string logTag => "UICameraCtrl";
+
+    private int streamingPort = 12345;
+
     private void Awake()
     {
         RecordBtn.OnChange += OnRecordBtn;
-        CameraSendToBtn.OnChange += OnCameraSendToBtn;
-        ListenCameraBtn.OnChange += OnListenCameraBtnBtn;
-        ListenPCCameraBtn.OnChange += ListenPCCameraBtnOnOnChange;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
         CameraHandle.AddStateListener(OnCameraStateChanged);
+
+        // Refactoring
+        listenBtn.OnChange += OnListenCameraBtn;
+
+        // Bind event
+        tcpManager.OnServerReceived += OnServerReceived;
+        tcpManager.OnClientReceived += OnClientReceived;
     }
-    
-    private void ListenPCCameraBtnOnOnChange(bool on)
+
+    private void OnServerReceived(byte[] data)
+    {
+        // apply protocol
+        Utils.WriteLog(logTag, $"OnServerReceived: {data.Length} bytes");
+
+        // Log first few bytes for debugging
+        if (data.Length > 0)
+        {
+            string hexDump = BitConverter.ToString(data, 0, Math.Min(data.Length, 32));
+            Utils.WriteLog(logTag, $"First bytes (hex): {hexDump}");
+        }
+
+        EventExecutor.ExecuteInUpdate(() =>
+        {
+            try
+            {
+                Utils.WriteLog(logTag, $"Processing data...");
+
+                // Check if it's a complete message first
+                if (!NetworkDataProtocolSerializer.IsCompleteMessage(data))
+                {
+                    Utils.WriteLog(logTag, $"Incomplete message received");
+                    return;
+                }
+
+                var protocol = NetworkDataProtocolSerializer.Deserialize(data);
+                Utils.WriteLog(logTag, $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
+
+                // Process the command
+                if (NetworkCommander.Instance == null)
+                {
+                    Utils.WriteLog(logTag, $"NetworkCommander.Instance is null");
+                    return;
+                }
+
+                if (NetworkCommander.Instance.Processor == null)
+                {
+                    Utils.WriteLog(logTag, $"NetworkCommander.Instance.Processor is null");
+                    return;
+                }
+
+                bool handled = NetworkCommander.Instance.Processor.ProcessCommand(protocol);
+                Utils.WriteLog(logTag, $"Command processed: {handled}");
+            }
+            catch (Exception e)
+            {
+                Utils.WriteLog(logTag, $"Error processing command: {e.Message}");
+                Utils.WriteLog(logTag, $"Stack trace: {e.StackTrace}");
+
+                // Log detailed buffer analysis
+                string bufferDebug = NetworkDataProtocolSerializer.DebugBufferContents(data);
+                Utils.WriteLog(logTag, $"Buffer analysis:\n{bufferDebug}");
+            }
+        });
+    }
+
+    private void OnClientReceived(string msg)
+    {
+        Utils.WriteLog(logTag, $"OnClientReceived: {msg}");
+    }
+
+    public void OnListenCameraBtn(bool on)
     {
         if (on)
         {
-            ListenPCCamera();
+            // check if the dropdown is updated
+            if (cameraDropdown.options == null || cameraDropdown.options.Count == 0) return;
+
+            // get the camera source from the dropdown
+            var cameraSource = cameraDropdown.options[cameraDropdown.value].text;
+
+            // Update camera source, including shaders, etc.
+            videoSourceManager.UpdateVideoSource(cameraSource);
+
+            // send video stream request to the server
+            CameraSendInputDialog.Show(RequestCameraStream);
         }
         else
         {
             RemoteCameraWindowObj.SetActive(false);
         }
-        ListenPCCameraBtn.SetOn(on);
+
+        // Update button
+        listenBtn.SetOn(on);
+    }
+
+    public void RequestCameraStream(string ip)
+    {
+        StartCoroutine(RequestCameraStreamCoroutine(ip));
+    }
+
+    IEnumerator RequestCameraStreamCoroutine(string ip)
+    {
+        if (TcpServer.Status == ServerStatus.Started)
+        {
+            // Close TcpServer first
+            TcpManager.Instance.StopServer();   
+        }
+
+        yield return new WaitForSeconds(0.1f);
+
+        // Get camera parameters
+        var camPara = VideoSourceConfigManager.Instance.CameraParameters;
+
+        // Start listening to the camera
+        RemoteCameraWindowObj.SetActive(true);
+        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(camPara.width, camPara.height, camPara.fps,
+            camPara.bitrate, streamingPort);
+
+        yield return new WaitForSeconds(0.2f);
+        
+        // Reset LERE
+        setLere.ResetCanvases();
+
+        yield return new WaitForSeconds(0.1f);
+
+        if (TcpClient.Status != ClientStatus.Connected)
+        {
+            // initialize TcpClient, server IP is the video source IP
+            TcpManager.Instance.StartClient(ip);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        var localIP = Utils.GetLocalIPv4();
+
+        // Send request to the server
+        var customConfig = CameraRequestSerializer.FromCameraParameters(
+            camPara,
+            0,
+            2, // (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D
+            VideoSourceConfigManager.Instance.CurrentVideoSource.camera,
+            localIP, // local ip
+            streamingPort);
+
+        // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
+        var data = CameraRequestSerializer.Serialize(customConfig);
+
+        // Use network commander
+        NetworkCommander.Instance.OpenCamera(data);
     }
 
     private void OnCameraStateChanged(int state)
@@ -58,73 +205,6 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         TcpHandler.ReceiveFunctionEvent -= OnNetReceive;
         CameraHandle.RemoveStateListener(OnCameraStateChanged);
-    }
-
-    private void OnCameraSendToBtn(bool on)
-    {
-        if (on)
-        {
-            CameraSendInputDialog.Show(SendVRCameraToVR);
-        }
-        else
-        {
-            StopSendImage();
-        }
-    }
-
-    public void SendVRCameraToVR(string ip)
-    {
-        CameraHandle.StartCameraPreview(1920, 1920/2, 60, 20 * 1024 * 1024, 0,
-            (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D,
-            () => { CameraHandle.StartSendImage(ip, 12345); });
-        CameraSendToBtn.SetOn(true);
-    }
-
-    private void OnListenCameraBtnBtn(bool on)
-    {
-        if (on)
-        {
-            ListenVRCamera();
-        }
-        else
-        {
-            RemoteCameraWindowObj.SetActive(false);
-        }
-    }
-
-    public void ListenVRCamera()
-    {
-        RemoteCameraWindowObj.SetActive(true);
-        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(1920, 1920 / 2, 60, 20 * 1024 * 1024, 12345);
-        // update shader parameters
-        setLere.ResetRatios();
-    }
-    
-    void UpdateShaderParams()
-    {
-        // default is vr's
-        var visibleRatio = 0.555f;
-        var contentRatio = 1.8f;
-        switch (cameraDropdown.value)
-        {
-            case 0:
-                // zed
-                visibleRatio = 0.4394638240337372f;
-                contentRatio = 1.7048496007919312f;
-                break;
-            default:
-                break;
-        }
-        // Update
-        setLere.UpdateRatios(visibleRatio, contentRatio);
-    }
-    
-    public void ListenPCCamera()
-    {
-        RemoteCameraWindowObj.SetActive(true);
-        RemoteCameraWindowObj.GetComponent<RemoteCameraWindow>().StartListen(2560, 720, 60, 4 * 1000 * 1000, 12345);
-        // update shader parameters
-        UpdateShaderParams();
     }
 
     private void OnRecordBtn(bool on)

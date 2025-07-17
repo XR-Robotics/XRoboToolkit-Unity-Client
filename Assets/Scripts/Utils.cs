@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Sockets;
 using Unity.XR.PICO.TOBSupport;
 using Unity.XR.PXR;
+using UnityEngine;
 
 namespace Robot
 {
@@ -118,6 +119,16 @@ namespace Robot
             return true;
 #endif
             return PXR_Input.GetControllerDeviceType() == PXR_Input.ControllerDevice.PICO_4U;
+        }
+        
+        public static void WriteLog(string tag, string msg)
+        {
+#if UNITY_EDITOR
+            Debug.Log($"[XRoboToolkit]<color=red>{tag}</color>\t{msg}");
+#else
+            // Output to logcat
+            Debug.Log($"[XRoboToolkit]\t{tag}\t{msg}");
+#endif
         }
     }
 }

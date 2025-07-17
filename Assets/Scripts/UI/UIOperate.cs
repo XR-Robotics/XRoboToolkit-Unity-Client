@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Robot;
+using Robot.Conf;
 using Unity.XR.PICO.TOBSupport;
 using Unity.XR.PXR;
 using UnityEngine;
@@ -34,6 +35,13 @@ public class UIOperate : MonoBehaviour
     public GameObject ExtDevPanel;
     public InputActionProperty SendDataAction;
 
+    [Space(30)]
+    [Header("Refactoring")]
+    public VideoSourceManager videoSource;
+    public VideoSourceConfigManager sourceConfig => videoSource.videoSourceConfigManager;
+
+    public Dropdown videoSourceDropdown;
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -43,7 +51,7 @@ public class UIOperate : MonoBehaviour
             Simulator.SetActive(true);
         }
 #endif
-        ReconnectBtn.gameObject.SetActive(false);
+        // ReconnectBtn.gameObject.SetActive(false);
 
         bodyModeDrop.onValueChanged.AddListener(OnBodyModeDrop);
         HeadTog.onValueChanged.AddListener(OnHeadTog);
@@ -64,15 +72,27 @@ public class UIOperate : MonoBehaviour
         Debug.Log("---InitEnterpriseService :" + intEnterprise);
         PXR_Enterprise.BindEnterpriseService(OnBindEnterpriseService);
 
-        if (CameraObj != null)
-        {
-            CameraObj.SetActive(false);
-        }
+        // if (CameraObj != null)
+        // {
+        //     CameraObj.SetActive(false);
+        // }
 
         AndroidProxy.CallBack += OnAndroidCallBack;
 #if UNITY_EDITOR
         SetDeviceSN("TestDevice");
 #endif
+        // Refactoring
+        sourceConfig.OnInitialized += OnSourceConfigOnOnInitialized;
+        // Reload because of the component loading order
+        sourceConfig.Reload();
+    }
+
+    private void OnSourceConfigOnOnInitialized()
+    {
+        // Update videoSourceDropdown options
+        print("OnSourceConfigOnOnInitialized");
+        videoSourceDropdown.ClearOptions();
+        videoSourceDropdown.AddOptions(sourceConfig.GetVideoSourceNames());
     }
 
     private void OnAndroidCallBack(string key, string value)
@@ -100,7 +120,7 @@ public class UIOperate : MonoBehaviour
 
     public void TcpConnect(string ip)
     {
-        TargetIP.text = "To:" + ip;
+        TargetIP.text = "PC Service: " + ip;
         ReconnectBtn.gameObject.SetActive(true);
         TcpHandler.Connect(ip);
         ConnectSuccess();
@@ -108,7 +128,7 @@ public class UIOperate : MonoBehaviour
 
     public void ConnectSuccess()
     {
-        TargetIP.text = "To:" + TcpHandler.GetTargetIP;
+        TargetIP.text = "PC Service: " + TcpHandler.GetTargetIP;
     }
 
     private void OnBindEnterpriseService(bool bind)
@@ -129,8 +149,8 @@ public class UIOperate : MonoBehaviour
     private void SetDeviceSN(string sn)
     {
         TcpHandler.SetDeviceSn(sn);
-        Debug.Log("SN:" + sn);
-        SN.text = "SN:" + sn;
+        Debug.Log("SN: " + sn);
+        SN.text = "SN: " + sn;
     }
 
     private void OnNetShareTog(bool ison)

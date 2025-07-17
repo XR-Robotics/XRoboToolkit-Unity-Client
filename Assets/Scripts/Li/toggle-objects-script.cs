@@ -10,12 +10,17 @@ public class ToggleCameraClippingPlane : MonoBehaviour
     [Header("Clipping Plane Values")]
     [SerializeField] private float nearClipValueA = 0.1f;
     [SerializeField] private float nearClipValueB = 0.35f;
+
+    [Header("RemoteCameraWindow")] public GameObject remoteCameraWindow;
     
     private bool wasButtonPressed = false;
     private bool useValueA = true; // Start with the first value
     
     void Update()
     {
+        // Return if the remote camera window is not active
+        if (!remoteCameraWindow.activeSelf) return;
+        
         // Get the right controller directly using XRNode
         var rightControllerDevice = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
         
