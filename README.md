@@ -23,7 +23,7 @@
 | Tracking - Data & Control - Send               | Toggle On/Off to sync above selected poses between XR device and robot PC                                |
 | Tracking - Data & Control - Switch w/ A Button | Toggle On/Off to rapid pause or resume sync with  the right-hand controller button A                     |
 | Tracking - Info                                | Panel to show tracking related information                                                               |
-| Camera - Dropdown (Video Source)               | Select a supported video source (configured in the `video_source.yml` file)                              |
+| Camera - Dropdown (Video Source)               | Select a supported video source                                                                          |
 | Camera - Listen                                | Open a connection to receive the video stream to the selected video source (used on human operator side) |
 | Camera - Save Camera Parameters                | Save camera intrinsic and extrinsic parameters in local path                                             |
 | Camera - Record                                | Record data                                                                                              |
@@ -296,6 +296,21 @@ A: Connect the headset to public internet and run it.
 - Q: Failed to connect on Linux.
 
 A: Ensure the PC and headset are in the same WiFi network. Run the 3D application first and then run the Headset App.
+
+- Q: How to update the video source? [V1.1.0+]
+
+A: Do the following steps:
+```bash
+# pull the file first
+adb pull /sdcard/Android/data/com.xrobotoolkit.client/files/video_source.yml
+# edit the video_source.yml
+# push the file back
+adb push video_source.yml /sdcard/Android/data/com.xrobotoolkit.client/files/video_source.yml
+```
+
+- Q: How to revert the video source to default? [V1.1.0+]
+
+A: Run `adb shell rm /sdcard/Android/data/com.xrobotoolkit.client/files/video_source.yml`.
 
 ---
 
