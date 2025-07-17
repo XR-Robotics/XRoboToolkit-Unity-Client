@@ -50,7 +50,8 @@ public class RemoteCameraWindow : MonoBehaviour
 
     private void OnDisable()
     {
-        MediaDecoder.release();
+        // MediaDecoder.release();
+        MediaDecoderUDP.release();
         Debug.Log("RemoteCameraWindow OnDisable");
         TcpHandler.SendFunctionValue("StopReceivePcCamera", "");
     }
@@ -72,8 +73,10 @@ public class RemoteCameraWindow : MonoBehaviour
         RemoteCameraImage.texture = _texture;
         yield return null;
 
-        MediaDecoder.initialize((int)_texture.GetNativeTexturePtr(), _resolutionWidth, _resolutionHeight);
-        MediaDecoder.startServer(port, true);
+        // MediaDecoder.initialize((int)_texture.GetNativeTexturePtr(), _resolutionWidth, _resolutionHeight);
+        // MediaDecoder.startServer(port, true);
+        MediaDecoderUDP.initialize((int)_texture.GetNativeTexturePtr(), _resolutionWidth, _resolutionHeight);
+        MediaDecoderUDP.startServer(port, true);
         yield return null;
 
         JsonData cameraParam = new JsonData();
@@ -102,9 +105,14 @@ public class RemoteCameraWindow : MonoBehaviour
         {
             if (Application.platform == RuntimePlatform.Android)
             {
-                if (MediaDecoder.isUpdateFrame())
+                // if (MediaDecoder.isUpdateFrame())
+                // {
+                //     MediaDecoder.updateTexture();
+                //     GL.InvalidateState();
+                // }
+                if (MediaDecoderUDP.isUpdateFrame())
                 {
-                    MediaDecoder.updateTexture();
+                    MediaDecoderUDP.updateTexture();
                     GL.InvalidateState();
                 }
             }

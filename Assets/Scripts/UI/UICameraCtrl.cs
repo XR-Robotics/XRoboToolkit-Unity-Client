@@ -42,9 +42,8 @@ public partial class UICameraCtrl : MonoBehaviour
     private void Awake()
     {
         RecordBtn.OnChange += OnRecordBtn;
-        CameraSendToBtn.OnChange += OnCameraSendToBtn;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
-        CameraHandle.AddStateListener(OnCameraStateChanged);
+        CameraHandleUDP.AddStateListener(OnCameraStateChanged);
 
         // Refactoring
         listenBtn.OnChange += OnListenCameraBtn;
@@ -205,27 +204,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private void OnDestroy()
     {
         TcpHandler.ReceiveFunctionEvent -= OnNetReceive;
-        CameraHandle.RemoveStateListener(OnCameraStateChanged);
-    }
-
-    private void OnCameraSendToBtn(bool on)
-    {
-        if (on)
-        {
-            CameraSendInputDialog.Show(SendVRCameraToVR);
-        }
-        else
-        {
-            StopSendImage();
-        }
-    }
-
-    public void SendVRCameraToVR(string ip)
-    {
-        CameraHandle.StartCameraPreview(1920, 1920 / 2, 60, 20 * 1024 * 1024, 0,
-            (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D,
-            () => { CameraHandle.StartSendImage(ip, 12345); });
-        CameraSendToBtn.SetOn(true);
+        CameraHandleUDP.RemoveStateListener(OnCameraStateChanged);
     }
 
     private void OnRecordBtn(bool on)
@@ -261,14 +240,14 @@ public partial class UICameraCtrl : MonoBehaviour
 
         Toast.Show("Start Record");
         Debug.Log("StartRecord:" + width + "," + height + "," + fps + "," + bitrate + "," + onTrackingData);
-        CameraHandle.StartCameraPreview(width, height, fps, bitrate, 0,
+        CameraHandleUDP.StartCameraPreview(width, height, fps, bitrate, 0,
             (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D,
             () =>
             {
                 string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string trackingFileName = $"CameraRecord_{timeStamp}.mp4";
                 string filePath = Path.Combine("/sdcard/Download/", trackingFileName);
-                CameraHandle.StartRecord(filePath);
+                CameraHandleUDP.StartRecord(filePath);
                 _recordTrackingData = onTrackingData;
                 if (_recordTrackingData)
                     OnStartRecordTracking(width, height);
@@ -282,8 +261,8 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         ResolutionDialog.Show("Setting the resolution", (width, height) =>
         {
-            string cameraIntrinsics = CameraHandle.GetCameraIntrinsics(width, height);
-            string cameraExtrinsics = CameraHandle.GetCameraExtrinsics();
+            string cameraIntrinsics = CameraHandleUDP.GetCameraIntrinsics(width, height);
+            string cameraExtrinsics = CameraHandleUDP.GetCameraExtrinsics();
 
             string saveStr = "CameraExtrinsics:" + cameraExtrinsics + "\n";
             saveStr += "cameraIntrinsics:" + cameraIntrinsics;
@@ -313,15 +292,15 @@ public partial class UICameraCtrl : MonoBehaviour
             _writer = null;
         }
 
-        CameraHandle.StopPreview();
-        CameraHandle.CloseCamera();
+        CameraHandleUDP.StopPreview();
+        CameraHandleUDP.CloseCamera();
         RecordBtn.SetOn(false);
     }
 
     private void StopSendImage()
     {
-        CameraHandle.StopPreview();
-        CameraHandle.CloseCamera();
+        CameraHandleUDP.StopPreview();
+        CameraHandleUDP.CloseCamera();
         CameraSendToBtn.SetOn(false);
     }
 
@@ -354,8 +333,8 @@ public partial class UICameraCtrl : MonoBehaviour
         cameraParam["timeStampNs"] = nsTime;
         //Convert coordinate system to right-handed system (X right, Y up, Z in)
 
-        string cameraExtrinsics = CameraHandle.GetCameraExtrinsics();
-        string cameraIntrinsics = CameraHandle.GetCameraIntrinsics(width, height);
+        string cameraExtrinsics = CameraHandleUDP.GetCameraExtrinsics();
+        string cameraIntrinsics = CameraHandleUDP.GetCameraIntrinsics(width, height);
         cameraParam["cameraExtrinsics"] = cameraExtrinsics;
         cameraParam["cameraIntrinsics"] = cameraIntrinsics;
         _writer.WriteLine(cameraParam.ToJson());
@@ -375,17 +354,17 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnApplicationPause(bool pauseStatus)
     {
-        if (CameraHandle.GetCaptureState() == (int)PXRCaptureState.CAPTURE_STATE_CAMERA_OPENING)
+        if (CameraHandleUDP.GetCaptureState() == (int)PXRCaptureState.CAPTURE_STATE_CAMERA_OPENING)
         {
             if (pauseStatus)
             {
                 //release camera
-                CameraHandle.CloseCamera();
+                CameraHandleUDP.CloseCamera();
             }
             else
             {
                 //reopen camera
-                CameraHandle.OpenCamera();
+                CameraHandleUDP.OpenCamera();
             }
         }
     }
