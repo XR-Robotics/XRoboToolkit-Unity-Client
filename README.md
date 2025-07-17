@@ -18,8 +18,8 @@
 | Tracking - Head                                | Toggle On/Off to send out head 6 DoF pose                                                                |
 | Tracking - Controller                          | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream                       |
 | Tracking - Hand                                | Toggle On/Off to parse hand tracking data in data stream                                                 |
-| Tracking - Body Tracking - Mode                | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream          |
-| Tracking - Body Tracking - TrackerNum          | Number of the trackers                                                                                   |
+| Tracking - PICO Motion Tracker - Mode          | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream          |
+| Tracking - PICO Motion Tracker - TrackerNum    | Number of the trackers                                                                                   |
 | Tracking - Data & Control - Send               | Toggle On/Off to sync above selected poses between XR device and robot PC                                |
 | Tracking - Data & Control - Switch w/ A Button | Toggle On/Off to rapid pause or resume sync with  the right-hand controller button A                     |
 | Tracking - Info                                | Panel to show tracking related information                                                               |
