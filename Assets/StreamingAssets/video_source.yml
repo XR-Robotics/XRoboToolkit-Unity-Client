@@ -18,15 +18,15 @@
     - name: "RawImageRectSize"
       type: "string"
       description: "Size of the RawImage rectangle for the stereo view"
-      value: "585.6x282.6"
+      value: "600x225"
     - name: "CamWidth"
       type: "int"
       description: "Camera width for the video stream"
-      value: 1920
+      value: 2160
     - name: "CamHeight"
       type: "int"
       description: "Camera height for the video stream"
-      value: 960
+      value: 810
     - name: "CamFPS"
       type: "int"
       description: "Frame rate of the video stream in FPS"

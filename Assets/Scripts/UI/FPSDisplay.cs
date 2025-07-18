@@ -24,11 +24,20 @@ public class FPSDisplay : MonoBehaviour
 
     private void Update()
     {
-        if (Time.frameCount % 10 == 0)
+        if (fpsText != null)
         {
-            // Calculate FPS
-            var fps = 1000.0f / deltaTime;
-            if (fpsText != null) fpsText.text = $"FPS: {fps:f1}";
+            if (Time.frameCount % 10 == 0)
+            {
+                var text = $"FPS: N/A";
+                // Calculate FPS
+                if (deltaTime > 0)
+                {
+                    var fps = 1000.0f / deltaTime;
+                    text = $"{fps:F1}";
+                }
+
+                fpsText.text = text;
+            }
         }
     }
 }

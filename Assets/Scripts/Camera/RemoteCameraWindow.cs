@@ -73,7 +73,7 @@ public class RemoteCameraWindow : MonoBehaviour
         yield return null;
 
         MediaDecoder.initialize((int)_texture.GetNativeTexturePtr(), _resolutionWidth, _resolutionHeight);
-        MediaDecoder.startServer(port, true);
+        MediaDecoder.startServer(port, false);
         yield return null;
 
         JsonData cameraParam = new JsonData();
