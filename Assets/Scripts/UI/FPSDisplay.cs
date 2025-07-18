@@ -21,6 +21,14 @@ public class FPSDisplay : MonoBehaviour
         deltaTime += (unDeltaTime - deltaTime) * 0.1f;
         //   Debug.Log("deltaTime:" + deltaTime);
     }
+    
+    public static void Reset()
+    {
+        if (deltaTime > 0)
+        {
+            deltaTime = 0f;   
+        }
+    }
 
     private void Update()
     {
@@ -33,7 +41,7 @@ public class FPSDisplay : MonoBehaviour
                 if (deltaTime > 0)
                 {
                     var fps = 1000.0f / deltaTime;
-                    text = $"{fps:F1}";
+                    text = $"FPS: {fps:F1}";
                 }
 
                 fpsText.text = text;

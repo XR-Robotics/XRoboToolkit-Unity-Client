@@ -309,6 +309,11 @@ public class UIOperate : MonoBehaviour
     private void OnSendTog(bool on)
     {
         TcpHandler.SendTrackingData = on;
+        // Reset FPS
+        if(!on)
+        {
+            FPSDisplay.Reset();
+        }
     }
 
     private void OnHighAccuracy(bool on)
