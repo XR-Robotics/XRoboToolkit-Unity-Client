@@ -185,5 +185,25 @@ namespace Robot
         {
             return GetJavaObject().Call<int>("CloseCamera");
         }
+
+        #region Record
+
+
+        public static void initializeTexture(int unityTextureId, int width, int height)
+        {
+            GetJavaObject().Call("initializeTexture", unityTextureId, width, height);
+        }
+
+        public static bool isUpdateFrame()
+        {
+            return GetJavaObject().Call<bool>("isUpdateFrame");
+        }
+
+        public static void updateTexture()
+        {
+            GetJavaObject().Call("updateTexture");
+        }
+
+        #endregion
     }
 }

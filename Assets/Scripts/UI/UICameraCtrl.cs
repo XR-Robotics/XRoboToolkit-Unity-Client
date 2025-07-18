@@ -39,6 +39,11 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private int streamingPort = 12345;
 
+    private Texture2D _texture;
+    public Texture2D Texture => _texture;
+
+    public RawImage localCameraImage;
+
     private void Awake()
     {
         RecordBtn.OnChange += OnRecordBtn;
@@ -79,7 +84,8 @@ public partial class UICameraCtrl : MonoBehaviour
                 }
 
                 var protocol = NetworkDataProtocolSerializer.Deserialize(data);
-                Utils.WriteLog(logTag, $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
+                Utils.WriteLog(logTag,
+                    $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
 
                 // Process the command
                 if (NetworkCommander.Instance == null)
@@ -149,7 +155,7 @@ public partial class UICameraCtrl : MonoBehaviour
         if (TcpServer.Status == ServerStatus.Started)
         {
             // Close TcpServer first
-            TcpManager.Instance.StopServer();   
+            TcpManager.Instance.StopServer();
         }
 
         yield return new WaitForSeconds(0.1f);
@@ -163,7 +169,7 @@ public partial class UICameraCtrl : MonoBehaviour
             camPara.bitrate, streamingPort);
 
         yield return new WaitForSeconds(0.2f);
-        
+
         // Reset LERE
         setLere.ResetCanvases();
 
@@ -228,18 +234,18 @@ public partial class UICameraCtrl : MonoBehaviour
         }, null);
     }
 
-    private void StartRecord(int width, int height, int fps, int bitrate,
+    public IEnumerator OnStartRecord(int width, int height, int fps, int bitrate,
         bool onTrackingData)
     {
-        //The VR camera image acquisition is only effective on the B-end device of Pico4U.
-        if (!Utils.IsPico4U())
-        {
-            Toast.Show("Please use B-end pico4U devices and apply for camera permissions.");
-            return;
-        }
+        _texture = new Texture2D(width, height, TextureFormat.RGB24, false, false);
+        localCameraImage.texture = _texture;
 
-        Toast.Show("Start Record");
-        Debug.Log("StartRecord:" + width + "," + height + "," + fps + "," + bitrate + "," + onTrackingData);
+        yield return new WaitForSeconds(0.1f);
+
+        CameraHandle.initializeTexture((int)_texture.GetNativeTexturePtr(), width, height);
+
+        yield return new WaitForSeconds(0.1f);
+
         CameraHandle.StartCameraPreview(width, height, fps, bitrate, 0,
             (int)PXRCaptureRenderMode.PXRCapture_RenderMode_3D,
             () =>
@@ -254,7 +260,24 @@ public partial class UICameraCtrl : MonoBehaviour
             });
 
         RecordBtn.SetOn(true);
+
         // PreviewCameraTog.gameObject.SetActive(true);
+    }
+
+    private void StartRecord(int width, int height, int fps, int bitrate,
+        bool onTrackingData)
+    {
+        //The VR camera image acquisition is only effective on the B-end device of Pico4U.
+        if (!Utils.IsPico4U())
+        {
+            Toast.Show("Please use B-end pico4U devices and apply for camera permissions.");
+            return;
+        }
+
+        Toast.Show("Start Record");
+        Debug.Log("StartRecord:" + width + "," + height + "," + fps + "," + bitrate + "," + onTrackingData);
+
+        StartCoroutine(OnStartRecord(width, height, fps, bitrate, onTrackingData));
     }
 
     public void UpdateCameraParamsNew()
@@ -291,15 +314,13 @@ public partial class UICameraCtrl : MonoBehaviour
             _writer.Close();
             _writer = null;
         }
-
-        CameraHandle.StopPreview();
+        
         CameraHandle.CloseCamera();
         RecordBtn.SetOn(false);
     }
 
     private void StopSendImage()
     {
-        CameraHandle.StopPreview();
         CameraHandle.CloseCamera();
         CameraSendToBtn.SetOn(false);
     }
@@ -342,6 +363,18 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void Update()
     {
+        if (_texture != null)
+        {
+            if (Application.platform == RuntimePlatform.Android)
+            {
+                if (CameraHandle.isUpdateFrame())
+                {
+                    CameraHandle.updateTexture();
+                    GL.InvalidateState();
+                }
+            }
+        }
+
         if (_recordTrackingData)
         {
             if (_writer != null)
