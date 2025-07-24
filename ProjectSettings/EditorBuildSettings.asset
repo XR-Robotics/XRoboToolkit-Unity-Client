@@ -5,9 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
+  - enabled: 0
     path: Assets/Main.unity
     guid: 93158e6ea578d1a4486e536d4a7bd999
+  - enabled: 1
+    path: Assets/Main-dev.unity
+    guid: f527d75797f06ec48af43b748f5c36e9
   m_configObjects:
     Unity.XR.PXR.Settings: {fileID: 11400000, guid: baaededcd5eca33479b1d58ea0d96039, type: 2}
     com.unity.input.settings: {fileID: 11400000, guid: f2ef844c0e47a5d4297d66125bf1d191, type: 2}

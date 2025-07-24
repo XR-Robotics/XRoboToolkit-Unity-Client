@@ -16,6 +16,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+            <meta-data android:name="pvr.app.type" android:value="vr" />
 			<meta-data android:name="enable_mr_safeguard"  android:value="1" />
 			
         </activity>

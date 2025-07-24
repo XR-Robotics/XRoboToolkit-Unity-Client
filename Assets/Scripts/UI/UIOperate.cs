@@ -339,7 +339,7 @@ public class UIOperate : MonoBehaviour
             MotionTrackerConnectState state = new MotionTrackerConnectState();
             PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
             //  PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
-            TrackNum.text = "TrackerNum:" + state.trackerSum;
+            TrackNum.text = "Num: " + state.trackerSum;
 
             if (tType == TrackingData.TrackingType.Body)
             {
