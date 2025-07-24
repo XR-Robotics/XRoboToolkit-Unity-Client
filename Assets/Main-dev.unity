@@ -3250,13 +3250,13 @@ MonoBehaviour:
     m_Top: 0
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: -3.38
+  m_Spacing: -9.71
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 0
   m_ChildControlHeight: 0
-  m_ChildScaleWidth: 0
-  m_ChildScaleHeight: 0
+  m_ChildScaleWidth: 1
+  m_ChildScaleHeight: 1
   m_ReverseArrangement: 0
 --- !u!1 &229172970 stripped
 GameObject:
@@ -18681,7 +18681,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Padding:
-    m_Left: 13
+    m_Left: 15
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
@@ -19854,7 +19854,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 10
-    m_Right: -12
+    m_Right: -4
     m_Top: 7
     m_Bottom: 0
   m_ChildAlignment: 0
@@ -30237,7 +30237,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -16.84, y: 0}
+  m_AnchoredPosition: {x: -12.11, y: 0}
   m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &4175409767687193328
@@ -34847,7 +34847,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -12, y: 0}
+  m_AnchoredPosition: {x: -9.09, y: 0}
   m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &5383722988833821781
@@ -35967,7 +35967,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0.5}
   m_AnchorMax: {x: 1, y: 0.5}
-  m_AnchoredPosition: {x: -302.93, y: -0.100040436}
+  m_AnchoredPosition: {x: -304.05, y: -0.100040436}
   m_SizeDelta: {x: 24, y: 24}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5691809735394115259
@@ -38740,7 +38740,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_Padding:
     m_Left: 0
-    m_Right: 22
+    m_Right: 24
     m_Top: -20
     m_Bottom: 0
   m_ChildAlignment: 0
@@ -40155,7 +40155,7 @@ MonoBehaviour:
     m_Top: 9
     m_Bottom: 0
   m_ChildAlignment: 0
-  m_Spacing: -752.76
+  m_Spacing: -762.12
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0
