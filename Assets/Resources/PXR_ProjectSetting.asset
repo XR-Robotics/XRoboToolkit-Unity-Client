@@ -41,7 +41,7 @@ MonoBehaviour:
   selfAdaptiveSharpening: 0
   handTrackingSupportType: 0
   arFoundation: 0
-  mrSafeguard: 0
+  mrSafeguard: 1
   enableRecommendMSAA: 1
   recommendSubsamping: 0
   recommendMSAA: 1
