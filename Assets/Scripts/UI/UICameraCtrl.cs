@@ -193,6 +193,8 @@ public partial class UICameraCtrl : MonoBehaviour
             VideoSourceConfigManager.Instance.CurrentVideoSource.camera,
             localIP, // local ip
             streamingPort);
+        
+        LogWindow.Info("Requesting camera stream with config: " + customConfig.ToString());
 
         // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
@@ -286,7 +288,7 @@ public partial class UICameraCtrl : MonoBehaviour
                 string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string trackingFileName = $"CameraRecord_{timeStamp}.mp4";
                 string filePath = Path.Combine("/sdcard/Download/", trackingFileName);
-                LogWindow.Info("Camera file path: " + filePath);
+                LogWindow.Warn("Vision file path: " + filePath);
                 CameraHandle.StartRecord(filePath);
                 _recordTrackingData = onTrackingData;
                 if (_recordTrackingData)
@@ -326,7 +328,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private void StopRecord()
     {
         Debug.Log(this + "StopRecord");
-        LogWindow.Warn("Stop record");
+        LogWindow.Info("Stop record");
         if (_writer != null)
         {
             _writer.Close();
@@ -359,13 +361,13 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnStartRecordTracking(int width, int height)
     {
-        LogWindow.Warn($"Start record tracking data: {width}x{height}");
+        LogWindow.Info($"Start record tracking data: {width}x{height}");
         Debug.Log("OnStartRecordTracking");
         string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string trackingFileName = $"trackingData_{timeStamp}.txt";
         string filePath = Path.Combine("/sdcard/Download/", trackingFileName);
         Debug.Log("trackingFilePath:" + filePath);
-        LogWindow.Info("Tracking file path:" + filePath);
+        LogWindow.Warn("Tracking file path:" + filePath);
         _writer = new StreamWriter(filePath, true);
         _writer.AutoFlush = true; // Enable automatic refresh to prevent data loss
 

@@ -75,11 +75,13 @@ namespace Network
 
         public void OpenCamera(byte[] data)
         {
+            LogWindow.Warn("Sending OPEN_CAMERA command.");
             SendCommand(NetworkCommand.OPEN_CAMERA, data);
         }
 
         public void CloseCamera()
         {
+            LogWindow.Warn("Sending CLOSE_CAMERA command.");
             SendCommand(NetworkCommand.CLOSE_CAMERA, new byte[0]);
         }
 
@@ -94,6 +96,7 @@ namespace Network
 
                 var cameraConfig = CameraRequestSerializer.Deserialize(data);
                 Utils.WriteLog("OpenCameraHandler", $"Received camera config: {cameraConfig}");
+                LogWindow.Warn($"Handling OPEN_CAMERA: {cameraConfig.ToString()}");
 
                 // The stream only works for the VR headset
                 if (cameraConfig.camera.Equals("VR"))
@@ -112,6 +115,7 @@ namespace Network
             public void HandleCommand(byte[] data)
             {
                 Debug.Log("Handling CLOSE_CAMERA command with data: " + BitConverter.ToString(data));
+                LogWindow.Warn("Handling CLOSE_CAMERA command");
                 // Stop the camera preview
                 CameraHandle.StopPreview();
             }

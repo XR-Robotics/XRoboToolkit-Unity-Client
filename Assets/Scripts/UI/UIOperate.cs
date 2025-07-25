@@ -35,9 +35,7 @@ public class UIOperate : MonoBehaviour
     public GameObject ExtDevPanel;
     public InputActionProperty SendDataAction;
 
-    [Space(30)]
-    [Header("Refactoring")]
-    public VideoSourceManager videoSource;
+    [Space(30)] [Header("Refactoring")] public VideoSourceManager videoSource;
     public VideoSourceConfigManager sourceConfig => videoSource.videoSourceConfigManager;
 
     public Dropdown videoSourceDropdown;
@@ -310,7 +308,7 @@ public class UIOperate : MonoBehaviour
     {
         TcpHandler.SendTrackingData = on;
         // Reset FPS
-        if(!on)
+        if (!on)
         {
             FPSDisplay.Reset();
         }
@@ -382,6 +380,7 @@ public class UIOperate : MonoBehaviour
             if (SendDataAction.action != null && SendDataAction.action.WasReleasedThisFrame())
             {
                 SendTog.isOn = !SendTog.isOn;
+                LogWindow.Info("Sending data: " + SendTog.isOn);
             }
         }
     }

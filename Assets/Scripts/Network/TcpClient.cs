@@ -12,7 +12,7 @@ namespace Robot.V2.Network
     public class TcpClient : AndroidJavaProxy
     {
         private static TcpClient _callbackProxy = new TcpClient();
-        
+
         public static TcpClient CallbackProxy => _callbackProxy;
 
         public event Action OnConnected;
@@ -21,7 +21,7 @@ namespace Robot.V2.Network
         public event Action<string, Exception> OnError;
 
         private string logTag = "TcpClient(C#)";
-        
+
         public static ClientStatus Status { get; private set; } = ClientStatus.None;
 
         public TcpClient() : base("com.picovr.robotassistantlib.TcpClient$ClientCallback")
@@ -43,6 +43,7 @@ namespace Robot.V2.Network
 
         public static void ConnectToServer(string ip, int port, Action onConnected)
         {
+            LogWindow.Info($"Attempting to connect to server at {ip}:{port}");
             _callbackProxy.OnConnected = onConnected;
             GetJavaObject().Call("connectToServer", ip, port, _callbackProxy);
             Status = ClientStatus.Connected;
@@ -55,6 +56,7 @@ namespace Robot.V2.Network
 
         public static void Disconnect()
         {
+            LogWindow.Info("Disconnecting from TCP server");
             GetJavaObject().Call("disconnect");
             Status = ClientStatus.Disconnected;
         }
@@ -62,6 +64,7 @@ namespace Robot.V2.Network
         public void onConnected()
         {
             Utils.WriteLog(logTag, "Java TcpClient: Connected");
+            LogWindow.Info("TCP Client successfully connected to server");
             Status = ClientStatus.Connected;
             OnConnected?.Invoke();
         }
@@ -69,6 +72,7 @@ namespace Robot.V2.Network
         public void onDisconnected()
         {
             Utils.WriteLog(logTag, "Java TcpClient: Disconnected");
+            LogWindow.Warn("TCP Client disconnected from server");
             Status = ClientStatus.Disconnected;
             OnDisconnected?.Invoke();
         }
@@ -82,6 +86,7 @@ namespace Robot.V2.Network
         public void onError(string errorMessage, AndroidJavaObject exception)
         {
             Utils.WriteLog(logTag, $"Java TcpClient: Error - {errorMessage} - {exception}");
+            LogWindow.Error($"TCP Client error: {errorMessage}");
             OnError?.Invoke(errorMessage, new Exception($"{errorMessage} - {exception}"));
         }
     }
