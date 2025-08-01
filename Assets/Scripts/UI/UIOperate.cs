@@ -212,8 +212,13 @@ public class UIOperate : MonoBehaviour
             BodyInfo.color = Color.red;
 
             bodyModeDrop.SetValueWithoutNotify(0);
+            // Update UI
+            HighAccuracy.gameObject.SetActive(false);
             return;
         }
+        
+        // Update UI
+        HighAccuracy.gameObject.SetActive(index > 0);
 
         BodyInfo.color = Color.white;
         BodyInfo.text = "Tracker detection is normal!";
