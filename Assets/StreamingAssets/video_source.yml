@@ -50,7 +50,7 @@
       value: 1.704850
     - name: "heightCompressionFactor"
       type: "float"
-      description: "Frame rate of the video stream in FPS"
+      description: "Height compression factor for the shader"
       value: 1.777778 # 16/9
     - name: "RawImageRectSize"
       type: "string"
