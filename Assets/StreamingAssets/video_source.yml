@@ -33,7 +33,7 @@
       value: 60
     - name: "CamBitrate"
       type: "int"
-      description: "Bitrate of the video stream in Kbps"
+      description: "Bitrate of the video stream in bps"
       value: 20971520 # 20 x 1024 x 1024
   
 - name: "ZEDMINI"
@@ -70,5 +70,5 @@
       value: 60
     - name: "CamBitrate"
       type: "int"
-      description: "Bitrate of the video stream in Kbps"
+      description: "Bitrate of the video stream in bps"
       value: 4000000
