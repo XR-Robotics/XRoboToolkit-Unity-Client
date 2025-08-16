@@ -262,6 +262,7 @@ public partial class UICameraCtrl : MonoBehaviour
             if (trackingToggle.isOn)
             {
                 // Only tracking data, use fixed resolution
+                _recordTrackingData = true;
                 OnStartRecordTracking(2160, 810);
                 RecordBtn.SetOn(true);
             }
