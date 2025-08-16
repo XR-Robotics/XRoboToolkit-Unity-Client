@@ -15,7 +15,7 @@ namespace Robot.V2.Network
     {
 
         private static TcpServer _callbackProxy = new TcpServer();
-        
+
         public static TcpServer CallbackProxy => _callbackProxy;
 
         public event Action<int> OnServerStarted;
@@ -25,12 +25,12 @@ namespace Robot.V2.Network
         public event Action OnServerStopped;
 
         private string logTag = "TcpServer(C#)";
-        
+
         public static ServerStatus Status { get; private set; } = ServerStatus.None;
 
         public TcpServer() : base("com.picovr.robotassistantlib.TcpServer$ServerCallback")
         {
-            
+
         }
 
         private static AndroidJavaObject _javaObj = null;
@@ -47,6 +47,7 @@ namespace Robot.V2.Network
 
         public static void StartTCPServer(int port, Action<int> onServerStarted)
         {
+            LogWindow.Info($"Starting TCP server on port {port}");
             _callbackProxy.OnServerStarted = onServerStarted;
 
             GetJavaObject().Call("startTCPServer", port, _callbackProxy);
@@ -55,6 +56,7 @@ namespace Robot.V2.Network
 
         public static void StopServer()
         {
+            LogWindow.Info("Stopping TCP server");
             GetJavaObject().Call("stopServer");
             Status = ServerStatus.Stopped;
         }
@@ -63,17 +65,20 @@ namespace Robot.V2.Network
         public void onServerStarted(int port)
         {
             Utils.WriteLog(logTag, $"Server started on port: {port}");
+            LogWindow.Info($"TCP Server successfully started on port {port}");
             OnServerStarted?.Invoke(port);
         }
 
         public void onClientConnected(AndroidJavaObject socket)
         {
             Utils.WriteLog(logTag, "Client connected: " + socket);
+            LogWindow.Info("Client connected to TCP server");
         }
 
         public void onClientDisconnected()
         {
             Utils.WriteLog(logTag, "Client disconnected");
+            LogWindow.Warn("Client disconnected from TCP server");
             OnClientDisconnected?.Invoke();
         }
 
@@ -90,12 +95,14 @@ namespace Robot.V2.Network
         public void onError(string errorMessage, AndroidJavaObject exception)
         {
             Utils.WriteLog(logTag, "Server error: " + errorMessage);
+            LogWindow.Error($"TCP Server error: {errorMessage}");
             OnError?.Invoke($"{errorMessage} - {exception}");
         }
 
         public void onServerStopped()
         {
             Utils.WriteLog(logTag, "Server stopped");
+            LogWindow.Info("TCP Server stopped");
             OnServerStopped?.Invoke();
         }
 

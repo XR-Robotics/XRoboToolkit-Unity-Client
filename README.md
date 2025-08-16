@@ -7,27 +7,29 @@
 
 ![ui.png](Docs/ui.png)
 
-| Item                                           | Description                                                                                              |
-|------------------------------------------------|----------------------------------------------------------------------------------------------------------|
-| Network - SN                                   | Display Serial number of the XR device, only functional with Pico 4 Ultra enterprise version             |
-| Network - IP                                   | IP address of the XR device                                                                              |
-| Network - FPS                                  | Data syncing frames per second                                                                           |
-| Network - Status                               | Connection status between robot and XR device                                                            |
-| Network - PC Service                           | IP address of the PC running PC service                                                                  |
-| Network - Enter                                | Manually input the PC service's IP                                                                       |
-| Tracking - Head                                | Toggle On/Off to send out head 6 DoF pose                                                                |
-| Tracking - Controller                          | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream                       |
-| Tracking - Hand                                | Toggle On/Off to parse hand tracking data in data stream                                                 |
-| Tracking - PICO Motion Tracker - Mode          | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream          |
-| Tracking - PICO Motion Tracker - TrackerNum    | Number of the trackers                                                                                   |
-| Tracking - Data & Control - Send               | Toggle On/Off to sync above selected poses between XR device and robot PC                                |
-| Tracking - Data & Control - Switch w/ A Button | Toggle On/Off to rapid pause or resume sync with  the right-hand controller button A                     |
-| Tracking - Info                                | Panel to show tracking related information                                                               |
-| Camera - Dropdown (Video Source)               | Select a supported video source                                                                          |
-| Camera - Listen                                | Open a connection to receive the video stream to the selected video source (used on human operator side) |
-| Camera - Save Camera Parameters                | Save camera intrinsic and extrinsic parameters in local path                                             |
-| Camera - Record                                | Record data                                                                                              |
-| Camera - Camera State                          | Panel to show the camera status (available on the VR headset serving as robot eyes)                      |
+| Item                                           | Description                                                                                     |
+|------------------------------------------------|-------------------------------------------------------------------------------------------------|
+| Network - SN                                   | Display Serial number of the XR device, only functional with Pico 4 Ultra enterprise version    |
+| Network - IP                                   | IP address of the XR device                                                                     |
+| Network - FPS                                  | Data syncing frames per second                                                                  |
+| Network - Status                               | Connection status between robot and XR device                                                   |
+| Network - PC Service                           | IP address of the PC running PC service                                                         |
+| Network - Enter                                | Manually input the PC service's IP                                                              |
+| Tracking - Head                                | Toggle On/Off to send out head 6 DoF pose                                                       |
+| Tracking - Controller                          | Toggle On/Off to parse VR controller's 6 DoF pose and button status in data stream              |
+| Tracking - Hand                                | Toggle On/Off to parse hand tracking data in data stream                                        |
+| Tracking - PICO Motion Tracker - Mode          | Dropdown menu to select None, full body tracking (require Pico tracker) to parse in data stream |
+| Tracking - PICO Motion Tracker - TrackerNum    | Number of the trackers                                                                          |
+| Tracking - Data & Control - Send               | Toggle On/Off to sync above selected poses between XR device and robot PC                       |
+| Tracking - Data & Control - Switch w/ A Button | Toggle On/Off to rapid pause or resume sync with  the right-hand controller button A            |
+| Tracking - Status                              | Panel to show tracking related information                                                      |
+| Remote Vision - State                          | Show the state of camera                                                                        |
+| Remote Vision - Dropdown (Video Source)        | Select a supported video source                                                                 |
+| Remote Vision - Listen                         | Open a connection to receive the video stream to the selected video source                      |
+| Data Collection - Tracking                     | Whether to record pose tracking data                                                            |
+| Data Collection - Vision                       | Whether to record vision data                                                                   |
+| Data Collection - Record                       | Start/Stop recording                                                                            |
+| Log                                            | Show logs                                                                                       |
 
 ## Feature list
 - **Pose sync between XR device and robot PC**
@@ -45,7 +47,7 @@
 2. On robot PC, run service:
    - **Windows**: Run `\Program Files (x86)\roboticsservice\runService.bat`
    - **Linux (Ubuntu/Debian x86)**: Run `/opt/apps/roboticsservice/runService.sh`
-3. Open app XR-Robotics-Toolkit-Unity-Sample on Pico 4 Ultra
+3. Open app XRoboToolkit on Pico 4 Ultra
 
 If the PC service is running successfully, when you open the app on Pico headset, you will receive a prompt window for server connection. Point to the IP address and click it with the trigger button on the controller.
 
@@ -102,7 +104,7 @@ Core resource folder containing all project assets:
 - **InteractionTools**
   XR interaction scripts and 3D models.
 - **Plugins**
-  Android interface implementations including `robotassistant_lib.aar` and Android platform configurations.
+  Android interface implementations including `robotassistant_lib-i18n-release.aar` and Android platform configurations.
 - **Resources**
   Project-specific assets.
 - **Scripts**
@@ -116,7 +118,7 @@ Core resource folder containing all project assets:
   - **UI**
     User interface components.
 
-### robotassistant_lib.aar
+### robotassistant_lib-i18n-release.aar
 Android library containing PICO device interfaces and image processing logic.
 
 ### Key Classes
@@ -148,7 +150,7 @@ Official SDK for PICO device integration:
 - Android Studio 4.2.2+
 - Android SDK 29
 - Android NDK 21.4.7075529
-- PICO Unity SDK 1.1.0 (Recommended)
+- PICO Integration SDK (com.unity.xr.picoxr) 3.1.2
 
 ⚠️ **Important Notes**:
 1. Use exact Unity version 2022.3.16f1 to avoid compatibility issues

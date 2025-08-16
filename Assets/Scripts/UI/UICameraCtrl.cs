@@ -15,11 +15,10 @@ using XRoboToolkit.Network;
 public partial class UICameraCtrl : MonoBehaviour
 {
     public GameObject RemoteCameraWindowObj;
-    public RecordDialog RecordDialog;
+
     public CameraRequestDialog CameraRequestDialog;
     public ResolutionDialog ResolutionDialog;
     public CameraSendInputDialog CameraSendInputDialog;
-    public CustomButton RecordBtn;
     public CustomButton ListenCameraBtn;
     public CustomButton CameraSendToBtn;
 
@@ -38,6 +37,12 @@ public partial class UICameraCtrl : MonoBehaviour
     private string logTag => "UICameraCtrl";
 
     private int streamingPort = 12345;
+
+    [Space(30)] [Header("Record")] public RecordDialog RecordDialog;
+    public CustomButton RecordBtn;
+
+    public Toggle trackingToggle;
+    public Toggle visionToggle;
 
     private void Awake()
     {
@@ -79,7 +84,8 @@ public partial class UICameraCtrl : MonoBehaviour
                 }
 
                 var protocol = NetworkDataProtocolSerializer.Deserialize(data);
-                Utils.WriteLog(logTag, $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
+                Utils.WriteLog(logTag,
+                    $"Successfully deserialized: command='{protocol.command}', data length={protocol.data.Length}");
 
                 // Process the command
                 if (NetworkCommander.Instance == null)
@@ -149,7 +155,7 @@ public partial class UICameraCtrl : MonoBehaviour
         if (TcpServer.Status == ServerStatus.Started)
         {
             // Close TcpServer first
-            TcpManager.Instance.StopServer();   
+            TcpManager.Instance.StopServer();
         }
 
         yield return new WaitForSeconds(0.1f);
@@ -163,7 +169,7 @@ public partial class UICameraCtrl : MonoBehaviour
             camPara.bitrate, streamingPort);
 
         yield return new WaitForSeconds(0.2f);
-        
+
         // Reset LERE
         setLere.ResetCanvases();
 
@@ -187,6 +193,8 @@ public partial class UICameraCtrl : MonoBehaviour
             VideoSourceConfigManager.Instance.CurrentVideoSource.camera,
             localIP, // local ip
             streamingPort);
+        
+        LogWindow.Info("Requesting camera stream with config: " + customConfig.ToString());
 
         // Utils.WriteLog(logTag, $"send camera config: {customConfig}");
         var data = CameraRequestSerializer.Serialize(customConfig);
@@ -221,16 +229,50 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OpenRecord()
     {
-        RecordDialog.Show(() =>
+        if (!visionToggle.isOn && !trackingToggle.isOn)
         {
-            StartRecord(RecordDialog.ResolutionWidth, RecordDialog.ResolutionHeight,
-                RecordDialog.Fps, RecordDialog.Bitrate, RecordDialog.RecordTrackingData);
-        }, null);
+            LogWindow.Error("Please select at least one option: Tracking or Vision.");
+            return;
+        }
+
+        // Vision data
+        if (visionToggle.isOn)
+        {
+            if (trackingToggle.isOn)
+            {
+                // Start together
+                RecordDialog.Show(() =>
+                {
+                    StartRecord(RecordDialog.ResolutionWidth, RecordDialog.ResolutionHeight,
+                        RecordDialog.Fps, RecordDialog.Bitrate, true);
+                }, null);
+            }
+            else
+            {
+                // Vision data only
+                RecordDialog.Show(() =>
+                {
+                    StartRecord(RecordDialog.ResolutionWidth, RecordDialog.ResolutionHeight,
+                        RecordDialog.Fps, RecordDialog.Bitrate, false);
+                }, null);
+            }
+        }
+        else
+        {
+            if (trackingToggle.isOn)
+            {
+                // Only tracking data, use fixed resolution
+                _recordTrackingData = true;
+                OnStartRecordTracking(2160, 810);
+                RecordBtn.SetOn(true);
+            }
+        }
     }
 
     private void StartRecord(int width, int height, int fps, int bitrate,
         bool onTrackingData)
     {
+        LogWindow.Info($"Start record {width}x{height}@{fps} fps {bitrate} bps Tracking: {onTrackingData}");
         //The VR camera image acquisition is only effective on the B-end device of Pico4U.
         if (!Utils.IsPico4U())
         {
@@ -247,6 +289,7 @@ public partial class UICameraCtrl : MonoBehaviour
                 string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
                 string trackingFileName = $"CameraRecord_{timeStamp}.mp4";
                 string filePath = Path.Combine("/sdcard/Download/", trackingFileName);
+                LogWindow.Warn("Vision file path: " + filePath);
                 CameraHandle.StartRecord(filePath);
                 _recordTrackingData = onTrackingData;
                 if (_recordTrackingData)
@@ -286,6 +329,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private void StopRecord()
     {
         Debug.Log(this + "StopRecord");
+        LogWindow.Info("Stop record");
         if (_writer != null)
         {
             _writer.Close();
@@ -318,11 +362,13 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnStartRecordTracking(int width, int height)
     {
+        LogWindow.Info($"Start record tracking data: {width}x{height}");
         Debug.Log("OnStartRecordTracking");
         string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string trackingFileName = $"trackingData_{timeStamp}.txt";
         string filePath = Path.Combine("/sdcard/Download/", trackingFileName);
         Debug.Log("trackingFilePath:" + filePath);
+        LogWindow.Warn("Tracking file path:" + filePath);
         _writer = new StreamWriter(filePath, true);
         _writer.AutoFlush = true; // Enable automatic refresh to prevent data loss
 

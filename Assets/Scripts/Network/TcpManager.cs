@@ -181,6 +181,10 @@ namespace Robot.V2.Network
                 Utils.WriteLog(clientTag, $"Send: {s}");
                 TcpClient.Send(Encoding.UTF8.GetBytes(s));
             }
+            else
+            {
+                LogWindow.Error("Client is not connected. Cannot send data.");
+            }
         }
 
         public void ClientSend(byte[] data)
@@ -189,6 +193,10 @@ namespace Robot.V2.Network
             {
                 Utils.WriteLog(clientTag, $"Send: {data.Length} bytes");
                 TcpClient.Send(data);
+            }
+            else
+            {
+                LogWindow.Error("Client is not connected. Cannot send data.");
             }
         }
 

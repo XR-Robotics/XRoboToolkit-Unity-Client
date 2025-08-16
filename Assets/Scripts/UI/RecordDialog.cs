@@ -19,16 +19,15 @@ public class RecordDialog : MonoBehaviour
     public Toggle trackingDataTog;
     private Action _confirm;
     private Action _cancel;
-
     public int ResolutionWidth
     {
-        get { return PlayerPrefs.GetInt("RecordResolutionWidth", 1024); }
+        get { return PlayerPrefs.GetInt("RecordResolutionWidth", 2160); }
         set { PlayerPrefs.SetInt("RecordResolutionWidth", value); }
     }
 
     public int ResolutionHeight
     {
-        get { return PlayerPrefs.GetInt("RecordResolutionHeight", 768 / 2); }
+        get { return PlayerPrefs.GetInt("RecordResolutionHeight", 810); }
         set { PlayerPrefs.SetInt("RecordResolutionHeight", value); }
     }
 
@@ -40,7 +39,7 @@ public class RecordDialog : MonoBehaviour
 
     public int Bitrate
     {
-        get { return PlayerPrefs.GetInt("RecordBitrate", 10 * 1024 * 1024); }
+        get { return PlayerPrefs.GetInt("RecordBitrate", 20 * 1024 * 1024); }
         set { PlayerPrefs.SetInt("RecordBitrate", value); }
     }
 
