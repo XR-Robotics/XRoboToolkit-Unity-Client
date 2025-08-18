@@ -35,9 +35,7 @@ public class UIOperate : MonoBehaviour
     public GameObject ExtDevPanel;
     public InputActionProperty SendDataAction;
 
-    [Space(30)]
-    [Header("Refactoring")]
-    public VideoSourceManager videoSource;
+    [Space(30)] [Header("Refactoring")] public VideoSourceManager videoSource;
     public VideoSourceConfigManager sourceConfig => videoSource.videoSourceConfigManager;
 
     public Dropdown videoSourceDropdown;
@@ -214,8 +212,13 @@ public class UIOperate : MonoBehaviour
             BodyInfo.color = Color.red;
 
             bodyModeDrop.SetValueWithoutNotify(0);
+            // Update UI
+            HighAccuracy.gameObject.SetActive(false);
             return;
         }
+        
+        // Update UI
+        HighAccuracy.gameObject.SetActive(index > 0);
 
         BodyInfo.color = Color.white;
         BodyInfo.text = "Tracker detection is normal!";
@@ -310,7 +313,7 @@ public class UIOperate : MonoBehaviour
     {
         TcpHandler.SendTrackingData = on;
         // Reset FPS
-        if(!on)
+        if (!on)
         {
             FPSDisplay.Reset();
         }
@@ -339,7 +342,7 @@ public class UIOperate : MonoBehaviour
             MotionTrackerConnectState state = new MotionTrackerConnectState();
             PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
             //  PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
-            TrackNum.text = "TrackerNum:" + state.trackerSum;
+            TrackNum.text = "Num: " + state.trackerSum;
 
             if (tType == TrackingData.TrackingType.Body)
             {
@@ -382,6 +385,7 @@ public class UIOperate : MonoBehaviour
             if (SendDataAction.action != null && SendDataAction.action.WasReleasedThisFrame())
             {
                 SendTog.isOn = !SendTog.isOn;
+                LogWindow.Info("Sending data: " + SendTog.isOn);
             }
         }
     }

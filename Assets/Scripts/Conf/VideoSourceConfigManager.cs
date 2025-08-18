@@ -37,6 +37,7 @@ public class VideoSourceConfigManager : MonoBehaviour
 
     private void LoadConfiguration(string path)
     {
+        LogWindow.Info($"Loading video sources from {path}");
         videoSources = new Dictionary<string, VideoSource>();
         // Parse the YAML file
         var parsedVideoSources = VideoSourceYamlParser.ParseYamlFile(path);
@@ -52,6 +53,7 @@ public class VideoSourceConfigManager : MonoBehaviour
 
         isInitialized = true;
         Debug.Log($"VideoSourceConfigManager initialized successfully. Loaded {videoSources.Count} video sources.");
+        LogWindow.Info($"Loaded {videoSources.Count} video sources.");
 
         // Log loaded video sources
         foreach (var kvp in videoSources)
