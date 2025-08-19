@@ -317,3 +317,16 @@ A: Run `adb shell rm /sdcard/Android/data/com.xrobotoolkit.client/files/video_so
 ---
 
 For technical support or documentation updates, contact the development team.
+
+## Citation
+
+If you find this project useful, please consider citing it as follows.
+
+```
+@article{zhao2025xrobotoolkit,
+      title={XRoboToolkit: A Cross-Platform Framework for Robot Teleoperation}, 
+      author={Zhigen Zhao and Liuchuan Yu and Ke Jing and Ning Yang}, 
+      journal={arXiv preprint arXiv:2508.00097},
+      year={2025}
+}
+```
