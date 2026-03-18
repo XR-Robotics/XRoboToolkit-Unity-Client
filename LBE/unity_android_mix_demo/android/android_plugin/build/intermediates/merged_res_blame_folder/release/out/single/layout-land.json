@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-land/mtrl_picker_header_dialog.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-land/mtrl_picker_header_dialog.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-land/material_timepicker.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-land/material_timepicker.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-land/material_clock_period_toggle_land.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-land/material_clock_period_toggle_land.xml"
+    }
+]

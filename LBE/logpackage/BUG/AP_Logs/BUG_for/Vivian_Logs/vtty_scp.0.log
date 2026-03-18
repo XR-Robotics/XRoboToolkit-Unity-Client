@@ -1,0 +1,102 @@
+
+AP UTC TIME:2026-03-18-02-15-35, reset cnt:0
+[21.614]init out: log
+[21.614]init in : vuart
+[21.614]init out: vuart
+[21.614]init in : pmu
+[21.615]init out: pmu
+[21.615]init in : uart
+[21.615]init out: uart
+[21.617]init in : irq
+[21.619]init out: irq
+[21.621]init in : ddrss
+[21.623]init out: ddrss
+[21.625]init in : gpio
+[21.628]init out: gpio
+[21.630]init in : i2c
+[21.632]dw_i2c: hcnt = 24 lcnt = 80 sda hold = 15
+[21.636]dw_i2c: hcnt = 24 lcnt = 80 sda hold = 15
+[21.640]init out: i2c
+[21.643]init in : ipc_pl320
+[21.645]init out: ipc_pl320
+[21.648]init in : regulator
+[21.751]i2c read slave[0x20] offset[0x6] data timeout 
+[21.755]failed to set out mode for gpio0(-3)
+[21.860]i2c read slave[0x21] offset[0x6] data timeout 
+[21.864]failed to set out mode for gpio0(-3)
+[21.868]init out: regulator
+[21.871]init in : cpuss_pm
+[21.873]A55 init voltage:750mv
+[21.876]init out: cpuss_pm
+[21.879]init in : ddr_dfs
+[21.881]init out: ddr_dfs
+[21.883]init in : pcie_pm
+[21.886]init out: pcie_pm
+[21.888]init in : power_init
+[21.890]init out: power_init
+[21.893]init in : shell
+[21.895]init out: shell
+> 
+AP UTC TIME:2026-03-18-02-17-51, reset cnt:0
+[21.890]init out: log
+[21.890]init in : vuart
+[21.890]init out: vuart
+[21.891]init in : pmu
+[21.891]init out: pmu
+[21.891]init in : uart
+[21.891]init out: uart
+[21.893]init in : irq
+[21.896]init out: irq
+[21.897]init in : ddrss
+[21.900]init out: ddrss
+[21.902]init in : gpio
+[21.904]init out: gpio
+[21.906]init in : i2c
+[21.908]dw_i2c: hcnt = 24 lcnt = 80 sda hold = 15
+[21.912]dw_i2c: hcnt = 24 lcnt = 80 sda hold = 15
+[21.917]init out: i2c
+[21.919]init in : ipc_pl320
+[21.921]init out: ipc_pl320
+[21.924]init in : regulator
+[22.027]i2c read slave[0x20] offset[0x6] data timeout 
+[22.031]failed to set out mode for gpio0(-3)
+[22.136]i2c read slave[0x21] offset[0x6] data timeout 
+[22.140]failed to set out mode for gpio0(-3)
+[22.144]init out: regulator
+[22.147]init in : cpuss_pm
+[22.149]A55 init voltage:750mv
+[22.152]init out: cpuss_pm
+[22.155]init in : ddr_dfs
+[22.157]init out: ddr_dfs
+[22.159]init in : pcie_pm
+[22.162]init out: pcie_pm
+[22.164]init in : power_init
+[22.166]init out: power_init
+[22.169]init in : shell
+[22.171]init out: shell
+> [518.451]CPU subsys power off
+[518.454]cpuss_post_power_off, to pmic off
+[518.458]regulator_disable_regmap: reg=0xac, mask=0xff, val=0x0
+[7994.477]Suspend time: 519.459, Resume time: 7993.154
+[7994.482]pcie link up start
+[7994.484]subsys pwr_sequence_status: 0x4001d
+[7994.488]subsys_initdone: 0xe001d
+[7994.492]subsys pwr_sequence_status: 0x4001d
+[7994.496]subsys_initdone: 0xe001d
+[7994.551]subsys pwr_sequence_status: 0x4003d, subsys_initdone: 0xe003d, pcie_reset: 0x1
+[7994.559]PCIe power-on successful. Starting link training
+[7994.564]regulator_enable_regmap: reg=0xac, mask=0xff, val=0x88
+[7994.571]CPUSS power-on successful
+[8315.402]CPU subsys power off
+[8315.405]cpuss_post_power_off, to pmic off
+[8315.409]regulator_disable_regmap: reg=0xac, mask=0xff, val=0x0
+[8676.140]Suspend time: 8316.408, Resume time: 8674.817
+[8676.145]pcie link up start
+[8676.147]subsys pwr_sequence_status: 0x4001d
+[8676.152]subsys_initdone: 0xe001d
+[8676.155]subsys pwr_sequence_status: 0x4001d
+[8676.159]subsys_initdone: 0xe001d
+[8676.214]subsys pwr_sequence_status: 0x4003d, subsys_initdone: 0xe003d, pcie_reset: 0x1
+[8676.222]PCIe power-on successful. Starting link training
+[8676.228]regulator_enable_regmap: reg=0xac, mask=0xff, val=0x88
+[8676.234]CPUSS power-on successful

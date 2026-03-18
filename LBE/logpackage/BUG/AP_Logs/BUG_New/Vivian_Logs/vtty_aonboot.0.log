@@ -1,0 +1,802 @@
+
+AP UTC TIME:2026-03-18-02-15-35, reset cnt:0
+A55 voltage:750mv, set to 750mv
+move mipi init function to spi receive process!
+close emmc 1.8v
+reset reason is 0x0, a55 pcsample regs need not check
+SBL: Fri Mar 13 00:17:17 CST 2026
+SBL: main, 182
+SBL: boot_from_pcie, 31
+SBL: received VIVIAN_OPCODE_SCREEN_CONFIG, get_spl_image_from_spi_slave, 436
+receive screen config command, and execute mipi poweroff function, func:get_spl_image_from_spi_slave, line:440
+receive screen config command, and execute mipi_power_on function, func:get_spl_image_from_spi_slave, line:442
+receive screen config command, and execute mipi_startup function, func:get_spl_image_from_spi_slave, line:450
+get oa_setr value: 0x5
+mipi_starup function complete, func:get_spl_image_from_spi_slave, line:453
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+dsirx port: 0, INT_ST_PHY_FATAL: 0x4040404
+dsirx port: 0, INT_ST_ERR_RPT: 0x40
+read dsirx count reg: 0x5ef
+read dsirx count reg: 0x8f5
+dsirx port: 2, INT_ST_PHY_FATAL: 0x4040404
+dsirx port: 2, INT_ST_ERR_RPT: 0x40
+read dsirx count reg: 0xcf0539
+read dsirx count reg: 0x27088f
+read dsirx count reg: 0x9782b8
+read dsirx count reg: 0x5fc
+read dsirx count reg: 0x902
+read dsirx count reg: 0xc07
+read dsirx count reg: 0x5e0
+read dsirx count reg: 0x8d4
+read dsirx count reg: 0xbda
+read dsirx count reg: 0xee0
+read dsirx count reg: 0x8b9
+read dsirx count reg: 0xbad
+read dsirx count reg: 0xeb2
+read dsirx count reg: 0x287
+read dsirx count reg: 0xb92
+read dsirx count reg: 0xe86
+read dsirx count reg: 0x25b
+read dsirx count reg: 0x560
+read dsirx count reg: 0xe6a
+read dsirx count reg: 0x22d
+read dsirx count reg: 0xd68532
+read dsirx count reg: 0x888
+read dsirx count reg: 0x262
+read dsirx count reg: 0x556
+read dsirx count reg: 0x85b
+read dsirx count reg: 0xb61
+read dsirx count reg: 0x53a
+read dsirx count reg: 0x82e
+read dsirx count reg: 0xb33
+read dsirx count reg: 0x5e8e38
+read dsirx count reg: 0x862
+read dsirx count reg: 0xca8b55
+read dsirx count reg: 0x348eab
+read dsirx count reg: 0x2d0
+read dsirx count reg: 0xbda
+read dsirx count reg: 0xa80ecd
+read dsirx count reg: 0x2f2
+read dsirx count reg: 0x5f8
+read dsirx count reg: 0x2000f00
+read dsirx count reg: 0x330
+read dsirx count reg: 0x636
+read dsirx count reg: 0x30093b
+read dsirx count reg: 0x365
+read dsirx count reg: 0x659
+read dsirx count reg: 0x95e
+read dsirx count reg: 0xc64
+read dsirx count reg: 0x63d
+read dsirx count reg: 0x931
+read dsirx count reg: 0xc36
+read dsirx count reg: 0xb
+read dsirx count reg: 0x8e0
+read dsirx count reg: 0xbd3
+read dsirx count reg: 0xed9
+read dsirx count reg: 0x782ad
+read dsirx count reg: 0xbed
+read dsirx count reg: 0xee0
+read dsirx count reg: 0x2b5
+read dsirx count reg: 0x5ba
+read dsirx count reg: 0xec5
+read dsirx count reg: 0x288
+read dsirx count reg: 0x55858d
+read dsirx count reg: 0x8e3
+read dsirx count reg: 0x2bd
+read dsirx count reg: 0x5b0
+read dsirx count reg: 0x8b6
+read dsirx count reg: 0xbbc
+read dsirx count reg: 0x348595
+read dsirx count reg: 0xdb08d9
+read dsirx count reg: 0xc2f
+read dsirx count reg: 0x4
+read dsirx count reg: 0x8d9
+read dsirx count reg: 0xbcd
+read dsirx count reg: 0xed3
+read dsirx count reg: 0x2a7
+read dsirx count reg: 0xb10bb1
+read dsirx count reg: 0xef5
+read dsirx count reg: 0x6602ca
+read dsirx count reg: 0x620
+read dsirx count reg: 0x0
+read dsirx count reg: 0x2b8
+read dsirx count reg: 0x5be
+read dsirx count reg: 0x4688c3
+read dsirx count reg: 0x2ed
+read dsirx count reg: 0x5e1
+read dsirx count reg: 0x8e6
+read dsirx count reg: 0xbec
+read dsirx count reg: 0x5c5
+read dsirx count reg: 0x8b9
+read dsirx count reg: 0xbbf
+read dsirx count reg: 0xec4
+CMD: efuse frame download to 0x20440000
+CMD: efuse parse addr:0x20440000
+open efuse regulator
+debug status efuse1:0x1
+debug status efuse2:0x1
+
+efuse1_vol:1800000 efuse2:1800000
+sec.bin contain device_id
+device id has programed!!!!
+sec.bin contain secure_boot_pubkey_hash
+secure boot pubkey hash has been written before
+sec.bin contain lcs
+sec.bin contain otp_ctrl
+key has been programed
+close efuse regulator
+verify spl image 
+Root_t Load Addr:0x20480000
+Image Size:0x20
+Chip Life Cycle: DD
+Secure Boot is enabled
+Read manifest version: 0
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x0
+sec_boot_get_images_info:image_info->name: spl
+sec_boot_get_images_info:image_info->static_addr: 0x20440000
+sec_boot_get_images_info:image_info->load_addr: 0x20440000
+sec_boot_get_images_info:image_info->entry_addr: 0x20440000
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x314c5
+sec_boot_get_images_info:image_info->storage_size: 0x314c5
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x1
+sec_boot_get_images_info:image_info->name: root_t
+sec_boot_get_images_info:image_info->static_addr: 0x0
+sec_boot_get_images_info:image_info->load_addr: 0x204714c5
+sec_boot_get_images_info:image_info->entry_addr: 0x0
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x20
+sec_boot_get_images_info:image_info->storage_size: 0x20
+sec_boot_get_img_info_by_idx:imag_info->name:spl
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x20440000
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x314c5
+Image Name:          spl
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x0000000020440000
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x000314c5
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Find Next boot image: spl
+sec_boot_get_img_info_by_idx:imag_info->name:root_t
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x204714c5
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x20
+Image Name:          root_t
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x00000000204714c5
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x00000020
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Root_t Load Addr:0x204724c5
+Image Size:0x20
+Read manifest version: 0
+read otp ver:0x0
+manifest_info.sec_boot_mnft_para.mnft_ver:0x0
+wait for ddr init done ...
+ddr init done
+firewall phase:0
+0x50010000:ffffffff,0,0,0
+range0:2, 0, 0, 3ffff, 0
+range1:2, 40000, 0, 203fffff, 0
+range2:2, 20400000, 0, 2041ffff, 0
+range3:2, 20420000, 0, 2043ffff, 0
+range4:2, 20440000, 0, 20443fff, 0
+range5:2, 20444000, 0, 2fffffff, 0
+range6:2, 30000000, 0, 3fffffff, 0
+range7:2, 40000000, 0, 40000fff, 0
+range8:2, 40001000, 0, 40207fff, 0
+range9:2, 40208000, 0, 40208fff, 0
+range10:2, 40209000, 0, 40612fff, 0
+range11:2, 40613000, 0, 40613fff, 0
+range12:2, 40614000, 0, 407fffff, 0
+range13:2, 40800000, 0, 40800fff, 0
+range14:2, 40801000, 0, 427fffff, 0
+range15:3, 42800000, 0, 42ffffff, 0
+range16:2, 43000000, 0, ffffffff, 1
+range17:2, 0, 2, 400fffff, 2
+range18:2, 40100000, 2, 401fffff, 2
+range19:2, 40200000, 2, 7f7fffff, 2
+range20:2, 7f800000, 2, 7f80ffff, 2
+range21:2, 7f810000, 2, 7fefffff, 2
+range22:2, 7ff00000, 2, 7fffffff, 2
+range23:2, 80000000, 2, 9fffffff, 2
+range24:2, a0000000, 2, ffffffff, 3
+range25:3, 1000, 0, 0, 0
+range26:3, 1000, 0, 0, 0
+range27:3, 1000, 0, 0, 0
+range28:3, 1000, 0, 0, 0
+range29:3, 1000, 0, 0, 0
+range30:3, 1000, 0, 0, 0
+pcie power up
+pcie power on
+try wake cnt:0
+trigger v2apwake rising edge
+wake trig time:4000
+try wake cnt:1
+trigger v2apwake rising edge
+wake trig time:6000
+try wake cnt:2
+trigger v2apwake rising edge
+wake trig time:8000
+try wake cnt:3
+trigger v2apwake rising edge
+wake trig time:10000
+try wake cnt:4
+trigger v2apwake rising edge
+wake trig time:12000
+try wake cnt:5
+trigger v2apwake rising edge
+wake trig time:14000
+try wake cnt:6
+trigger v2apwake rising edge
+wake trig time:16000
+try wake cnt:7
+trigger v2apwake rising edge
+wake trig time:18000
+wake perst time:18000
+detect perst rising edge,rising times:0x1
+pcie subsys init
+poll fabric
+poll perst high
+poll pclk stable
+pcie ip reconfigenable ltssm log
+pcie set ltssm_enabledeassert perst,clear rising int
+[0x1]ltssm:0x6
+[0x2]ltssm:0x1
+[0x3]ltssm:0x21
+[0x4]ltssm:0x22
+[0x5]ltssm:0x23
+[0x6]ltssm:0x11
+Link up,Gen3X1
+    init ipc to ap
+    init ipc from ap
+
+      PCIe Ramdump test,cnt:1 start!
+sft_gpr0 reg val:0x0,NO need ramdump
+    init ipc to ap
+    init ipc from ap
+
+      PCIe Image download test,cnt:1 start!
+    init ipc to ap
+firewall phase:4
+0x50010000:ffffffff,0,0,0
+range0:3, 0, 0, 3ffff, 0
+range1:2, 40000, 0, 203fffff, 0
+range2:3, 20400000, 0, 2041ffff, 0
+range3:2, 20420000, 0, 2043ffff, 0
+range4:2, 20440000, 0, 20443fff, 0
+range5:2, 20444000, 0, 2fffffff, 0
+range6:3, 30000000, 0, 3fffffff, 0
+range7:3, 40000000, 0, 40000fff, 0
+range8:2, 40001000, 0, 40207fff, 0
+range9:3, 40208000, 0, 40208fff, 0
+range10:2, 40209000, 0, 40612fff, 0
+range11:3, 40613000, 0, 40613fff, 0
+range12:2, 40614000, 0, 407fffff, 0
+range13:3, 40800000, 0, 40800fff, 0
+range14:2, 40801000, 0, 427fffff, 0
+range15:3, 42800000, 0, 42ffffff, 0
+range16:2, 43000000, 0, ffffffff, 1
+range17:3, 0, 2, 400fffff, 2
+range18:3, 40100000, 2, 401fffff, 2
+range19:3, 40200000, 2, 7f7fffff, 2
+range20:3, 7f800000, 2, 7f80ffff, 2
+range21:3, 7f810000, 2, 7fefffff, 2
+range22:3, 7ff00000, 2, 7fffffff, 2
+range23:3, 80000000, 2, 9fffffff, 2
+range24:2, a0000000, 2, ffffffff, 3
+range25:3, 1000, 0, 0, 0
+range26:3, 1000, 0, 0, 0
+range27:3, 1000, 0, 0, 0
+range28:3, 1000, 0, 0, 0
+range29:3, 1000, 0, 0, 0
+range30:3, 1000, 0, 0, 0
+   To load UBOOT(image id:3)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x3,0x40100000,0x2,0x101
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x3,0x78d80,0x0,0x101
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x3,0x1,0x2,0x101
+received ipc ack from AP
+   To load LINUX(image id:4)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x4,0x7ff7ef3c,0x2,0x102
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x4,0x1a1f1db7,0x0,0x102
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x4,0x1,0x2,0x102
+received ipc ack from AP
+   To load SCPFW(image id:5)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x5,0x0,0x0,0x103
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x5,0x1dd6c,0x0,0x103
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x5,0x1,0x0,0x103
+received ipc ack from AP
+  pcie download test SUCCESS!
+cmdline ddr_addr_on_a55:0x7ff7ef3c,header:0x12345678,0xe,0x5f766564,0x64632077
+pice done
+verify scpfw image 
+Root_t Load Addr:0x20480000
+Image Size:0x20
+Chip Life Cycle: DD
+Secure Boot is enabled
+Read manifest version: 0
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x0
+sec_boot_get_images_info:image_info->name: scpfw
+sec_boot_get_images_info:image_info->static_addr: 0x0
+sec_boot_get_images_info:image_info->load_addr: 0x0
+sec_boot_get_images_info:image_info->entry_addr: 0x0
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x1cd6c
+sec_boot_get_images_info:image_info->storage_size: 0x1cd6c
+sec_boot_get_img_info_by_idx:imag_info->name:scpfw
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x0
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x1cd6c
+Image Name:          scpfw
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x0000000000000000
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x0001cd6c
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Find Next boot image: scpfw
+
+AP UTC TIME:2026-03-18-02-17-51, reset cnt:0
+A55 voltage:750mv, set to 750mv
+move mipi init function to spi receive process!
+close emmc 1.8v
+reset reason is 0x0, a55 pcsample regs need not check
+SBL: Fri Mar 13 00:17:17 CST 2026
+SBL: main, 182
+SBL: boot_from_pcie, 31
+SBL: received VIVIAN_OPCODE_SCREEN_CONFIG, get_spl_image_from_spi_slave, 436
+receive screen config command, and execute mipi poweroff function, func:get_spl_image_from_spi_slave, line:440
+receive screen config command, and execute mipi_power_on function, func:get_spl_image_from_spi_slave, line:442
+receive screen config command, and execute mipi_startup function, func:get_spl_image_from_spi_slave, line:450
+get oa_setr value: 0x5
+mipi_starup function complete, func:get_spl_image_from_spi_slave, line:453
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+read dsirx count reg: 0x2000000
+dsirx port: 0, INT_ST_PHY_FATAL: 0x4040404
+dsirx port: 0, INT_ST_ERR_RPT: 0x40
+read dsirx count reg: 0x52c
+read dsirx count reg: 0xc18832
+dsirx port: 2, INT_ST_PHY_FATAL: 0x4040404
+dsirx port: 2, INT_ST_ERR_RPT: 0x40
+read dsirx count reg: 0x4c8
+read dsirx count reg: 0x7ce
+dsirx port: 0, INT_ST_PHY_FATAL: 0x40004
+dsirx port: 0, INT_ST_ERR_RPT: 0x0
+read dsirx count reg: 0x9b4
+read dsirx count reg: 0xcba
+read dsirx count reg: 0x72008e
+read dsirx count reg: 0x3e4
+read dsirx count reg: 0xcef
+read dsirx count reg: 0xb1
+read dsirx count reg: 0x39c
+read dsirx count reg: 0x6a2
+read dsirx count reg: 0x7b
+read dsirx count reg: 0x354
+read dsirx count reg: 0x65a
+read dsirx count reg: 0x960
+read dsirx count reg: 0x339
+read dsirx count reg: 0x62d
+read dsirx count reg: 0x933
+read dsirx count reg: 0xc39
+read dsirx count reg: 0x612
+read dsirx count reg: 0x905
+read dsirx count reg: 0xc0a
+read dsirx count reg: 0x2000f00
+read dsirx count reg: 0xdb0953
+read dsirx count reg: 0xc97
+read dsirx count reg: 0x6c
+read dsirx count reg: 0x357
+read dsirx count reg: 0xc61
+read dsirx count reg: 0x24
+read dsirx count reg: 0x30f
+read dsirx count reg: 0xc48614
+read dsirx count reg: 0x3e
+read dsirx count reg: 0x317
+read dsirx count reg: 0x61c
+read dsirx count reg: 0x922
+read dsirx count reg: 0x2fc
+read dsirx count reg: 0x5ef
+read dsirx count reg: 0x8f5
+read dsirx count reg: 0xbfb
+read dsirx count reg: 0x5d4
+read dsirx count reg: 0x8c8
+read dsirx count reg: 0x468bcd
+read dsirx count reg: 0x0
+read dsirx count reg: 0x8c7
+read dsirx count reg: 0xbbb
+read dsirx count reg: 0xec0
+read dsirx count reg: 0x295
+read dsirx count reg: 0xb9f
+read dsirx count reg: 0xe93
+read dsirx count reg: 0x268
+read dsirx count reg: 0x56d
+read dsirx count reg: 0xe78
+read dsirx count reg: 0x2b823a
+read dsirx count reg: 0x590
+read dsirx count reg: 0xd20895
+read dsirx count reg: 0x2bf
+read dsirx count reg: 0x5b3
+read dsirx count reg: 0x8b9
+read dsirx count reg: 0xbbe
+read dsirx count reg: 0x888597
+read dsirx count reg: 0x8db
+read dsirx count reg: 0xbe1
+read dsirx count reg: 0xee6
+read dsirx count reg: 0x8c0
+read dsirx count reg: 0xbb4
+read dsirx count reg: 0xeb9
+read dsirx count reg: 0x28e
+read dsirx count reg: 0xb98
+read dsirx count reg: 0xe8c
+read dsirx count reg: 0x261
+read dsirx count reg: 0xb40566
+read dsirx count reg: 0xec1
+read dsirx count reg: 0x284
+read dsirx count reg: 0x589
+read dsirx count reg: 0x88f
+read dsirx count reg: 0x268
+read dsirx count reg: 0x55c
+read dsirx count reg: 0x862
+read dsirx count reg: 0xb68
+read dsirx count reg: 0x541
+read dsirx count reg: 0x835
+read dsirx count reg: 0xa80b3a
+read dsirx count reg: 0xe90
+read dsirx count reg: 0x869
+read dsirx count reg: 0xb5d
+read dsirx count reg: 0xe63
+read dsirx count reg: 0x237
+read dsirx count reg: 0xb42
+read dsirx count reg: 0x408e35
+read dsirx count reg: 0x25a
+read dsirx count reg: 0x560
+CMD: efuse frame download to 0x20440000
+CMD: efuse parse addr:0x20440000
+open efuse regulator
+debug status efuse1:0x1
+debug status efuse2:0x1
+
+efuse1_vol:1800000 efuse2:1800000
+sec.bin contain device_id
+device id has programed!!!!
+sec.bin contain secure_boot_pubkey_hash
+secure boot pubkey hash has been written before
+sec.bin contain lcs
+sec.bin contain otp_ctrl
+key has been programed
+close efuse regulator
+verify spl image 
+Root_t Load Addr:0x20480000
+Image Size:0x20
+Chip Life Cycle: DD
+Secure Boot is enabled
+Read manifest version: 0
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x0
+sec_boot_get_images_info:image_info->name: spl
+sec_boot_get_images_info:image_info->static_addr: 0x20440000
+sec_boot_get_images_info:image_info->load_addr: 0x20440000
+sec_boot_get_images_info:image_info->entry_addr: 0x20440000
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x314c5
+sec_boot_get_images_info:image_info->storage_size: 0x314c5
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x1
+sec_boot_get_images_info:image_info->name: root_t
+sec_boot_get_images_info:image_info->static_addr: 0x0
+sec_boot_get_images_info:image_info->load_addr: 0x204714c5
+sec_boot_get_images_info:image_info->entry_addr: 0x0
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x20
+sec_boot_get_images_info:image_info->storage_size: 0x20
+sec_boot_get_img_info_by_idx:imag_info->name:spl
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x20440000
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x314c5
+Image Name:          spl
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x0000000020440000
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x000314c5
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Find Next boot image: spl
+sec_boot_get_img_info_by_idx:imag_info->name:root_t
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x204714c5
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x20
+Image Name:          root_t
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x00000000204714c5
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x00000020
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Root_t Load Addr:0x204724c5
+Image Size:0x20
+Read manifest version: 0
+read otp ver:0x0
+manifest_info.sec_boot_mnft_para.mnft_ver:0x0
+wait for ddr init done ...
+ddr init done
+firewall phase:0
+0x50010000:ffffffff,0,0,0
+range0:2, 0, 0, 3ffff, 0
+range1:2, 40000, 0, 203fffff, 0
+range2:2, 20400000, 0, 2041ffff, 0
+range3:2, 20420000, 0, 2043ffff, 0
+range4:2, 20440000, 0, 20443fff, 0
+range5:2, 20444000, 0, 2fffffff, 0
+range6:2, 30000000, 0, 3fffffff, 0
+range7:2, 40000000, 0, 40000fff, 0
+range8:2, 40001000, 0, 40207fff, 0
+range9:2, 40208000, 0, 40208fff, 0
+range10:2, 40209000, 0, 40612fff, 0
+range11:2, 40613000, 0, 40613fff, 0
+range12:2, 40614000, 0, 407fffff, 0
+range13:2, 40800000, 0, 40800fff, 0
+range14:2, 40801000, 0, 427fffff, 0
+range15:3, 42800000, 0, 42ffffff, 0
+range16:2, 43000000, 0, ffffffff, 1
+range17:2, 0, 2, 400fffff, 2
+range18:2, 40100000, 2, 401fffff, 2
+range19:2, 40200000, 2, 7f7fffff, 2
+range20:2, 7f800000, 2, 7f80ffff, 2
+range21:2, 7f810000, 2, 7fefffff, 2
+range22:2, 7ff00000, 2, 7fffffff, 2
+range23:2, 80000000, 2, 9fffffff, 2
+range24:2, a0000000, 2, ffffffff, 3
+range25:3, 1000, 0, 0, 0
+range26:3, 1000, 0, 0, 0
+range27:3, 1000, 0, 0, 0
+range28:3, 1000, 0, 0, 0
+range29:3, 1000, 0, 0, 0
+range30:3, 1000, 0, 0, 0
+pcie power up
+pcie power on
+try wake cnt:0
+trigger v2apwake rising edge
+wake trig time:4000
+try wake cnt:1
+trigger v2apwake rising edge
+wake trig time:6000
+try wake cnt:2
+trigger v2apwake rising edge
+wake trig time:8000
+try wake cnt:3
+trigger v2apwake rising edge
+wake trig time:10000
+try wake cnt:4
+trigger v2apwake rising edge
+wake trig time:12000
+try wake cnt:5
+trigger v2apwake rising edge
+wake trig time:14000
+try wake cnt:6
+trigger v2apwake rising edge
+wake trig time:16000
+try wake cnt:7
+trigger v2apwake rising edge
+wake trig time:18000
+wake perst time:18000
+detect perst rising edge,rising times:0x1
+pcie subsys init
+poll fabric
+poll perst high
+poll pclk stable
+pcie ip reconfigenable ltssm log
+pcie set ltssm_enabledeassert perst,clear rising int
+[0x1]ltssm:0x6
+[0x2]ltssm:0x1
+[0x3]ltssm:0x21
+[0x4]ltssm:0x22
+[0x5]ltssm:0x23
+[0x6]ltssm:0x11
+Link up,Gen3X1
+    init ipc to ap
+    init ipc from ap
+
+      PCIe Ramdump test,cnt:1 start!
+sft_gpr0 reg val:0x0,NO need ramdump
+    init ipc to ap
+    init ipc from ap
+
+      PCIe Image download test,cnt:1 start!
+    init ipc to ap
+firewall phase:4
+0x50010000:ffffffff,0,0,0
+range0:3, 0, 0, 3ffff, 0
+range1:2, 40000, 0, 203fffff, 0
+range2:3, 20400000, 0, 2041ffff, 0
+range3:2, 20420000, 0, 2043ffff, 0
+range4:2, 20440000, 0, 20443fff, 0
+range5:2, 20444000, 0, 2fffffff, 0
+range6:3, 30000000, 0, 3fffffff, 0
+range7:3, 40000000, 0, 40000fff, 0
+range8:2, 40001000, 0, 40207fff, 0
+range9:3, 40208000, 0, 40208fff, 0
+range10:2, 40209000, 0, 40612fff, 0
+range11:3, 40613000, 0, 40613fff, 0
+range12:2, 40614000, 0, 407fffff, 0
+range13:3, 40800000, 0, 40800fff, 0
+range14:2, 40801000, 0, 427fffff, 0
+range15:3, 42800000, 0, 42ffffff, 0
+range16:2, 43000000, 0, ffffffff, 1
+range17:3, 0, 2, 400fffff, 2
+range18:3, 40100000, 2, 401fffff, 2
+range19:3, 40200000, 2, 7f7fffff, 2
+range20:3, 7f800000, 2, 7f80ffff, 2
+range21:3, 7f810000, 2, 7fefffff, 2
+range22:3, 7ff00000, 2, 7fffffff, 2
+range23:3, 80000000, 2, 9fffffff, 2
+range24:2, a0000000, 2, ffffffff, 3
+range25:3, 1000, 0, 0, 0
+range26:3, 1000, 0, 0, 0
+range27:3, 1000, 0, 0, 0
+range28:3, 1000, 0, 0, 0
+range29:3, 1000, 0, 0, 0
+range30:3, 1000, 0, 0, 0
+   To load UBOOT(image id:3)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x3,0x40100000,0x2,0x101
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x3,0x78d80,0x0,0x101
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x3,0x1,0x2,0x101
+received ipc ack from AP
+   To load LINUX(image id:4)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x4,0x7ff7ef3c,0x2,0x102
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x4,0x1a1f1db7,0x0,0x102
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x4,0x1,0x2,0x102
+received ipc ack from AP
+   To load SCPFW(image id:5)
+1.Send ipc:request image
+send ipc DR[0-6]:0x10630f01,0x2000001,0x1c,0x5,0x0,0x0,0x103
+received ipc ack from AP
+2.To wait image down
+get image down result by aon_ipc SUCCESS,recieve DR[0-6]:0x10630f01,0x1000002,0x1c,0x5,0x1dd6c,0x0,0x103
+3.Verify image
+4.Send image verify result:sucess
+send ipc DR[0-6]:0x10630f01,0x2000003,0x1c,0x5,0x1,0x0,0x103
+received ipc ack from AP
+  pcie download test SUCCESS!
+cmdline ddr_addr_on_a55:0x7ff7ef3c,header:0x12345678,0xe,0x5f766564,0x64632077
+pice done
+verify scpfw image 
+Root_t Load Addr:0x20480000
+Image Size:0x20
+Chip Life Cycle: DD
+Secure Boot is enabled
+Read manifest version: 0
+sec_boot_get_images_info:image_info->encrypt_flag: 0x0
+sec_boot_get_images_info:image_info->xip_flag: 0x0
+sec_boot_get_images_info:image_info->emb_flag: 0x0
+sec_boot_get_images_info:image_info->entry_addr_flag: 0x0
+sec_boot_get_images_info:image_info->image_id: 0x0
+sec_boot_get_images_info:image_info->name: scpfw
+sec_boot_get_images_info:image_info->static_addr: 0x0
+sec_boot_get_images_info:image_info->load_addr: 0x0
+sec_boot_get_images_info:image_info->entry_addr: 0x0
+sec_boot_get_images_info:image_info->image_flags: 0x0
+sec_boot_get_images_info:image_info->size: 0x1cd6c
+sec_boot_get_images_info:image_info->storage_size: 0x1cd6c
+sec_boot_get_img_info_by_idx:imag_info->name:scpfw
+sec_boot_get_img_info_by_idx:imag_info->static_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->loading_addr: 0x0
+sec_boot_get_img_info_by_idx:imag_info->entry_addr: 0xffffffff
+sec_boot_get_img_info_by_idx:imag_info->size: 0x1cd6c
+Image Name:          scpfw
+Image Static Addr:   0x00000000ffffffff
+Image Load Addr:     0x0000000000000000
+Image Entry Addr:    0x00000000ffffffff
+Image Size:          0x0001cd6c
+Image Is Encryption: False
+Image Is XIP:        True
+Image Flags:         0x00000000
+Find Next boot image: scpfw

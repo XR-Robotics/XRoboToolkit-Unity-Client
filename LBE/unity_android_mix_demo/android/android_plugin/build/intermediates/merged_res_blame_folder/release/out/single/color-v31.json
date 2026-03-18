@@ -1,0 +1,86 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral22.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral22.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral6.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral6.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_dark_default_color_primary_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_dark_default_color_primary_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral12.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral12.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral98.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral98.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_default_color_primary_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_default_color_primary_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral17.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral17.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral96.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral96.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_primary_text_disable_only.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_primary_text_disable_only.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral94.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral94.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_dark_default_color_secondary_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_dark_default_color_secondary_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral4.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral4.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral24.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral24.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_dark_highlighted_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_dark_highlighted_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_default_color_secondary_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_default_color_secondary_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_dark_primary_text_disable_only.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_dark_primary_text_disable_only.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_highlighted_text.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_highlighted_text.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral87.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral87.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_ref_palette_dynamic_neutral92.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_ref_palette_dynamic_neutral92.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_dark_hint_foreground.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_dark_hint_foreground.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-v31/m3_dynamic_hint_foreground.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-v31/m3_dynamic_hint_foreground.xml"
+    }
+]

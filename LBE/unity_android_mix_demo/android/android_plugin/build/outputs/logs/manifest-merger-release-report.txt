@@ -1,0 +1,31 @@
+-- Merging decision tree log ---
+manifest
+ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:2:1-8:12
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:2:1-8:12
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:2:1-8:12
+	package
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:2:1-8:12
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+	xmlns:android
+		ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:3:5-67
+	android:name
+		ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:3:22-64
+application
+ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml:4:5-7:19
+uses-sdk
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml reason: use-sdk injection requested
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+	android:targetSdkVersion
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+	android:minSdkVersion
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+		ADDED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml
+		INJECTED from /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/android/android_plugin/src/main/AndroidManifest.xml

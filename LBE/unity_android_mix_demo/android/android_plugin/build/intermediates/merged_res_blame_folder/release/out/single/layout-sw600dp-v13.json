@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-sw600dp-v13/design_layout_snackbar.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-sw600dp-v13/design_layout_snackbar.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-sw600dp-v13/mtrl_layout_snackbar.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-sw600dp-v13/mtrl_layout_snackbar.xml"
+    }
+]

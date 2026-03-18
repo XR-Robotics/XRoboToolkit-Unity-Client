@@ -1,0 +1,34 @@
+{
+    "logs": [
+        {
+            "outputFile": "com.example.androidplugin.android_plugin-merged_res-28:/values-small-v4/values-small-v4.xml",
+            "map": [
+                {
+                    "source": "/Users/bytedance/.gradle/caches/transforms-3/1072879069efd070fb6992aa0ec3c2d9/transformed/material-1.9.0/res/values-small-v4/values-small-v4.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,128,198,270",
+                        "endColumns": "72,69,71,69",
+                        "endOffsets": "123,193,265,335"
+                    }
+                }
+            ]
+        },
+        {
+            "outputFile": "com.example.androidplugin.android_plugin-mergeReleaseResources-26:/values-small-v4/values-small-v4.xml",
+            "map": [
+                {
+                    "source": "/Users/bytedance/.gradle/caches/transforms-3/1072879069efd070fb6992aa0ec3c2d9/transformed/material-1.9.0/res/values-small-v4/values-small-v4.xml",
+                    "from": {
+                        "startLines": "2,3,4,5",
+                        "startColumns": "4,4,4,4",
+                        "startOffsets": "55,128,198,270",
+                        "endColumns": "72,69,71,69",
+                        "endOffsets": "123,193,265,335"
+                    }
+                }
+            ]
+        }
+    ]
+}

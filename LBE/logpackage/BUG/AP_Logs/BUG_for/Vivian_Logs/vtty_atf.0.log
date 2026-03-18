@@ -1,0 +1,35 @@
+
+AP UTC TIME:2026-03-18-02-15-35, reset cnt:0
+[21.720]BL31: ATF virtiual uart init done
+[30.353]SH STAR1 already on
+
+AP UTC TIME:2026-03-18-02-17-51, reset cnt:0
+[21.997]BL31: ATF virtiual uart init done
+[30.630]SH STAR1 already on
+[41.205]Exception flag: 0x0
+[43.122]Exception flag: 0x0
+[176.444]Exception flag: 0x0
+[178.337]Exception flag: 0x0
+[365.410]Exception flag: 0x0
+[380.702]Exception flag: 0x0
+[518.451]BL31:vivian_pwrc_cluster_pwr_off:cluster off done
+[518.451]core0 warmboot address: 0x27ff0011c
+[7994.571]core0 warmboot and exit deep sleep
+[7994.571]system begin to resume
+[7997.977]Exception flag: 0x0
+[8024.905]Exception flag: 0x0
+[8072.795]Exception flag: 0x0
+[8088.590]Exception flag: 0x0
+[8099.678]Exception flag: 0x0
+[8112.437]Exception flag: 0x0
+[8140.759]Exception flag: 0x0
+[8160.717]Exception flag: 0x0
+[8315.402]BL31:vivian_pwrc_cluster_pwr_off:cluster off done
+[8315.402]core0 warmboot address: 0x27ff0011c
+[8676.235]core0 warmboot and exit deep sleep
+[8676.235]system begin to resume
+[8680.464]Exception flag: 0x0
+[8682.437]Exception flag: 0x0
+[8683.193]Exception flag: 0x0
+[8696.179]Exception flag: 0x0
+[8705.313]Exception flag: 0x0

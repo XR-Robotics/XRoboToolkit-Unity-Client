@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-v26/abc_screen_toolbar.xml",
+        "source": "com.example.androidplugin.android_plugin-appcompat-1.6.1-6:/layout-v26/abc_screen_toolbar.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/layout-v26/mtrl_calendar_month.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/layout-v26/mtrl_calendar_month.xml"
+    }
+]

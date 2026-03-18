@@ -1,0 +1,268 @@
+
+AP UTC TIME:2026-03-18-02-17-59, reset cnt:0
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+( 145887085)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  71911845)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  84008198)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  72900131)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  76895431)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  67884120)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  83718990)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  69909289)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  61749534)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  67543068)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  72394700)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  59582517)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  79252113)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  87445135)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  99420680)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  65094953)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+( 129590651)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  67949605)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288
+Build Info: tag: commit:3d4bc4 date:2026-03-11 19:26:12 user:zhoujie@zhoujie-Precision-3650-Tower
+(  79104851)                     XMP_LOG: core2: Proc ID: 2
+SHARED_MEM_PTR = 0x0x61e01004, SHARED_MEM_SIZE = 0x1f6ffc
+Local Memory Start : Size
+----------------------------
+DRAM0: 0x40000358 : 0x3fca8
+DRAM1: 0x40040000 : 0x3d000
+----------------------------
+L2 Memory Start : Size
+----------------------------
+L2 Memory: 0x55600000 : 0x200000
+----------------------------
+Stack: 0x4007d000 - 0x40080000
+Stack Size: 12288

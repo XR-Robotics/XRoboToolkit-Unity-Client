@@ -1,0 +1,313 @@
+本文目标是把 Unity 与 Android 同链路（可同仓或分仓） 的混编工程，从「空工程过审」到「可在海外环境稳定出包」再到「逐步迁移业务功能」给出一套可执行、可复用、可审计的操作指南。关键约束来自两份参考文档：Unity+Android 混编工程方案说明（版本统一/组件合规/执行路径）与 ICM 制作编译镜像入门（构建镜像与本地使用）。
+
+---
+0. 适用范围与交付物
+适用场景包括：Android App 中嵌入 Unity（Unity as a Library）、Unity 工程中集成 Android 原生能力（Android 插件/AAR）、以及两者并存的「混编」工程。
+交付物建议明确到可检查的实体，便于对齐期望与验收：
+- A. 空工程（过审基线）：仅包含 Unity Editor/Android 构建支持与最小依赖的样例工程，可在目标海外环境出包。
+- B. 统一构建环境：ICM 编译镜像（含 JDK/Android SDK/NDK/Gradle/必要工具；是否包含 Unity Editor 由团队策略决定）。
+- C. 混编工程仓库：包含 Unity 工程、Android 宿主工程、构建脚本与 CI 配置。
+- D. 合规依赖链路：Android（Maven/TTP 源）、Unity（UPM/包源/TTP）两套依赖管理均可追溯且能通过合规审核。
+行动方针（强约束）：先做过审的空工程，在海外跑通 Unity 编译出包流程；链路跑通后，再逐一解决工程迁移问题。
+
+---
+1. 角色与责任（建议固化）
+角色
+主要职责
+关键输出/验收点
+业务研发（Unity/Android）
+工程集成、脚本与 CI、问题排查
+空工程基线、混编仓库、可复现构建、版本/依赖清单
+OS 团队（如承担 Sandbox）
+Sandbox 侧开发与接口定义（若由 OS 负责）
+Sandbox 交付物与集成方式说明
+USDS（或对应合规对口）
+Unity 官方版本认可、官方组件策略沟通
+Unity 版本确认结论；官方组件处理路径
+Bits TTP 团队
+TTP 源配置、上传/拉取流程、扫描链路对接
+TTP 仓库/源地址、凭证/权限、扫描策略落地
+
+---
+2. 前置准备（一次性完成，避免反复踩坑）
+2.1 版本统一（必须先定下来）
+团队需要统一 Unity 国际版版本（或明确支持多版本策略），当前可选版本（以参考文档为准）：Unity 2021.3.45f2 / 2022.4.39f / 团结引擎 1.6.9 / Unity 6.0003 LTS。
+Unity 版本审核主体需要与 USDS 沟通确认，务必在「空工程过审」阶段完成结论固化，否则后续迁移成本会指数级上升。
+2.2 本地基础环境
+- JDK（建议按 Android Gradle Plugin 要求固定大版本，避免团队成员差异）
+- Android SDK / Build-tools / Platform-tools
+- Android NDK（若使用 IL2CPP / native 库，建议固定 NDK 版本并写入文档与镜像）
+- Git（如 Unity 大资源建议配合 Git LFS 或内部等效方案）
+- Android Studio（用于宿主工程调试）
+2.3 权限与凭证
+- ICM 镜像配置中心访问权限与镜像仓库绑定的服务树权限（参考《ICM 制作编译镜像入门》）
+- Docker Hub（hub.byted.org）登录凭证：在 ICM 页面左下角「访问凭证」配置与获取
+
+---
+3. 混编形态选型（先选清楚再开工）
+形态 A：Android 宿主 + Unity as a Library（推荐）
+适合需要把 Unity 作为某个功能模块嵌入到现有 Android App（登录、支付、权限、路由等仍由原生主导）。
+核心做法： Unity 导出为 unityLibrary 模块，Android 工程通过 Gradle include 并运行。
+形态 B：Unity 主工程 + Android 插件（AAR/UPM）
+适合 Unity 作为主入口，原生能力以插件形式提供（支付/分享/系统能力等）。
+核心做法： Android 产出 AAR（或 Maven 包），上传到 TTP 源后由 Unity Gradle 构建拉取。
+多数混编项目最终会同时用到 A 与 B：Android 宿主集成 Unity（A），同时 Unity 通过插件调用原生能力（B）。建议从 A 开始，因为它最能复用现有 Android 研发体系。
+
+---
+4. 推荐仓库结构（同仓可审计）
+推荐优先把 Unity 与 Android 放在同一个 Codebase 仓库，便于扫描与依赖治理落地；如现阶段已分为两个仓库（同一 Codebase 命名空间下），仍可落地，见 4.1：
+repo-root/
+  android/                 # Android Studio 工程（宿主 + unityLibrary）
+    app/
+    unityLibrary/          # Unity 导出产物（由脚本生成/更新）
+    buildSrc/              # 可选：统一 Gradle 版本/插件管理
+  unity/                   # Unity 工程（Assets/Packages/ProjectSettings）
+  scripts/
+    build_android.sh
+    export_unity_gradle.sh
+  ci/
+    pipeline.yml           # 或对应平台配置
+  docs/
+    dependency_list.md     # 组件清单（合规/审核使用）
+
+原则：android/unityLibrary 不要手工改动（或只允许改动少数模板文件），统一由导出脚本生成，避免「本地能跑、CI 不能跑」的不可控状态。
+4.1 现有分仓场景的落地方案（Unity/Android 两仓）
+如果 Unity 与 Android 目前分为两个仓库，但处于同一 Codebase 命名空间下，依旧可以满足扫描与合规要求。关键是把「Unity 导出产物」做成 Android 构建的可追溯输入：Android 每次构建都能明确对应到 Unity 的提交版本与导出产物。
+分仓场景下，禁止 Android 构建阶段“临时拉取 Unity 仓某分支最新代码并导出”，必须做到：固定 Unity commit → 固定导出产物 → 固定构建结果。
+方案 1（推荐）：产物交付 + 版本锁定
+1. 在 Unity 仓库提供无交互导出脚本，CI 使用 batchmode 导出 unityLibrary。
+2. Unity 仓库 CI 在导出后，将 android/unityLibrary（或导出目录）打包成 zip，并以 UnityVersion + UnityCommit 命名上传为制品（CI Artifact / 内部制品库 / TTP）。
+3. 在 Android 仓库新增一个版本锁定文件（示例：unity_revision.json），内容包含 Unity 仓库地址、commit、制品地址。
+4. Android 仓库 CI 在 ./gradlew assemble 前，先下载并解压该制品到 android/unityLibrary，然后再进行正常 Gradle 构建。
+5. 若需要本地复现，提供 scripts/sync_unity_artifact.sh，读取 unity_revision.json 一键拉取制品并解压。
+6. 升级 Unity 版本/提交时，必须通过 MR 修改 unity_revision.json，并附带对应 Unity 仓库的导出流水线链接，确保审计可回溯。
+示例 unity_revision.json：
+{
+  "unity_repo": "<codebase_unity_repo>",
+  "unity_commit": "<commit_sha>",
+  "unity_version": "2022.4.39f",
+  "unity_export_artifact": "<artifact_url>"
+}
+
+方案 2：Git Submodule 固定 Unity 源码
+1. Android 仓库作为主仓，添加 Unity 仓库为 submodule，并固定到指定 commit。
+2. CI 克隆代码时开启 submodule 拉取，然后执行导出与构建。
+3. 升级 Unity 时通过 MR 更新 submodule 指针（等价于版本锁定）。
+方案 3：定期镜像同步（subtree/vendor）
+1. 通过脚本定期把 Unity 仓库指定 commit 的快照同步到 Android 仓库的 unity/ 目录。
+2. 同步变更通过 MR 体现 diff，便于审计与回滚。
+3. 适合对“单仓扫描/单仓构建”要求强、但能接受同步成本的团队。
+三种方案中，方案 1 最适合先跑通海外出包链路：Android 构建无需依赖 Unity 源码拉取权限与导出耗时，且可把 Unity 导出成本前移到 Unity 仓库流水线。
+
+---
+5. 构建环境标准化：混编构建镜像（ICM / BigMac）
+这一步的目标是：把 Unity/Android 构建所需工具链固化到镜像里，保证海外/国内、个人/CI 一致。一般情况下，Linux 容器化构建使用 ICM（Docker 镜像）；macOS 云构建使用 BigMac（macOS 简化 image 机制）。
+5.0 如果你们通过 BigMac 制作混编镜像（macOS 场景）
+BigMac 镜像主要用于 macOS 云构建任务：每个任务在 BigMac 镜像提供的文件系统中隔离运行。BigMac 镜像只能在 Mac 上制作/升级，并且需要注意镜像与 macOS 版本的兼容性。
+你们提到“通过 BigMac 完成混编镜像”，落地上通常意味着：把 Unity Editor（含 Android Build Support）、Android SDK/NDK/JDK/Gradle、以及构建所需的内部工具，一起固化进 BigMac 镜像，然后在出包 Job 的 环境镜像 字段中直接选用该镜像版本。
+5.0.1 制作/升级 BigMac 镜像（示例流程）
+1. 安装 BigMac 命令行（仅 Mac 可用）：
+curl https://ios.bytedance.net/wlapi/tosDownload/iosbinary/bigmac_registry/release/bin/bigMac -o /usr/local/bin/bigMac; chmod 777 /usr/local/bin/bigMac; echo DONE
+
+2. 查看远程基础镜像（示例）：
+bigMac image list --remote | grep Android
+
+3. 拉取并解压某个基础镜像到本地目录（示例）：
+mkdir -p tmp && cd tmp
+bigMac image extract Android:1.0.9
+cd Android
+
+4. 修改 ImageFile.yml（至少包含）：
+  - version：每次更新递增
+  - description：写清新增/变更的工具链版本
+  - compatiblePlatform：确认与目标 macOS 版本匹配
+  - environment：把 JAVA_HOME、ANDROID_HOME/ANDROID_SDK_ROOT、NDK_HOME、PATH 等配置到可用状态
+5. 把需要的工具链放入镜像根目录并对齐环境变量（按项目需要选择）：Unity Editor + Android Build Support、Android SDK/NDK、JDK、Gradle、zip/unzip、python3、git 等。
+6. 打包并推送镜像：
+bigMac image package -t --push ./
+
+Unity 出包通常需要离线 license。建议把离线 license 文件随镜像一起发布并固定到统一路径，构建脚本里显式读取该路径，避免“换机器/换容器就失效”。
+5.0.2 在出包 Job 中指定 BigMac 镜像
+在 Bits 平台的 Job 管理 > 查看配置 > 基本信息配置 中，将 环境镜像 填为 ImageName:Version（示例：ModuleUpgrade15:1.3.12），保存后下一次任务运行即会使用该 BigMac 镜像版本。
+5.1 在 ICM 创建镜像仓库
+1. 打开 新版 ICM 镜像配置中心
+2. 点击导航栏 镜像仓库
+3. 点击右上角 新建镜像，进入新建页面
+4. 按页面指引绑定服务树与权限（更详细步骤可参考 ICM 说明文档「创建镜像仓库」链接）
+5.2 构建镜像
+1. 在镜像仓库列表找到目标仓库，进入 仓库详情
+2. 点击右上角 构建镜像
+3. 配置关键参数：
+  - 构建区域：编译镜像建议选择 China-North-LF
+  - 构建版本：首次默认从 1.0.0.1 开始，建议保持纯数字版本号
+4. 点击 构建 完成
+镜像内容建议至少包含：JDK、Android SDK/Build-tools、NDK、Gradle、git、zip/unzip、python3（如构建脚本需要）。
+Unity Editor 是否进入镜像取决于团队策略：
+- 若海外/CI 必须容器化构建 Unity，需把 Unity Editor（含 Android Build Support）预装进镜像。
+- 若 Unity 构建仍在固定构建机完成，镜像可先用于 Android/依赖构建与扫描链路。
+5.3 使用镜像（Docker / BigMac）
+Docker（ICM，常用于 Linux 容器化构建）
+下方步骤适用于 Docker 镜像的拉取与本地容器复现。
+BigMac（macOS 云构建）
+通常不需要研发本地 docker pull。直接在出包 Job 的 环境镜像 字段填写 Image:Version 使用指定 BigMac 镜像版本即可。
+1. 先完成权限：授予与 ICM 仓库绑定的服务树权限
+2. 获取个人 Docker 访问凭证（ICM 页面左下角「访问凭证」）
+3. 登录：
+docker login hub.byted.org
+
+4. 从 ICM 仓库详情页获取镜像地址，拉取并进入容器（示例，按实际替换）：
+# 示例：镜像地址以 ICM 仓库详情为准
+docker pull hub.byted.org/<namespace>/<image>:<version>
+
+# 把本地工程挂载进容器
+docker run --rm -it \
+  -v "$PWD":/workspace \
+  -w /workspace \
+  hub.byted.org/<namespace>/<image>:<version> \
+  bash
+
+5.4 在 CI 使用镜像（建议做成一键脚本）
+- 按所用镜像方式准备凭证与环境：Docker 镜像需要在任务执行前完成 docker login；BigMac 镜像按 Job 配置指定并由平台拉取
+- 统一从构建镜像启动构建任务（Linux：ICM Docker 镜像；macOS：BigMac 环境镜像）
+- 把 Unity 导出、Gradle 构建、签名、产物上传等步骤串起来
+
+---
+6. 从 0 到 1 跑通链路（按行动方针拆阶段）
+6.1 阶段 0：空工程基线（过审）
+目标：在不引入任何业务组件的情况下，跑通 Unity+Android 混编最小链路，并把关键版本/依赖固化。
+建议检查项：
+- Unity 版本已与 USDS 确认
+- 工程仅使用必要内置组件
+- 产物能在目标海外环境构建并安装运行
+- 组件清单（含 Unity Packages / Android 依赖）已生成并可审计
+6.2 阶段 1：海外环境出包（稳定）
+目标：在海外构建环境中，将「导出 Unity → Android 集成 → Gradle 出包」做成一条稳定流水线。
+建议检查项：
+- 构建环境来自 ICM 镜像（或固定构建机），版本一致
+- 构建脚本无交互、可重复执行
+- 产物输出路径与命名规范固定（便于上传/回溯）
+6.3 阶段 2：逐一迁移工程能力
+目标：把业务组件按「从少到多」逐步引入，任何新增组件都可回溯来源与合规状态。
+建议节奏：一次只引入一个组件（或一组强耦合组件），每次引入都完成：依赖入源 → 扫描/审核 → 海外出包验证 → 回归验证。
+
+---
+7. 形态 A 操作指南：Android 宿主集成 Unity as a Library
+以下以「Unity 工程导出为 unityLibrary 模块，Android Studio 工程运行」为主线。
+7.1 Unity 侧准备（一次性配置）
+1. 打开 Unity 工程（确保版本符合团队统一版本）
+2. File > Build Settings... 选择 Android，点击 Switch Platform
+3. Player Settings 建议先固化：
+  - Scripting Backend：IL2CPP（如有要求）
+  - Target Architectures：至少包含 arm64（64-bit 要求）
+  - Minify / Managed Stripping Level：按项目需要，但空工程阶段建议保持最简单
+4. 如果需要自定义 Gradle/Manifest：勾选并生成模板（Unity 菜单位置因版本不同略有差异）
+  - Custom Main Gradle Template
+  - Custom Launcher Gradle Template
+  - Custom Base Gradle Template
+  - Custom AndroidManifest
+空工程阶段建议只做「必须配置」，避免把后续迁移问题提前引入。
+7.2 Unity 导出脚本化（推荐强制）
+把导出动作做成脚本，避免人工在 Unity UI 点来点去导致不一致。
+- 方式 1：Unity Editor -batchmode 调用 ExecuteMethod
+- 方式 2：在 Unity 内部提供菜单项导出（但 CI 仍建议 batchmode）
+示例命令（路径与方法名按项目替换）：
+/opt/unity/Editor/Unity \
+  -quit -batchmode -nographics \
+  -projectPath ./unity \
+  -executeMethod Build.ExportAndroidProject \
+  -logFile -
+
+导出目标建议固定到 ./android/unityLibrary（或 ./android/unity/），并在脚本里清理旧产物。
+7.3 Android 工程集成 unityLibrary
+1. 在 android/settings.gradle（或 settings.gradle.kts）中 include：
+include(":app")
+include(":unityLibrary")
+project(":unityLibrary").projectDir = file("unityLibrary")
+
+2. 在宿主 app/build.gradle 添加对 unityLibrary 的依赖（按需选择）：
+dependencies {
+  implementation project(":unityLibrary")
+}
+
+3. 处理 Manifest 合并：
+  - 宿主保留自己的 applicationId、签名、权限策略
+  - Unity 导出的 AndroidManifest.xml 作为 library manifest 合并进入宿主
+4. 入口 Activity 策略（两种常见做法）：
+  - 宿主 Activity 内嵌 Unity（推荐：更易与现有导航/权限体系融合）
+  - 以独立 UnityPlayerActivity 作为单独页面（切换简单，但返回栈/生命周期要更小心）
+7.4 宿主启动 Unity（参考实现思路）
+- 如果使用 Unity 官方提供的 UnityPlayerActivity，按 Unity 导出工程的示例接入
+- 如果需要嵌入到自定义 Activity/Fragment，建议封装一个「Unity 容器层」，统一处理：
+  - UnityPlayer 初始化与销毁
+  - onPause/onResume/onWindowFocusChanged/onConfigurationChanged 转发
+  - 渲染视图挂载与卸载
+混编工程最容易出问题的不是「能不能跑」，而是生命周期与资源管理（旋转、后台、权限弹窗、返回键、分屏等）。建议在空工程阶段就把这些场景跑一遍。
+7.5 构建与运行
+在 android/ 目录执行（建议在 ICM 镜像中跑）：
+./gradlew :app:assembleDebug
+# 或
+./gradlew :app:assembleRelease
+
+
+---
+8. 形态 B 操作指南：Unity 集成 Android 插件（AAR / Maven / TTP）
+8.1 Android 侧产出 AAR
+1. 新建或复用一个 Android Library Module
+2. 产出 AAR：
+./gradlew :mylib:assembleRelease
+
+3. 产物位于 mylib/build/outputs/aar/
+8.2 组件入源与拉取（对齐 TTP）
+参考文档将组件分为：内置组件（走镜像审核）、官方组件（需与 USDS 沟通）、自研组件、第三方组件。对「非官方 SDK 与组件」的要求是：上传至 TTP 环境，配置使用 TTP 源拉取；自研 SDK/组件需通过神盾合规审核后拉取使用。
+落地建议：
+- Android（Gradle）：统一在 settings.gradle 或 build.gradle 配置 TTP Maven 源（源地址/凭证由 Bits TTP 团队提供），禁止直接引用公网仓库
+- Unity（UPM/Gradle）：
+  - UPM 包：通过 scoped registry 指向内部包源（需要与 TTP/包源团队确认支持方案）
+  - Gradle 依赖：通过 mainTemplate.gradle 等模板配置 Maven 源并拉取
+合规落地关键点：不要在工程里留「临时直连公网」的开口（即使只用于开发），否则后续审计会非常痛苦。
+
+---
+9. Unity ↔ Android 通信与边界（建议规范化）
+9.1 Android 调用 Unity
+- 经典方式：UnityPlayer.UnitySendMessage(gameObject, method, param)
+- 建议做一层桥接：把可调用的 Unity API 收敛在少数入口对象，避免散落调用导致难以维护
+9.2 Unity 调用 Android
+- AndroidJavaClass / AndroidJavaObject 调用 Java/Kotlin 静态/实例方法
+- 建议提供一个 IPlatformService 抽象：Unity 侧只依赖接口，Android 侧实现并注入
+9.3 数据协议
+- 小数据：字符串/JSON
+- 大数据：建议用文件/共享内存/ContentProvider 等方式（视业务而定），避免频繁跨层拷贝
+
+---
+10. 扫描与合规（与工程结构绑定）
+已知结论之一是：Bits 侧 Unity 混编工程的扫描对象为 Codebase 仓库（参考文档中的评论结论）。因此建议：
+- 优先同仓；若已分仓，确保 Unity 仓与 Android 仓都纳入扫描范围，并在 Android 仓中通过 unity_revision（提交号/制品地址）锁定 Unity 版本，保证审计可追溯
+- 第三方/自研依赖严格走「入源 → 审核 → 从 TTP 拉取」闭环
+- 内置组件与构建环境相关依赖（例如镜像里预装工具）走镜像审核流程
+如果团队尚未明确「扫描工作的实施方式及责任主体」，建议在阶段 0 就拉齐：谁申请、谁维护白名单、谁在组件升级时复审。
+
+---
+11. 常见问题与排查路径（建议按优先级排）
+11.1 Gradle/AGP/JDK 版本不匹配
+现象：Unsupported class file major version、This version of the Android Gradle plugin requires...
+处理：
+- 先固化 JDK 大版本与 AGP 版本
+- 用 ICM 镜像统一工具链，禁止个人电脑各装各的
+11.2 NDK / IL2CPP 构建失败
+现象：clang 报错、ndk-build 不存在、arm64 构建失败
+处理：
+- 固定 NDK 版本并在镜像内安装
+- Unity Player Settings 的 ABI 配置与宿主保持一致
+11.3 依赖冲突（重复 so / 重复 aar）
+现象：Duplicate class、More than one file was found with OS independent path、运行时崩溃
+处理：
+- 统一在宿主侧做依赖收敛（版本对齐、exclude）
+- Unity 导出产物尽量不手改；需要改时改「模板」并记录原因
+
+---
+12. 一页式落地检查清单（建议每次变更都过一遍）
+- Unity 版本是否仍在认可范围内（变更是否已同步 USDS）
+- 是否新增/升级组件（Android Maven / Unity UPM）并完成入源与审核
+- ICM 镜像版本是否变化（变更是否记录在构建说明中）
+- 海外环境是否完成一次端到端出包验证
+- 生命周期关键场景是否回归（后台、旋转、权限弹窗、返回栈）

@@ -1,0 +1,1167 @@
+Format: Log Type - Time(microsec) - Message - Optional Info
+Log Type: B - Since Boot(Power On Reset),  D - Delta,  S - Statistic
+S - QC_IMAGE_VERSION_STRING=BOOT.MXF.2.5.3-00187-KAANAPALI-1
+S - IMAGE_VARIANT_STRING=SocKaanapaliLAA
+S - OEM_IMAGE_VERSION_STRING=ip-10-195-203-28
+S - Boot Interface: UFS
+S - Secure Boot: On
+S - Boot Config @ 0x221c8600 = 0x00000001
+S - JTAG ID @ 0x221c8744 = 0x102b40e1
+S - OEM ID @ 0x221c8700 = 0x0000018c
+S - Serial Number @ 0x221c8610 = 0x0000046a0cb9b49f
+S - Feature Config Row 0 @ 0x221c2188 = 0x000000ffffffff00
+S - Feature Config Row 1 @ 0x221c2190 = 0xf000000000000000
+S - Core 0 Frequency, 1363 MHz
+S - PBL Patch Ver: 3
+S - PBL freq: 600 MHZ
+S - Cluster: 0, Core: 0
+S - --------------------------------------------------
+PBL Timestamps (in usecs)(,version/bytes)
+--------------------------------------------------
+CPBL Start: 168
+CPBL HW INIT Start: 550
+CPBL HW INIT End: 4528
+CPBL APPS Reset Start: 4611
+CPBL APPS Sec Packet Init Start: 4773
+CPBL APPS Sec Packet Init End: 4783
+CPBL APPS Init Start: 4805
+CPBL APPS Cache Init Start: 5235
+CPBL APPS Cache Init End: 5275
+CPBL APPS Core PWRUP Start: 5351
+CPBL APPS Core PWRUP End: 5420
+CPBL APPS Init End: 5435
+CPBL APPS Reset End: 5446
+APBL start: 5463,16777474
+CPBL Exit: 5508
+ APBL Cold Boot start6258
+APBL Boot Media Detect Start: 18051
+	 APBL flash init stage 1 complete: 21088
+	 APBL flash init stage 2 complete: 38965
+	 APBL flash init stage 3 complete: 48848
+APBL Boot Media Detect End: 50101
+APBL SHELF Load+Auth Start: 50105
+	APBL ELF MD Load Start: 58648
+	APBL ELF MD Load End: 59161
+	APBL ELF Seg Load Start: 59165
+	APBL ELF Seg Load End: 61821,4864
+		APBL SEQ Valid Set: 61841
+		APBL SEQ SA ACK Rcvd: 63948
+	APBL ELF MD Load Start: 66435
+	APBL ELF MD Load End: 67675
+	APBL ELF Auth Start: 67678
+	APBL ELF Auth End: 74328
+	APBL ELF Seg Load Start: 74330
+	APBL ELF Seg Load End: 74606,12088
+	APBL ELF Seg Verify Start: 74610
+	APBL ELF Seg Verify End: 75333
+	APBL ELF MD Load Start: 76831
+	APBL ELF MD Load End: 78070
+	APBL ELF Auth Start: 78073
+	APBL ELF Auth End: 85543
+	APBL ELF Seg Load Start: 85545
+	APBL ELF Seg Load End: 85920,12088
+	APBL ELF Seg Verify Start: 85923
+	APBL ELF Seg Verify End: 86666
+	APBL ELF MD Load Start: 88166
+	APBL ELF MD Load End: 89721
+	APBL ELF Auth Start: 89725
+	APBL ELF Auth End: 102011
+	APBL ELF Seg Load Start: 102015
+	APBL ELF Seg Load End: 104060,43760
+	APBL ELF Seg Verify Start: 104061
+	APBL ELF Seg Verify End: 105345
+	APBL ELF MD Load Start: 106845
+	APBL ELF MD Load End: 108668
+	APBL ELF Auth Start: 108671
+	APBL ELF Auth End: 120926
+	APBL ELF Seg Load Start: 120928
+	APBL ELF Seg Load End: 126728,203840
+	APBL ELF Seg Verify Start: 126731
+	APBL ELF Seg Verify End: 130280
+	APBL ELF MD Load Start: 131780
+	APBL ELF MD Load End: 133575
+	APBL ELF Auth Start: 133578
+	APBL ELF Auth End: 145863
+	APBL ELF Seg Load Start: 145865
+	APBL ELF Seg Load End: 157470,1174496
+	APBL ELF Seg Verify Start: 157473
+	APBL ELF Seg Verify End: 164263
+APBL SHELF Load+Auth End: 164351
+		APBL TME PBL Exit: 164355
+		APBL XBL_SC Exit Check: 164765
+		APBL XBL_SC Exit Ack: 197938
+APBL Exit: 197943
+B -    198829 - SBL1, Start
+B -    599965 - SBL1 BUILD @ 19:45:03 on Sep 23 2025
+B -    602985 - usb: usb_eud_serial  , 0xcb9b49f
+D -      4758 - sbl1_hw_init
+D -       915 - media_init:1
+B -    614605 - XBL_AC_CFG -  Image Load, Start
+D -     25895 - Auth Metadata
+D -     60756 - Segments hash check
+D -     90402 - XBL_AC_CFG -  Image Loaded, Delta - (40356 Bytes)
+B -    708332 - APDP -  Image Load, Start
+D -     14884 - Auth Metadata
+D -      6710 - Segments hash check
+D -     28060 - APDP -  Image Loaded, Delta - (4496 Bytes)
+D -         0 - boot_dload_dump_security_regions
+D -         0 - EUD Init
+D -         0 - blacklist enable
+B -    765763 - Debug Policy: processed
+B -    765824 - Debug Policy: debug policy applied
+D -     17629 - DP_Milestone
+D -      3782 - Auth Metadata
+D -      7045 - sbl1_xblconfig_init
+B -    781227 - XBL Config -  Image Load, Start
+D -      4605 - boot_pre_ddr_dtb_load
+D -      3965 - tsens_init_if
+D -       549 - boot_check_device_temp
+B -    814807 - BUS: 0, PMIC A:2.0 B:2.0 D:2.1 F:2.1 G:2.1 I:2.1
+B -    814899 - BUS: 1, PMIC A:2.0 H:2.1 J:2.1
+B -    824628 - PM: OEM_PSI pre-device-opsi Start
+B -    826550 - PM: OEM_PSI pre-device-opsi Done
+B -    830789 - PM: Reset by PSHOLD
+B -    834114 - PM: Reset Type: Hard Reset
+B -    884561 - PM: SET_VAL:Skip
+B -    884896 - PM: PSI: b0x00_v0xA0 OTP: v0x00
+B -    890051 - PM: OEM_PSI post-device-opsi Start
+B -    893528 - PM: OEM_PSI post-device-opsi Done
+B -    896791 - PM: Device Init # SPMI Transn: 4950 0x0
+D -    105255 - pm_device_init, Delta
+B -    906399 - pm_driver_init, Start
+B -    928054 - PM: OEM_PSI post-driver-opsi Start
+B -    929579 - PM: OEM_PSI post-driver-opsi Done
+B -    932781 - PM: Driver Init # SPMI Transn: 1312
+D -     27480 - pm_driver_init, Delta
+D -    146034 - sbl1_pmic_init
+D -         0 - EUD Post PMIC Init
+B -    949312 - Failed to Locate 'ufs-phy-sel-reg' in dtsi.Ignore if platform d
+D -     23424 - media_init:2
+B -   1183095 - UFS Spec Version: 4.10
+B -   1186053 - UFS INQUIRY ID: SAMSUNG KLUFG8RHKF-F0H1 2000
+B -   1188493 - UFS Boot LUN: 1
+B -   1193983 - UFS Total Size: 512 GB
+B -   1207952 - UFS Speed: Gear 5 Lane 2 Rate B
+D -    243787 - media_init:3
+D -       732 - boot_wdog_disable_check
+B -   1219390 - LOG_START-0000000430
+D -      4209 - init-logstomedia
+D -         0 - shrm_load_cancel
+B -   1228936 - SHRM -  Image Load, Start
+D -     16561 - Auth Metadata
+D -      4453 - Segments hash check
+D -     28640 - SHRM -  Image Loaded, Delta - (174756 Bytes)
+D -       122 - boot_cdt_init
+B -   1266451 - CDT -  Image Load, Start
+B -   1269257 - CDT Version:6,Platform ID:11,Major ID:0,Minor ID:0,Subtype:8
+D -     24431 - sbl1_hw_platform_pre_ddr
+B -   1294176 - PM: Get RID from SDAM: 199000
+B -   1297744 - PM: Battery ID: 199000 Ohm
+B -   1302990 - usb: chgr -  CDP_CHARGER
+B -   1305888 - usb: qusb_dci_eud_init
+B -   1310951 - usb: usb_shared_hs_phy_init dt_error  , 0x6
+B -   1513257 - usb: usb_dp_toggled_for_cdp , 0xc8
+B -   1517100 - PM: VBAT: 8632mV IBAT: 0mA T: 28C
+B -   1518259 - PM: CHG Init # SPMI Transn: 98 0x0
+B -   1522773 - vsense_init, Start
+D -         0 - vsense_init, Delta
+D -    247081 - sbl1_hw_pre_ddr_init
+D -       763 - boot_fedl_check
+D -         0 - boot_dload_handle_forced_dload_timeout
+D -      1800 - sbl1_load_ddr_training_data
+B -   1552724 - Pre_DDR_clock_init, Start
+D -         0 - Pre_DDR_clock_init, Delta
+D -     13146 - sbl1_ddr_set_params
+B -   1564467 - sbl1_ddr_init, Start
+B -   1573861 - DDR_INIT with shrm.elf
+B -   1574166 - INFO: PXI based read & write training enabled
+B -   1602378 - eCDT MRR - Data Starting Address: 0x3104E500
+B -   1616256 - Returning from DDR_FW_Init
+B -   1616561 - ddr_init = 1 cold boot
+D -     52796 - sbl1_ddr_init, Delta
+B -   1624186 - DSF version = 028.00.00
+B -   1627510 - Manufacturer ID = 0x1, Device Type = 0x8
+B -   1631201 - Rank 0 size = 8192 MB, Rank 1 size = 8192 MB
+D -     73871 - sbl1_ddr_init
+D -         0 - store-logstomedia
+B -   1645414 - do_ddr_training, Start
+B -   1672986 - DDR: Start of DDR Training Init
+B -   8124681 - TRAINING TIME PER FUNCTION:
+B -   8128097 - GROUP,NAME,CALL_COUNT,TOTAL_TIME(us)
+B -   8129043 - PLL Pre-Cal,PLL Precal,9,95221
+B -   8133862 - DCC 0,CLKIO DCC Monitor,10,105043
+B -   8138162 - DCC 1,DRAM DCC,3,82106
+B -   8142707 - DCC 3,RDT4 DCC Monitor,7,49898
+B -   8146306 - RCW 0,IO_Qual Vref Training,3,606645
+B -   8150606 - RCW 0,RD_IO_Vref_Cpy_Profile,4,671
+B -   8155456 - RCW 1,RCW CDC/Full Cycle Sweep,1,40840
+B -   8160122 - 547 WR,PXI_WR_Training_Config,1,976
+B -   8165124 - 547 WR,PHY_Trn_LowFreqWR_HCD_V2,1,75426
+B -   8169852 - R,PXI_RD_Training_Config,1,854
+B -   8174945 - R,RD_Low_Freq_Write,1,3081
+B -   8179246 - R,RD_Matched_1TV,9,392076
+B -   8183180 - R,RD_Matched_2OV,9,333000
+B -   8187054 - R,RD_Matched_RD_PB_LA,9,101716
+B -   8190897 - R,RD_Matched_4RDQS_PB,9,162137
+B -   8195441 - R,PHY_TRN_RD_TV_Modify,9,323085
+B -   8199498 - R,RD_DRAM_DCC_HIST,3,539759
+B -   8203890 - R,RD_Matched_3RDQDCC,6,376766
+B -   8207916 - R,RD_Matched_4RDQS_PB,9,162198
+B -   8212125 - R,PHY_SED_RD,1,57676
+B -   8216425 - HighSpeed DIT,DIT - Periodic Training,10,8477
+B -   8219872 - W,PXI_WR_Training_Config,1,946
+B -   8225484 - W,PHY_Trn_WR_HCD_V2,9,949311
+B -   8229784 - W,DRAM_LP5_WR_VMod,6,256199
+B -   8233902 - W,PHY_Trn_WR_CLKADJ,1,236131
+B -   8237928 - W,PHY_Trn_LP5_WR_DCC_CDC,9,719495
+B -   8242045 - W,PHY_Trn_LP5_DRAM_DFE,1,476806
+B -   8246620 - W,PHY_SED_LP5_WR_Print,1,187117
+B -   8251012 - PXI Config,PXI_Post_Training_Config,1,61
+B -   8255404 - TRAINING TIME TOTAL(us): 6343717
+B -   8281360 - Returning from DDR_FW_Train
+B -   8283586 - DDR: End of DDR Training Init
+D -   6657784 - do_ddr_training, Delta
+B -   8313324 - SecLib initiate DARE sequence start
+B -   8318539 - Enable default ARM features
+B -   8318844 - MPAM_EN:1 MTE_EN:0 SME_EN:1 SVE_EN:1
+B -   8324243 - SecLib initiate DARE sequence successful
+B -   8340316 - Returning from DDR_FW_Exit
+B -   8340896 - DDR:set boot freq from device tree
+B -   8344586 - Current DDR Freq = 2096 MHz
+B -   8349222 - Max enabled DDR Freq = 4780 MHz
+D -   6708597 - xbl_trng_ddi_seq
+D -         0 - store-logstomedia
+D -         0 - XBL DDR QB milestone call
+D -      4483 - xbl_map_smem
+D -        30 - boot_smem_debug_init
+D -      8235 - sbl1_smmu_init
+D -     18483 - boot_smem_init
+D -       732 - boot_ddr_share_data_to_aop
+D -      1281 - boot_populate_ddr_details_shared_table
+D -         0 - boot_recovery_partitions_info_smem_init
+B -   8410558 - MIPC & DARE DISABLED
+D -      5063 - boot_update_ram_partition_table
+B -   8419037 - Pimem init cmd, entry
+B -   8427851 - (50000e)
+D -      4758 - Pimem init cmd, exit
+B -   8444413 - External heap init, Start
+B -   8446578 - External heap init, End
+D -     54565 - sbl1_post_ddr_init
+D -        30 - sbl1_hw_init_secondary
+B -   8477170 - DDR -  Image Load, Start
+D -      6436 - boot_post_ddr_dtb_load
+D -         0 - imageinfo_init
+D -         0 - boot_fmf_license_load_and_verify
+B -   8494006 - HYP_AC_CFG -  Image Load, Start
+D -     18818 - Auth Metadata
+D -      2989 - Segments hash check
+D -     28883 - HYP_AC_CFG -  Image Loaded, Delta - (73124 Bytes)
+B -   8526336 - usb: UFS Serial - 44ac329a
+D -      5947 - boot_usb_update_serial
+D -         0 - boot_usb_handle_charger
+D -       366 - sbl1_hw_platform_smem
+D -         0 - ramdump_load_cancel
+B -   8546862 - RamDump -  Image Load, Start
+D -      3325 - RamDump -  Image Loaded, Delta - (0 Bytes)
+B -   8554335 - QUPFW -  Image Load, Start
+D -     12841 - Auth Metadata
+D -      5551 - Segments hash check
+D -     25864 - QUPFW -  Image Loaded, Delta - (52715 Bytes)
+B -   8620367 - [gpi_firmware_load], Before - GSI CFG ENABLE 0x200 for QUP 1
+B -   8622716 - [gpi_firmware_load], After - GSI CFG ENABLE 0x5 for QUP 1
+B -   8643303 - [gpi_firmware_load], Before - GSI CFG ENABLE 0x200 for QUP 2
+B -   8644066 - [gpi_firmware_load], After - GSI CFG ENABLE 0x5 for QUP 2
+B -   8658614 - DCP_DTB -  Image Load, Start
+D -     11651 - Auth Metadata
+D -      7716 - Segments hash check
+D -     21930 - DCP_DTB -  Image Loaded, Delta - (61017 Bytes)
+B -   8683990 - DCP -  Image Load, Start
+D -     12017 - Auth Metadata
+D -      6314 - Segments hash check
+D -     33337 - DCP -  Image Loaded, Delta - (642393 Bytes)
+D -        30 - boot_update_abnormal_reset_status
+D -         0 - boot_cache_set_memory_barrier
+D -        31 - boot_smem_alloc_for_minidump
+D -         0 - boot_shrm_mini_dump_init
+D -        61 - boot_minidump_register_regions
+D -       122 - boot_smem_store_pon_status
+D -        30 - boot_clock_init_rpm
+D -         0 - boot_vsense_copy_to_smem
+D -       519 - sbl1_tlmm_init
+D -         0 - sbl1_efs_handle_cookies
+B -   8788941 - PM: PM Total Mem Allocated: 14193 
+D -     28334 - sbl1_pm_aop_pre_init_wrapper
+B -   8793912 - AOP Config -  Image Load, Start
+D -      3843 - Auth Metadata
+D -      2409 - Segments hash check
+D -     14274 - AOP Config -  Image Loaded, Delta - (19567 Bytes)
+B -   8811541 - AOP -  Image Load, Start
+D -     12749 - Auth Metadata
+D -     10339 - Segments hash check
+D -     40992 - AOP -  Image Loaded, Delta - (375158 Bytes)
+D -         0 - aop_loaded
+B -   8861287 - TZ_AC_CFG -  Image Load, Start
+D -     18818 - Auth Metadata
+D -      3233 - Segments hash check
+D -     25955 - TZ_AC_CFG -  Image Loaded, Delta - (60836 Bytes)
+B -   8890567 - SOCCP_DTB -  Image Load, Start
+D -     11559 - Auth Metadata
+D -      7930 - Segments hash check
+D -     28212 - SOCCP_DTB -  Image Loaded, Delta - (91664 Bytes)
+B -   8922104 - SOCCP -  Image Load, Start
+D -     11986 - Auth Metadata
+D -      8540 - Segments hash check
+D -     57492 - SOCCP -  Image Loaded, Delta - (2409271 Bytes)
+B -   8983409 - SOCCP_DEBUG -  Image Load, Start
+D -     12444 - Auth Metadata
+D -     14579 - Segments hash check
+D -     46360 - SOCCP_DEBUG -  Image Loaded, Delta - (43606 Bytes)
+B -   9030897 - SOCCP_DCD -  Image Load, Start
+D -     11102 - Auth Metadata
+D -      1189 - Segments hash check
+D -     20344 - SOCCP_DCD -  Image Loaded, Delta - (11976 Bytes)
+B -   9054535 - PDP_CDB -  Image Load, Start
+D -     11072 - Auth Metadata
+D -      1433 - Segments hash check
+D -     20130 - PDP_CDB -  Image Loaded, Delta - (4729 Bytes)
+B -   9077959 - PDP -  Image Load, Start
+D -     12078 - Auth Metadata
+D -      3294 - Segments hash check
+D -     22997 - PDP -  Image Loaded, Delta - (300884 Bytes)
+D -         0 - boot_prepare_cpucp
+B -   9109709 - CPUCP_DTB -  Image Load, Start
+D -      3294 - Auth Metadata
+D -      1464 - Segments hash check
+D -     10309 - CPUCP_DTB -  Image Loaded, Delta - (8792 Bytes)
+B -   9123343 - CPUCPFW -  Image Load, Start
+D -     12017 - Auth Metadata
+D -      3264 - Segments hash check
+D -     26931 - CPUCPFW -  Image Loaded, Delta - (434500 Bytes)
+D -         0 - boot_reset_cpucp
+B -   9159363 - TZ_QTI_Config -  Image Load, Start
+D -     18300 - Auth Metadata
+D -      1860 - Segments hash check
+D -     25712 - TZ_QTI_Config -  Image Loaded, Delta - (134564 Bytes)
+B -   9188399 - QSEE Dev Config -  Image Load, Start
+D -      3019 - Auth Metadata
+D -      3050 - Segments hash check
+D -     14640 - QSEE Dev Config -  Image Loaded, Delta - (53864 Bytes)
+B -   9206364 - QSEE -  Image Load, Start
+D -     13420 - Auth Metadata
+D -     14213 - Segments hash check
+D -     38827 - QSEE -  Image Loaded, Delta - (4213196 Bytes)
+B -   9250040 - DTB: Vibration Enabled
+D -      6619 - sbl1_hw_play_vibr
+D -       122 - sbl1_smmuv2_fault_scan
+B -   9260806 - BL31 -  Image Load, Start
+D -      3569 - BL31 -  Image Loaded, Delta - (0 Bytes)
+B -   9268248 - SEC -  Image Load, Start
+D -     11132 - Auth Metadata
+D -      1495 - Segments hash check
+D -     19459 - SEC -  Image Loaded, Delta - (4396 Bytes)
+B -   9291032 - HYP Config -  Image Load, Start
+D -      5246 - HYP Config -  Image Loaded, Delta - (0 Bytes)
+B -   9300670 - QHEE -  Image Load, Start
+D -     12017 - Auth Metadata
+D -      3294 - Segments hash check
+D -     22600 - QHEE -  Image Loaded, Delta - (1654456 Bytes)
+B -   9326564 - APPSBL -  Image Load, Start
+D -      2928 - Auth Metadata
+D -      3538 - Segments hash check
+D -     14366 - APPSBL -  Image Loaded, Delta - (2789916 Bytes)
+B -   9344803 - SBL1, End
+D -   9151220 - SBL1, Delta
+S - Flash Throughput, 187136 KB/s  (14035258 Bytes,  75823 us)
+S - DDR Frequency, 2092 MHz
+
+
+UEFI Start     [ 9625]
+ - 0x0C6801000 [ 9640] Sec.efi
+ASLR          : ON
+DEP           : ON (RTB)
+[ 9641] [STARTUP.UEFI.SEC] SEC START! 
+Timer Delta   : -8590 mS
+RAM Entry 0   : Base 0x0080000000  Size 0x0000E00000
+RAM Entry 1   : Base 0x0081300000  Size 0x0000100000
+RAM Entry 2   : Base 0x0081960000  Size 0x0000C40000
+RAM Entry 3   : Base 0x00D8800000  Size 0x0000000000
+RAM Entry 4   : Base 0x00DFDA0000  Size 0x0020260000
+RAM Entry 5   : Base 0x0880000000  Size 0x002F6FD000
+RAM Entry 6   : Base 0x08B0000000  Size 0x0008500000
+RAM Entry 7   : Base 0x0A00000000  Size 0x0200000000
+RAM Entry 8   : Base 0x08C0000000  Size 0x0140000000
+RAM Entry 9   : Base 0x0082600000  Size 0x0055A29000
+RAM Entry 10   : Base 0x0081200000  Size 0x0000040000
+RAM Available : 16116 MB (0x03EF406000)
+RAM Installed : 16384 MB (0x0400000000)
+Minidump      : ON
+Init 1 aux cores of 7
+Init CPU core 1
+Continue booting UEFI on Core 0
+  > Scheduler up on Core 1
+UEFI Ver      : 6.0.260311.BOOT.MXF.2.5.3-00187-KAANAPALI-1
+Build Info    : 64b Mar 11 2026 23:56:50
+Boot Device   : UFS
+PROD Mode     : TRUE
+Retail        : TRUE
+ - 0x0C3DCE000 [ 9843] DxeCore.efi 
+[ 9844] [STARTUP.UEFI.DXE] DXE START! 
+[ 9845] [STARTUP.UEFI.DXE] DXE CoreDispatcher! 
+HW Wdog Setting from PCD : Enabled
+mbox_os_init: Failed to locate SCM protocol for Mailbox 14
+ ****
+SLT Platform Key not found: 14
+SCMI error: ProtocolId = 0x80, MessageId = 0x13, error = -1
+Warning: calibration complete notification to PDP0 failed
+SCMI error: ProtocolId = 0x80, MessageId = 0x13, error = -1
+Warning: calibration complete notification to PDP1 failed
+IsArmV8Smc() return TRUE 
+Lockinit failed Bad Buffer Size
+ Primordial_getRegionInfo..... 
+addr 0xC3ACE000   len  0x23000  perm 0x20000006..... 
+ Primordial_getRegionInfo..... 
+addr 0xC3A8C000   len  0x41000  perm 0x20000006..... 
+ Protective MBR validation might be needed. 
+Embedded  Commonlibs loaded
+LoadSecureApps: Load app from partition(keymaster): Status = 0x0, AppId = 4294901761
+[10335] [STARTUP.UEFI.DXE.Driver] DXE Driver I2CLed Start! 
+I2CLedEntryPoint start
+aw210xx_Led_Probe start
+RGB_LED aw210xx_Hw_Enable start
+RGB_LED set enable_pin output high
+RGB_LED aw210xx_Hw_Enable end
+I2c led read chipid: 2 
+aw210xx_Led_Probe end
+I2CLedEntryPoint end
+[10353] [STARTUP.UEFI.DXE.Driver] DXE Driver LRFPGADxe Start! 
+LRGPA Dxe
+HMD is plugin, set HMD power limit to 4A!
+enable HMD power!
+enable cable Optoelectronic Conversion power!
+fpga_lr_ldo_active: start
+vccx ldo_3v3 enabled!
+vcc ldo_1v2 enabled!
+vcco ldo_1v8 enabled!
+vcco ldo_1v2 enabled!
+vcco ldo (1v2/2v5) enabled, now is 1v2
+fpga_lr_ldo_active: end
+cdt_board_id:8
+enable jtag lvl shift!!
+set lsfpga reconfig high!!
+fpga done ok, set io voltage to 2.5v
+lrfpga_check[in] fpga status code = 3F020
+lrfpga_check[in] fpga id = 1100481B
+fpga user code = A2CB
+get cur slot 0
+get raw part header
+Loading Image Start : 10717 ms
+file usercode = 0xA2CB
+inst:20
+[10727] [STARTUP.UEFI.DXE.Driver] DXE Driver CPIMGTransferDxe Start! 
+CPIMGTransfer Dxe, 10727 ms
+Subtype : 8
+boot_shared_imem_ptr, 14680000
+Unable to locate VB protocol: Not Found
+sec_status = 0
+get request!!!
+inst:26
+request cmd: 0x2
+img_id:0, offset: 0,  len:1024
+get raw part header
+transfer data to copro!
+inst:26
+get request!!!
+inst:26
+request cmd: 0x2
+img_id:0, offset: 1024,  len:120140
+get raw part header
+transfer data to copro!
+inst:26
+get request!!!
+inst:26
+request cmd: 0x1
+copro not in loading img process, receive cmd 1
+send cmd 2 to copro!
+inst:26
+config screen
+€
+inst:26
+VendorHWInfor Dxe
+ Smc Invoke call failed ret 0xB 
+ QCOM_Hibernate_CacheData: IClientEnv_open - Fail, nReturn = 11
+ Smc Invoke call failed ret 0x10 
+Device SKU-ing failed - feature is disabled! If this feature is required, please enable "OEM_SKU_ready" via devcfg.
+ RemoteObj_invoke  count 1 
+FMF DeferredSKU failed - 7 
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+DisplayFeatureEnablerExecute FeatureEnablerSendCommandTAs failed: eStatus=0, rsp.status=11
+[11478] [STARTUP.UEFI.DXE.Driver] DXE Driver DisplayDxe Start! 
+select panel name is swan_copro_72hz_3552x3840_dsc_vid
+DisplayDxe: Panel_SwanBox_PowerUp start.
+DisplayDxe: Board is SWAN SL, skip power up sequence.
+DisplayDxe: splash buffer info (0xF3800000, 0xBB00000)
+SPSSLib:: SPSSLib_CheckImageExistsSpunvm GetFileSize(\image\spss1p.mdt) failed, status [14]
+Overriding PIL cfg by caller
+pil-SPSS Failed to get MDT size
+pil-SPSS Failed to load metadata
+SPSSLib:: SPSSLib_LoadSPSS ProcessPilImageExt = Load Error 
+EFI_PmicGlink_LinkStatus:: IsPMICChannelOpen = 0.
+EFI_PmicGlink_Connect:: pmic_glink_Init start.
+pmic_glink_Init:: GlinkInit start.
+pmic_glink_Init:: glink is up, retry count = 0.  
+pmic_glink_open:: GlinkOpen start.
+pmic_glink_open:: success, retry count = 0.  
+pmic_glink_Init:: open glink channel success 
+EFI_PmicGlink_CpdLogConnect:: pmic_glink_cpdlog_Init start.
+EFI_PmicGlink_LinkStatus:: IsPMICChannelOpen = 1.
+EFI_PmicGlink_LinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_sync_send_receive:: opcode = 1. 
+ChargerLib:: ChargerLibTarget_SendHostSwStageToFW send software stage = 1 to FW, Status = Success 
+QcomChargerDxe:: ChargerPlatform_Init Configuring CPD Logging, interval = 2 
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_cpdlog_process_rx_data::****Received ChargerPD Init Logs of size 8024****
+0x000000000BBE0744: Info: GetPmicInfo: PmicIndex:0, Bus:0, Model:0x5C, Rev:0x20 0x0 0x0 0x2, SlaveId:0x0
+0x000000000BBE0B5B: Info: GetPmicInfo: PmicIndex:1, Bus:0, Model:0x5D, Rev:0x20 0x0 0x0 0x2, SlaveId:0x1
+0x000000000BBE5FC4: Info: GetPmicInfo: PmicIndex:3, Bus:0, Model:0x61, Rev:0x21 0x0 0x1 0x2, SlaveId:0x3
+0x000000000BBEB357: Info: GetPmicInfo: PmicIndex:5, Bus:0, Model:0x61, Rev:0x21 0x0 0x1 0x2, SlaveId:0x5
+0x000000000BBEB6A1: Info: GetPmicInfo: PmicIndex:6, Bus:0, Model:0x61, Rev:0x21 0x0 0x1 0x2, SlaveId:0x6
+0x000000000BBF0C5A: Info: GetPmicInfo: PmicIndex:8, Bus:0, Model:0x61, Rev:0x21 0x0 0x1 0x2, SlaveId:0x8
+0x000000000BC2A1C5: Info: GetPmicInfo: PmicIndex:21, Bus:1, Model:0x56, Rev:0x21 0x0 0x1 0x2, SlaveId:0x7
+0x000000000BC2FD22: Info: GetPmicInfo: PmicIndex:23, Bus:1, Model:0x60, Rev:0x21 0x0 0x1 0x2, SlaveId:0x9
+0x000000000BC93640: Info: DetectPmicHardware: Total PMICs detected: 8
+0x000000000BC93A1B: Info: InitializePmicFramework: Charger PMIC Found :: PmicIndex 21, SlaveId = 7, PmicModel= 0x56 
+0x000000000BC9683A: Info: InitializePmicFramework: PMIC Lib Initialized
+0x000000000BC96A25: Info: battman_msm_gpio_init: gpio handle initialized
+0x000000000BC96BFB: Info: BattMngr_GpioIrqInit: BattMngr_GpioIrqInit:: success
+0x000000000BC971AF: Info: battman_update_boot_reason: Chgr PD Boot Reason type: 0
+0x000000000BC97D06: Info: battman_dt_parse_platform_config: Parsed power monitor config: interval=3000, depth=10, enable=1
+0x000000000BC98240: Info: battman_dt_parse_gauge_config: Parsed gauge config status=0
+0x000000000BC98FAE: Info: battman_aggregator_init: Complete
+0x000000000BC997FD: Info: BattMngrDevice_InitContext: SelectPlatform = 3, TestPowerFlag = 0, ChargingHeartBeatTimer = 30000, DischargingHeartBeatTimer = 30000, PollTimer = 0, ChargeTimeoutTimer = 28080000, Generic Test Interface support is 1
+0x000000000BCC48B6: Warn: battman_i2c_read: battman_i2c_read_with_retry::failed reading address: 0x501, retry_count: 0
+0x000000000BDBEFB0: Info: smb139x_itlg_init: role=4,sku_no=0x96
+0x000000000BDCA45E: Info: smb139x_itlg_init: smb139x_itlg_init: role=4, SCHG_PERPH0_MISC_CFG0=0xe0
+0x000000000BDD570A: Info: smb139x_itlg_init: smb139x_itlg_init: role=4, SCHG_PERPH0_REV_CUR_PROT_CTRL=0x81
+0x000000000BDFD790: Info: smb139x_itlg_init: role=5,sku_no=0x96
+0x000000000BE08C23: Info: smb139x_itlg_init: smb139x_itlg_init: role=5, SCHG_PERPH0_MISC_CFG0=0xe0
+0x000000000BE13EF8: Info: smb139x_itlg_init: smb139x_itlg_init: role=5, SCHG_PERPH0_REV_CUR_PROT_CTRL=0x81
+0x000000000BE401DA: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: PowerMonitor DT config: interval=3000, depth=10, enable=1
+0x000000000BE406F9: Info: BattMngrTech_BattErrHandle_GetDevCfg: error Action: debugAction = 8, normalAction = 1, smartAuthState = 1, unknownState = 0, battMissingState = 16, invalidState = 2, outOPRangeState = 4
+0x000000000BE413BA: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: override BattAuthData.enable to 0
+0x000000000BE41507: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: override BattAuthData.unAuthChargingAction to 0
+0x000000000BE4167A: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: BattAuthEn = 0, en_bsi_chip = 1, battAuthCOmms = 1, battAuthUidLen = 12, unAuthChargingAction = 0
+0x000000000BE417A4: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: BattAuthTimeout = 1 s, BattAuthStatusCheckTimer = 250 ms (capped at BattAuthTimeoutPeriod)
+0x000000000BE418EC: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: Power Ok Boot Criterion, en_soc_based_boot = 1, boot_to_hlos_thresh_soc_pct = 5
+0x000000000BE41C0B: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: JeitaAlg = 1, criticalCold = -20, HardCold = 0, SoftCold = 0, SoftWarm = 0, HardHot = 55, CriticalHot = 70 
+0x000000000BE41E4D: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: ChargerLedConfig: ChargingLed = 0, DoneChangingLed = 0
+0x000000000BE41FB4: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: LowBatteryShutdownCfg: LowBattShutdownEnable = 0, LowBattSocTh = 2 perc, CriticalBattSocTh = 0 perc, WdogBiteTimer = 60 sec
+0x000000000BE42D47: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg::BattHealthCfg: EnableChargeLimit = 0, EndThreshold = 80, RechargeDelta = 10, chg_limit_sig = 0x00
+0x000000000BE42EDC: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: ThermThresholdCfgType::DieTempLow = 60, DieTempHigh = 80, SkinTempLow = 0, SkinTempHigh = 0, ConnectorTempLow = 50, ConnectorTempHigh = 55, SmbTempLow = 0, SmbTempHigh = 0
+0x000000000BE43137: Info: battmngr_plat_scpqchg_qbg_r1_get_dev_cfg: LPDCfgType::Enable = 0, sink_periodic_lpd=0, mitigation_current = 500 ma
+0x000000000BE43BB7: Info: fg_common_init: fg_selection=5
+0x000000000BE4498B: Info: battmngr_tech_qbg_r1_get_auth_battId: read from SDAM RID = 199000ohm
+0x000000000BE44B16: Info: battmngr_tech_qbg_r1_auth_chip_init: convertedRID = 199000, battAuthUidLen=12
+0x000000000C5E7CD1: Warn: battmngr_tech_qbg_r1_auth_chip_init: fail to read battery UID
+0x000000000C6239B0: Info: BattMngrTech_QBG_init_data: QbgCfg: ignore shutdown soc, time = 1800, cold = 10, warm = 20, OCV increase = 100, OCV delta = 500, checkQbgSwVersion = 0
+0x000000000C623B5F: Info: BattMngrTech_QBG_init_data: QbgCfg: PonDebugFifoCount = 6, hpmFifoLen = 29, splitBatteryProfile = 0, is2PBatteriesSeparable = 0, vbatEmptyThreshold_mV_1S = 2700, vbatEmptyThreshold_mV_2S = 2700
+0x000000000C623CBD: Info: BattMngrTech_QBG_init_data: QbgCfg: vbatCutoff_mV = 3100, vbatEmptyThreshold_mV_1S = 2700, vbatEmptyThreshold_mV_2S = 2700
+0x000000000C623EFE: Info: BattMngrTech_QBG_init_data: QbgCfg: fvssEntryDelta_mV = 400, fvssVbattFiltTau_us = 50000000, fcssEntryDelta_mA = 300, fcssVbattFiltTau_us = 50000000
+0x000000000C624034: Info: BattMngrTech_QBG_init_data: QbgCfg: sohSocHigh = 130, sohSocLow = 60, sohTbatHigh_degC = 40, sohTbatLow_degC = 20
+0x000000000C624192: Info: BattMngrTech_QBG_init_data: MaintenanceChgCfg:: Aged Battery Compensation=0 Vflt Cmp=100 iterm Cmp=50
+
+0x000000000C6242CC: Info: BattMngrTech_QBG_R1_Init: PmicIndex = 21
+0x000000000C62525D: Info: BattMngrTech_QBG_R1_Init: R-sense ibat tenfold scaling: 10
+0x000000000C628442: Info: BattMngrTech_QBG_R1_Battery_Init: batt2_id_en=0 batt2_therm_en = 0 	
+0x000000000C63118D: Info: bp_select_battery_profile: platform ID = 0xb, is_smart_battery = 0
+0x000000000C63174F: Warn: bp_select_battery_profile: no profile with matching batt id and checksum, force load the first profile
+0x000000000C631907: Info: bp_select_battery_profile: platform ID = 0xb, is_smart_battery = 0
+0x000000000C631B9D: Warn: bp_select_battery_profile: no profile with matching batt id and checksum, force load the first profile
+0x000000000C6324F3: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell_id=0, sdam_batt_id=199904, batt_id=199807, diff=97, id_matched=1, id_matched_tot=1
+0x000000000C63AFB9: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell_id=1, sdam_batt_id=199904, batt_id=199807, diff=97, id_matched=1, id_matched_tot=1
+0x000000000C63B143: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: set batt id to sdam actual_batt_id_list[0]=199807
+0x000000000C63B588: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: set batt id to sdam actual_batt_id_list[1]=199807
+0x000000000C63C294: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: stored rev_id=3, stored qbg_sw_rev_id=2, rev_id=3, qbg_sw_rev_id=2, b_revision_matched=1
+0x000000000C63C791: Info: battmngr_tech_qbg_r1_get_pon_status: pon_acc0_data=0x569e, pon_acc1_data= 0x568e, pon_acc2_data= 0xe
+0x000000000C63CC33: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [0], pon_ocv = 431572562 10nV pon_ibat = 854518 10nA
+0x000000000C63CFCE: Info: battmngr_tech_qbg_r1_get_pon_status: pon_acc0_data=0x569e, pon_acc1_data= 0x568e, pon_acc2_data= 0xe
+0x000000000C63D357: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [1], pon_ocv = 431261154 10nV pon_ibat = 854518 10nA
+0x000000000C63D4EB: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [0], retain long term data from sdam
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_cpdlog_process_rx_data::****Received ChargerPD Init Logs of size 8001****
+0x000000000C63EA3E: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [0], b_ocv_increased = 0, b_ocv_jumped = 0, pon_ocv = 431572562 10nV, prev_ocv = 433651712 10nV
+0x000000000C63EB59: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [0], b_batt_therm_cold_to_warm = 0 C, temp = 28, prev_temp = 31 C
+0x000000000C63ECE4: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [1], retain long term data from sdam
+0x000000000C640167: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [1], b_ocv_increased = 0, b_ocv_jumped = 0, pon_ocv = 431261154 10nV, prev_ocv = 435945472 10nV
+0x000000000C640287: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: cell [1], b_batt_therm_cold_to_warm = 0 C, temp = 28, prev_temp = 31 C
+0x000000000C6407C3: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: b_sdam_outdated = 0, rtc_time = 2687760 s, prev_rtc_time = 2687651 s
+0x000000000C643A20: Info: battmngr_tech_qbg_r1_validate_and_load_sdam_data: retain short term data from sdam
+0x000000000C643C71: Info: BattMngrTech_QBG_R1_Battery_Init: first soc = 85000192 10nunits
+0x000000000C644400: Info: BattMngrTech_QBG_R1_Init: recharge_soc_delta_pct = 5, recharge_vfloat_delta_mv = 100, recharge_iterm_ma = 300
+0x000000000C644E4E: Info: BattMngrTech_QBG_Thread_Init: status =0
+0x000000000C644FB8: Info: BattMngrTech_QBG_R1_Init: pDeviceContext->CurrentStateIDs=0
+0x000000000C6A01F5: Info: BattMngrTech_QBG_R1_Init: BattMngrTech_QBG_R1_Calculate soc=85187467
+0x000000000C6A97D0: Info: extfg_common_init: Battery ID: 199739 Ohm
+0x000000000C6A991E: Info: extfg_common_init: EXTFG Selection: SH366009
+0x000000000C6A9A68: Info: extfg_sh366003_init: SH366003 I2C Init, addr = 0x55, bus_freq = 400 kHz
+0x000000000C6BFA1B: Info: extfg_sh366003_init: SH366003 I2C Init Success, Get Voltage = 8640
+0x000000000C6BFCDA: Info: extfg_sh366003_init: SH366003 Is Initialized.
+0x000000000C6BFEC5: Info: extfg_common_init: EXTFG SH366009 Init Success
+0x000000000C6E6FFE: Info: battmngr_plat_scpqchg_qbg_r1_init: Battery device name = Ü9v €mm 
+0x000000000C6E72DC: Info: battmngr_plat_scpqchg_update_threshold: emergency shutdown threshold, esd_voltage_1s_mv = 2700 mv, esd_voltage_2s_mv = 4500
+0x000000000C6E7457: Info: battmngr_plat_scpqchg_update_threshold: Power Ok Boot Criterion, boot_to_hlos_thresh_mv = 3400 mv
+0x000000000C6F07E9: Info: get_step_chg_jeita_config: batt_id matched, choose profile_swan[2]
+0x000000000C6F0A8F: Info: battmngr_tech_qbg_r1_set_step_chg_jeita_config: Initial Jeita Zone =2 for battery index 0
+
+0x000000000C6F0CA1: Info: battmngr_plat_scpqchg_qbg_r1_init: set POWER_SUPPLY_CHARGE_CONTROL_LIMIT_MAX 14000000
+0x000000000C6F129A: Info: battman_aggregator_set_callback: Handle=0, FuncType=1
+0x000000000C6F14B8: Info: battman_aggregator_set_callback: Handle=1, FuncType=1
+0x000000000C6F16A2: Info: battman_aggregator_set_callback: Handle=2, FuncType=1
+0x000000000C6F187A: Info: battman_aggregator_set_callback: Handle=3, FuncType=1
+0x000000000C6F1A52: Info: battman_aggregator_set_callback: Handle=4, FuncType=1
+0x000000000C6F208E: Info: concur_init: ++
+0x000000000C738978: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=0 succeeded
+0x000000000C73AA2C: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=1 succeeded
+0x000000000C73C18B: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=2 succeeded
+0x000000000C73D894: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=3 succeeded
+0x000000000C73EF9B: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=4 succeeded
+0x000000000C7406D1: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=6 succeeded
+0x000000000C741DD5: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=7 succeeded
+0x000000000C7434FE: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=8 succeeded
+0x000000000C744BE8: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=9 succeeded
+0x000000000C744D17: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=10 succeeded
+0x000000000C744DD0: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=11 succeeded
+0x000000000C746462: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=12 succeeded
+0x000000000C747AD4: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=13 succeeded
+0x000000000C749148: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=14 succeeded
+0x000000000C74A838: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=15 succeeded
+0x000000000C74BECE: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=16 succeeded
+0x000000000C74D592: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=17 succeeded
+0x000000000C74D6A1: Info: battmngr_plat_irq_scpqchg_qbg_r1_irq_setup: Setting up interrupt for IRQ_INDEX=18 succeeded
+0x000000000C74D7EF: Info: battmngr_plat_scpqchg_qbg_r1_init: disable irq WLS_CHIP_GPIO_PING_DET
+0x000000000C8039B9: Info: BattMngrTech_SOCFilter_Linearized_HlosSoc: chaseMonotonicSoc=0 from sdam, savedLinearizedHlosSoc=0
+0x000000000C81318F: Info: battmngr_platform_init: Platform initialization succeeded
+0x000000000C824116: Info: battmngr_platform_common_init: chg_det_cfg.NoOfInput = 1
+0x000000000C826FE6: Info: charger_detection_initial_detection: Input[0] bPlugIn=1, Module type=0, chgpd_boot_reason=1
+0x000000000C84FC09: Info: battmngr_platform_common_init: Platform initialization succeeded
+0x000000000C84FDDD: Info: BattMngrStateMachine_InitializeTimerAndThread: ++
+0x000000000C8505C0: Info: BattMngrStateMachine_Main_Thread_Init: Battery Manager Main Thread created successfully
+0x000000000C851CE1: Info: ppm_get_dev_config: PPM: Port[0] Config::bDPAltModeOK=1, bTBT3AltModeOK=0, ConnCapOpMode:0xE7, ExtOpMode=0x00
+0x000000000C8526E1: Info: ppm_init: ppm_init: status=0
+0x000000000C853127: Info: dpm_init: dpm_init: success
+0x000000000C85403E: Info: gio_core_init: Complete
+0x000000000C8545C4: Info: gio_init: Complete
+0x000000000C8551D8: Info: oem_interface_init: OEM INF: oem_interface_init: status=0x0
+0x000000000C855318: Info: oem_init: oem_init: success
+0x000000000C859087: Info: dpm_aggregator_init: DPM: Get Aggregator Handle success, sDpmAggIUsbHandles[0]=0
+0x000000000C859285: Info: dpm_aggregator_init: DPM: Get Aggregator Handle success, sDpmAggSnkStdbyHandles[0]=4
+0x000000000C866E8F: Info: tcpc_plat_hw_init: [port_0]: tcpc_plat_hw_init[0]::pre_uefi_offmode = 0, uefi_offmode = 0, Type-C HW StateMachine = 3, PDStatus = 1, Battery Status = 0
+0x000000000C867D74: Info: tcpc_plat_hw_reset_vbus_current_limit: [port_0]: tcpc_plat_hw_reset_vbus_current_limit[0]::SourceRpValue=2, VbusOCPImplicitOvrMa=0. Configure ocp_current=3000
+0x000000000C86BBC2: Info: tcpc_lpd_init: [port_0]: tcpc_lpd_init::LPD Not supported in this platform
+0x000000000C86CDFE: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 0, Enable=1
+0x000000000C86CEAE: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 0:
+0x000000000C86DDCD: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 1, Enable=1
+0x000000000C86DE59: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 1:
+0x000000000C86ED2F: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 2, Enable=1
+0x000000000C86EDAC: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 2:
+0x000000000C86FC85: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 3, Enable=1
+0x000000000C86FD03: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 3:
+0x000000000C870C09: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 4, Enable=1
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_process_rx_data:: got rx data for battery manager.  
+pmic_glink_cpdlog_process_rx_data::****Received ChargerPD Init Logs of size 3043****
+0x000000000C870C9E: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 4:
+0x000000000C871BA7: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 5, Enable=1
+0x000000000C871C26: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 5:
+0x000000000C872B1E: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 6, Enable=1
+0x000000000C872B93: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 6:
+0x000000000C8743E5: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 7, Enable=1
+0x000000000C87444E: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 7:
+0x000000000C8753D4: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 8, Enable=1
+0x000000000C875433: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 8:
+0x000000000C876335: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 9, Enable=1
+0x000000000C87639B: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 9:
+0x000000000C8772A5: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 10, Enable=1
+0x000000000C87731A: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 10:
+0x000000000C878218: Info: tcpc_irq_enable: [port_0]: tcpc_irq_enable::IRQ_ID = 11, Enable=1
+0x000000000C878282: Info: tcpc_irq_init: [port_0]: tcpc_irq_init::Interrupt enabled IRQ_ID = 11:
+0x000000000C882D75: Info: pe_state_init: [port_0]: PE: ChgPD Boot reason = 1
+0x000000000C883195: Info: pe_check_mpd_contract: [port_0]: PE SDAM cached active_port = 8
+0x000000000C89E174: Info: pe_snk_state_startup_init: [port_0]: PE: bFirstConnection=1, BattSts=0, Boot reason=1, bPDContractRecovery=0
+0x000000000C89F025: Info: dpm_task_init: Task::preferred_role_cfg=0x0, TaskEnBM=0x0, MinPartnerSrcUW=30000000
+0x000000000C89FB65: Info: dpm_mainthread: DPM: LPM[0] Event Handler Ready, wait_count=0
+0x000000000C8D548A: Info: battmngr_plat_scpqchg_qbg_r1_batt_err_handle_action_get_batt_st: AFPTriggerMaxBattTemp= 70, AdcCode = 0x21c6
+0x000000000C8D5DCC: Info: battmngr_plat_scpqchg_qbg_r1_batt_err_handle_action_get_batt_st: AFPTriggerMinBattTemp= -20, AdcCode = 0xeb45
+0x000000000C8DCCE7: Info: battmngr_plat_scpqchg_qbg_r1_en_charger: Get Init Suspend State: port_index=0, InitUsbSuspendState=0, InitWlsSuspendState=0
+0x000000000D3532C7: Info: pmic_glink_Link_State_NotifCb: GLINK_LINK_STATE_UP
+0x000000000D353B1C: Info: pmic_glink_open: openning brand new glink
+0x000000000D3540FE: Info: pmic_glink_open: succeeds
+0x000000000D3541EF: Info: pmic_glink_ulog_Link_State_NotifCb: GLINK_LINK_STATE_UP
+0x000000000D35498B: Info: pmic_glink_ulog_open: openning brand new glink
+0x000000000D354EC1: Info: pmic_glink_ulog_open: succeeds
+0x000000000D381F16: Info: pmic_glink_state_change: GLINK_CONNECTED
+0x000000000D38332D: Info: charger_detection_enable_ufcs_support: UFCS support enable:1
+0x000000000D3B17EC: Info: pmic_glink_ulog_state_change: GLINK_CONNECTED
+0x000000000D3E0A2E: Info: pmic_glink_rx_intent_req: rx intent req_size: 0x418
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+QcomChargerDxe:: ChargerPlatform_CpdlogConfig Timer Event is created 
+qcom repeater found : 0x0
+usb_redriver_init, Disable: 0x0
+ChargerLib:: ChargerLib_GetBatteryID BATT_ID_2 = 199000 
+ConnectSts : Attach, Data Role : UFP (DEVICE Mode), Lane : CC2, CoreNum : 0
+Reset notification not located, Status:Not Found
+ButtonsDxeTest: Keypress SDAM data payload 0 
+ RemoteObj_invoke  count 1 
+ RemoteObj_invoke  count 1 
+[11744] [STARTUP.UEFI.BDS] BDS START! 
+WaitParallelThreads InIt [11747] 
+Display_Utils_RenderBGRTImage: resolution is 7104 x 3840!
+CalculateLogoPositionVr: Position X is 1454, Position Y is 2008
+CalculateLogoPositionVr: Position X is 5006, Position Y is 1552
+UEFI Ver           : 6.0.260311.BOOT.MXF.2.5.3-00187-KAANAPALI-1
+Platform           : QRD
+Subtype            : 8
+Boot Device        : UFS
+Chip Name          : SM8850P
+Chip Ver           : 2.0
+Chip ECID          : 0x046A0CB9B49F
+SKU ID             : 0x3
+P_Code             : 0x2
+UFS SERIAL         : 0x44AC329A
+SECURE BOOT         : 1
+PONReason        : 1
+DDR Manufature     : 1
+DDR Type           : 8
+DDR capacity (MB)  : 16384 MB
+-----------------------------
+Quantum Sdk failed to load. Status : Device Error
+[11773] [STARTUP.UEFI.BDS] BDS LocateProtocol CPimage! 
+[QcomBds] Locate protocol status:0
+boot_shared_imem_ptr, 14680000
+sec_status = 1
+get raw part header
+send cmd 4 to copro!
+inst:26
+efuse config return status code = 0
+get request!!!
+inst:26
+request cmd: 0x2
+img_id:1, offset: 0,  len:262144
+get raw part header
+transfer data to copro!
+inst:26
+get request!!!
+inst:26
+request cmd: 0x2
+img_id:2, offset: 0,  len:524288
+get raw part header
+get raw part header
+read nv_a partition
+transfer data to copro!
+inst:26
+get request!!!
+inst:26
+request cmd: 0x1
+copro not in loading img process, receive cmd 1
+send cmd 2 to copro!
+inst:26
+QcomChargerApp:: QcomChargerApp_Entry ENTRY 
+ChargerLib:: ChargerLib_GetBatteryID BATT_ID_2 = 199000 
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_cpdlog_process_rx_data::****Received ChargerPD Init Logs of size 137****
+0x000000000ECEE646: Info: charger_detection_expiry_cb: batt_present=1, plugin=1, bLegacyCable=0, typec_sm=3, skip legacy cable detection
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+0x000000000BC9C3ED: Info: set_wls_icl: wls_icl = 500
+0x000000000BE410C2: Info: battman_setting_batt_auth_handler: status=0x202, pinor read failed. Fall back to SDAM
+0x000000000BE41264: Info: battman_setting_batt_auth_handler: status=0x202, b_write=0 batt_auth.auth=2 unauth_charging=2, sdam: 2, 2
+
+0x000000000BE42B6B: Info: battman_setting_bhm_handler: b_write=0 sig=0 chg_limit=0 tgt_soc=0 delta_soc=0
+0x000000000C1EC7A2: Warn: battman_bsi_receive_from_fifo: rx_int =0x0, latched_sts =0x0, bsi_sts=0x80, ulTimeOut_cnt=2000
+0x000000000C1EC8FD: Warn: Swi_ReceiveData: Swi_ReceiveData:: bsi_error_code=0xc
+0x000000000C5B7708: Warn: battman_bsi_receive_from_fifo: rx_int =0x0, latched_sts =0x0, bsi_sts=0x80, ulTimeOut_cnt=2000
+0x000000000C5B784F: Warn: Swi_ReceiveData: Swi_ReceiveData:: bsi_error_code=0xc
+0x000000000C5E7A69: Warn: BattMngrTech_Auth_R1_Authon_Init_SDK: fail to init authon sdk
+0x000000000C676391: Info: BattMngrTech_QBG_R1_Calculate: fifo count = 1
+0x000000000C6764B2: Info: BattMngrTech_QBG_R1_Calculate: R-sense ibat tenfold scaling: 10
+0x000000000C678254: Info: BattMngrTech_QBG_R1_Calculate: esr_pulse_fifo_index = 10.
+0x000000000C678DB6: Info: BattMngrTech_QBG_R1_Calculate: fifo[0], deltaTime = 6000000 uS, corrected_deltaTime = 6000000 us, charger_present = 1
+0x000000000C678F5D: Info: BattMngrTech_QBG_R1_Calculate: fifo[0], ibatt1 = -55 mA, ibatt2 = 0 mA, vbatt1= 427504795 10nV, vbatt2= 436243682 10nV, tbatt1 = 2926 10mdegreeC, tbatt2 = 0 10mdegreeC
+0x000000000C724362: Info: battman_aggregator_execute: Client[0] to Aggregator[2]: VoteType=1, Vote=2000
+0x000000000C724545: Info: battman_aggregator_vote_evaluate: Aggregator: Operation=0, result=2000, hEffClient=0
+0x000000000C72559B: Info: battman_aggregator_execute: Aggregator 2: Result=2000, bmActiveClients=0x00000001, hEffClient=0, hOvrClient=-1
+0x000000000C725837: Info: battman_aggregator_execute: Client[0] to Aggregator[1]: VoteType=1, Vote=0
+0x000000000C725977: Info: battman_aggregator_vote_evaluate: Aggregator: Operation=0, result=0, hEffClient=0
+0x000000000C725B88: Info: battman_aggregator_execute: Aggregator 1: Result=0, bmActiveClients=0x00000001, hEffClient=0, hOvrClient=-1
+0x000000000C72AA6B: Info: get_batt_chgr_status: Battery Charging Status, BCS = FULLON (value: 3)
+0x000000000C7F2079: Info: extfg_sh366003_get_voltage: SH366003 Get Voltage = 8640mV
+0x000000000C7F6545: Info: extfg_sh366003_get_current: SH366003 Get Current = 6mA
+0x000000000C7FA848: Info: extfg_sh366003_get_ocv: SH366003 Get OCV = 4320000uV, cell_id = 0
+0x000000000C7FEA96: Info: extfg_sh366003_get_ocv: SH366003 Get OCV = 4320000uV, cell_id = 1
+0x000000000C802EA7: Info: extfg_sh366003_get_soc: SH366003 Get SOC = 86
+0x000000000C803140: Info: BattMngrTech_QBG_R1_Get_TimeToFull: Time to Full is 0 sec
+0x000000000C80BFC5: Info: battmngr_plat_scpqchg_qbg_r1_get_battery_status: battPerc = 8600 100micro Unit, nominal_capacity = 7020000 uAh, learned_capacity = 7196000 uAh, charger_counter = 6188560 uAh
+0x000000000C8103B4: Info: extfg_sh366003_get_temperature: SH366003 Get Temperature = 31
+0x000000000C810CB2: Info: get_batt_chgr_status: Battery Charging Status, BCS = FULLON (value: 3)
+0x000000000C811860: Info: battmngr_plat_scpqchg_qbg_r1_update_uefi_action: vbatt_mv=8640 ocv_mv=8640 uefi_action=3 power_state=5
+0x000000000C811E07: Info: battmngr_plat_scpqchg_qbg_r1_set_os_type: SDAM_BM_OS_HLOS
+0x000000000C811F6E: Info: battmngr_plat_scpqchg_qbg_r1_get_battery_status: batt voltage = 8640 mV, current = -6 mA, batt_temp = 31 C
+0x000000000C81587E: Info: state_machine_log: enter state S_ICM_NCP_STBY
+0x000000000C81603D: Info: ncp_stby_misc_cb: fcc1_ma = 0
+0x000000000C81638E: Info: ncp_stby_misc_cb: fcc2_ma = 0
+0x000000000C821617: Info: state_machine_log: leaving state S_ICM_NCP_STBY for S_ICM_SCP_SVS
+0x000000000C8217D9: Info: state_machine_log: enter state S_ICM_SCP_SVS
+0x000000000C822480: Info: state_machine_log: enter state SS_SCP_SVS_STARTUP
+0x000000000C822609: Info: state_machine_log: leaving state SS_SCP_SVS_STARTUP for SS_SCP_SVS_BALANCED
+0x000000000C822721: Info: state_machine_log: enter state SS_SCP_SVS_BALANCED
+0x000000000C826355: Info: typec_detect_partner: PortNum=0, TypeCPartnerType=0
+0x000000000C827227: Warn: concur_usb_sink: wls is not enabled, return
+0x000000000C827569: Info: typec_set_dam_aicl_config: PortNum=0, DamAiclCfg=0
+0x000000000C827724: Warn: concur_state_usb_sink: invalid event input
+0x000000000C856497: Warn: dpm_client_push_request: dpm_client::WARN: client manager is not ready for service
+0x000000000C867B24: Warn: concur_state_usb_sink: invalid event input
+0x000000000C873592: Warn: tcpc_sm_signal_thread: [port_0]: tcpc_sm_signal_thread::WARN::StateMachineInitialized = False, Ignore the event
+0x000000000C8796E5: Warn: tcpc_sm_signal_thread: [port_0]: tcpc_sm_signal_thread::WARN::StateMachineInitialized = False, Ignore the event
+0x000000000C879BD4: Warn: concur_state_usb_sink: invalid event input
+0x000000000C8A263C: Info: typec_detect_partner: PortNum=0, TypeCPartnerType=8
+0x000000000C8A4D75: Warn: pmic_glink_tx: glink handle is NULL
+0x000000000C8A4E1F: Warn: pmic_glink_send_oem_notification: not sent due to oem glink disconnected
+0x000000000C8A6184: Info: typec_detect_partner: PortNum=0, TypeCPartnerType=8
+0x000000000C8A7EC0: Warn: lpm_process_bm_dataport_detect_request: [port_0]: WARN:: LPM: Legacy Data Port Detect ignored, ConnectStatus=1, PowerDirection=0, ConnectPartnerType=1
+0x000000000C8B33F9: Info: state_machine_log: event CHARGER_EVENT_INPUT_I_CHANGE in state S_ICM_SCP_SVS
+0x000000000C8B42BC: Info: scp_svs_misc_cb: icl_ma = 1500
+0x000000000C8B4377: Info: state_machine_log: event CHARGER_EVENT_INPUT_I_CHANGE
+0x000000000C8B44C5: Info: state_machine_log: event CHARGER_EVENT_CHGR_TYPE_CHANGE in state S_ICM_SCP_SVS
+0x000000000C8BE218: Info: ssdev_typec_set_uv_overide: PortNum=0, bUVThresholdOvrEn=0, UVThresholdOvrInMV=0 mV
+0x000000000C8BEB0A: Info: state_machine_log: event CHARGER_EVENT_CHGR_TYPE_CHANGE
+0x000000000C8D670A: Warn: battmngr_plat_scpqchg_qbg_r1_check_state_change: WARNING: Error mode
+0x000000000C8D68FF: Warn: battmngr_plat_scpqchg_qbg_r1_batt_err_handle_action_err_shutdown: System will perform error shutdown
+0x000000000C8D6CD0: Warn: pmic_glink_tx: glink handle is NULL
+0x000000000C8D6D63: Warn: pmic_glink_send_power_supply_notification: not sent due to glink disconnected
+0x000000000C8DFE7F: Info: icm_core_event_screening: gps_demod_active=0, fcc_step_size_ma=400
+0x000000000C8DFFEB: Info: icm_lib_stepper_init: stepper[0], step_dir=0 (0=up, 1=down), step_size=400, no_step_thd=4000, target_val=0
+0x000000000C8E0070: Info: icm_lib_stepper_init: stepper[1], step_dir=0 (0=up, 1=down), step_size=400, no_step_thd=4000, target_val=4900
+0x000000000C8E02B1: Info: state_machine_log: event CHARGER_EVENT_BAT_FCC_CHANGE in state S_ICM_SCP_SVS
+0x000000000C8E03F4: Info: state_machine_log: event CHARGER_EVENT_BAT_FCC_CHANGE in state SS_SCP_SVS_BALANCED
+0x000000000C8E089D: Info: state_machine_log: event CHARGER_EVENT_BAT_FV_CHANGE
+0x000000000C8E44E2: Warn: battmngr_plat_scpqchg_qbg_update_charger_power_supply: NoOfCharger=1
+0x000000000C8E458B: Warn: battmngr_plat_scpqchg_qbg_update_charger_power_supply: chargers[charger_index].bAttached=1 chargers[charger_index].PartnerType=4
+0x000000000C8E4705: Warn: pmic_glink_tx: glink handle is NULL
+0x000000000C8E4796: Warn: pmic_glink_send_power_supply_notification: not sent due to glink disconnected
+0x000000000C8E6DDB: Info: state_machine_log: event CHARGER_EVENT_HEARTBEAT_LOG in state S_ICM_SCP_SVS
+0x000000000C8E6F90: Info: scp_svs_db_log: fcc1_ma=0, fcc2_ma=0, icl_ma=1500, vin_mv=5000
+0x000000000C8E73D4: Info: state_machine_log: event CHARGER_EVENT_HEARTBEAT_LOG
+0x000000000C90145B: Warn: battmngr_plat_scpqchg_qbg_r1_check_state_change: Exiting Error mode
+0x000000000C901D1D: Warn: battmngr_plat_scpqchg_qbg_update_charger_power_supply: NoOfCharger=1
+0x000000000C901DC9: Warn: battmngr_plat_scpqchg_qbg_update_charger_power_supply: chargers[charger_index].bAttached=1 chargers[charger_index].PartnerType=4
+QcomChargerApp:: QcomChargerApp_Entry Charging Action = 3 
+ConfigRgbLed: set EFI_I2C_RGB_ALL_WHITE 
+QcomChargerApp:: QcomChargerApp_DeInitialize ENTRY 
+EFI_PmicGlink_CpdLogLinkStatus:: IsPMICChannelOpen = 1.
+QcomChargerDxe:: ChargerPlatform_CpdlogTimer_Exit ChargerPD logging categories set to 133143986176 
+QcomChargerDxe:: ChargerPlatform_CpdlogTimer_Exit Timer Event Exit Success
+UEFI Total : 4134 ms
+POST Time      [13759] OS Loader
+[13764] [STARTUP.UEFI.ABL] ABL START! 
+Loader Build Info: Mar 12 2026 02:29:16
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+VB: RWDeviceState: Succeed using rpmb!
+GetActiveSlot: First boot: set default slot _a
+Loading Image efisp Done : 1 ms, Image size : 3145728 Bytes
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+Loading Image sysconfig Done : 1 ms, Image size : 4096 Bytes
+CHK_COUNT: @ 0xBECDAC08x
++++ system_config: ->magic0       = 0x0
++++ system_config: ->magic1       = 0x0
++++ system_config: ->size         = 0x0
++++ system_config: ->log_level    = 0x0
++++ system_config: ->serial_on    = 0x0
++++ system_config: ->usb_mode     = 0x0
++++ system_config: ->boot_mode    = 0x0
++++ system_config: ->ramdump_mode = 0x0
++++ system_config: ->selinux_mode = 0x0
++++ system_config: ->display_dump = 0x0
++++ system_config: ->kmemleak_on  = 0x0
++++ system_config: ->pageowner_on = 0x0
++++ system_config: ->color        = 0x0
++++ system_config: ->boot_max     = 0x0
++++ system_config: ->boot_limit   = 0x0
++++ system_config: ->boot_count   = 0x0
++++ system_config: ->magic2       = 0x0
++++ system_config: ->magic3       = 0x0
++++ system_config: ->wlan_disable = 0x0
++++ system_config: ->wlan_defer_enumerate = 0x0
++++ system_config: ->copro_enable = 0x0
++++ system_config: ->ramdump_hotkey_enable = 0x0
++++ system_config: ->copro_serial = 0x0
++++ system_config: ->off_mode_charge_enable = 0x0
++++ system_config: ->chksum       = 0x0
+CHK_COUNT: @ 0xBECDAC08x
++++ system_config: ->magic0       = 0x0
++++ system_config: ->magic1       = 0x0
++++ system_config: ->size         = 0x0
++++ system_config: ->log_level    = 0x0
++++ system_config: ->serial_on    = 0x0
++++ system_config: ->usb_mode     = 0x0
++++ system_config: ->boot_mode    = 0x0
++++ system_config: ->ramdump_mode = 0x0
++++ system_config: ->selinux_mode = 0x0
++++ system_config: ->display_dump = 0x0
++++ system_config: ->kmemleak_on  = 0x0
++++ system_config: ->pageowner_on = 0x0
++++ system_config: ->color        = 0x0
++++ system_config: ->boot_max     = 0x0
++++ system_config: ->boot_limit   = 0x0
++++ system_config: ->boot_count   = 0x0
++++ system_config: ->magic2       = 0x0
++++ system_config: ->magic3       = 0x0
++++ system_config: ->wlan_disable = 0x0
++++ system_config: ->wlan_defer_enumerate = 0x0
++++ system_config: ->copro_enable = 0x0
++++ system_config: ->ramdump_hotkey_enable = 0x0
++++ system_config: ->copro_serial = 0x0
++++ system_config: ->off_mode_charge_enable = 0x0
++++ system_config: ->chksum       = 0x0
++++check_system_config =-2
+++OFF_MODE_CHARGE enabled
++++UartSwitchInit successfully
++++CoproUartGpioInit ignore
+vendor build datetime: 1773253566
+CHK_COUNT: @ 0xBECDAC08x
++++ system_config: ->magic0       = 0x53795330
++++ system_config: ->magic1       = 0x73597331
++++ system_config: ->size         = 0x70
++++ system_config: ->log_level    = 0x6
++++ system_config: ->serial_on    = 0x0
++++ system_config: ->usb_mode     = 0x0
++++ system_config: ->boot_mode    = 0x0
++++ system_config: ->ramdump_mode = 0x1
++++ system_config: ->selinux_mode = 0x1
++++ system_config: ->display_dump = 0x0
++++ system_config: ->kmemleak_on  = 0x0
++++ system_config: ->pageowner_on = 0x0
++++ system_config: ->color        = 0x0
++++ system_config: ->boot_max     = 0x0
++++ system_config: ->boot_limit   = 0x0
++++ system_config: ->boot_count   = 0x0
++++ system_config: ->magic2       = 0x53795332
++++ system_config: ->magic3       = 0x53595333
++++ system_config: ->wlan_disable = 0x0
++++ system_config: ->wlan_defer_enumerate = 0x0
++++ system_config: ->copro_enable = 0x1
++++ system_config: ->ramdump_hotkey_enable = 0x1
++++ system_config: ->copro_serial = 0x0
++++ system_config: ->off_mode_charge_enable = 0x1
++++ system_config: ->chksum       = 0x6DA56D41
+vol_up_key:0
+vol_dn_key:0
+hmd key vol_up_key:0, vol_dn_key:0
+VB: RWDeviceState: Succeed using rpmb!
+VB: RWDeviceState: Succeed using rpmb!
+VB: RWDeviceState: Succeed using rpmb!
+Total DDR Size: 0x00000003EF406000 
+Locate EFI_SOFTSKU_Protocol failed, Status = (0xE)
+KeyPress:0, BootReason:0
+Fastboot=0, Recovery:0
+SilentBoot Mode:11
+[13917] [*STARTUP.UEFI.ABL*] RTC=1998-02-01 02:36:03 MODE=normal PON=HARD_RESET POFF=PS_HOLD BOOTREASON=0x0/NORMAL_MODE
+[13917] [STARTUP.UEFI.ABL] ABL LoadImageAndAuth (MultiSlot=1 Recovery=0)
+Loading Image recovery_a Done : 1 ms, Image size : 4096 Bytes
+Loading Image init_boot_a Done : 1 ms, Image size : 4096 Bytes
+Loading Image pvmfw_a Done : 0 ms, Image size : 4096 Bytes
+ChargerLib:: ChargerLib_GetBatteryID BATT_ID_2 = 199000 
+Active Slot _a is bootable, retry count 6
+Booting from slot (_a)
+Booting Into Mission Mode
+Loading Image boot_a Done : 1 ms, Image size : 4096 Bytes
+Load Image vbmeta_a total time: 1 ms 
+No public key matches
+avb_slot_verify.c:1054: ERROR: vbmeta_a: Public key used to sign data rejected.
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image boot_a total time: 1 ms 
+Load Image boot_a total time: 1 ms 
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image boot_a total time: 24 ms 
+Load Image vbmeta_odm_a total time: 2 ms 
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image recovery_a total time: 1 ms 
+Load Image recovery_a total time: 1 ms 
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image vbmeta_system_a total time: 1 ms 
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image pvmfw_a total time: 1 ms 
+Load Image vbmeta_vendor_a total time: 1 ms 
+avb_slot_verify.c:1075: ERROR: check rollback index.
+Load Image dtbo_a total time: 18 ms 
+Load Image init_boot_a total time: 3 ms 
+avb_slot_verify.c:605: ERROR: init_boot_a: Hash of data does not match digest in descriptor.
+Load Image vendor_boot_a total time: 23 ms 
+avb_slot_verify.c:605: ERROR: vendor_boot_a: Hash of data does not match digest in descriptor.
+ReadPersistentValue 0xE 
+Ftr OsVer:0x40000 SPL:0x2996
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+KeyMasterSetRotAndBootState Set RoT success
+KeyMasterSetRotAndBootState Set Boot State success
+VB2: Authenticate complete! boot state is: orange
+VB: RWDeviceState: Succeed using rpmb!
+VB: RWDeviceState: Succeed using rpmb!
+Loaded Partition: boot
+Loaded Partition: pvmfw
+VB: Bcc Params populated
+VB2: boot state: orange(1)
+Failed to add memory space :0x80D60000 0x1000
+Hyp version: 1
+Silent Mode value: 11
+Memory Base Address: 0x80000000
+Apply Overlay total time: 66 ms 
+Load Image qtvm_dtbo_a total time: 1 ms 
+avb_footer.c:41: ERROR: Footer magic is incorrect.
+Load Image qtvm_dtbo_a total time: 1 ms 
+avb_vbmeta_image.c:65: ERROR: Magic is incorrect.
+avb_slot_verify.c:969: ERROR: qtvm_dtbo_a: Error verifying vbmeta image: invalid vbmeta header
+AvbSlotVerify returned ERROR_INVALID_METADATA
+ERROR: Device State Unlocked,AvbSlotVerify returned ERROR_INVALID_METADATA
+AuthQtvmDtboImg failed, Status=0x1
+Error: Failed to read qtvm_dtbo partition
+
+
+ChargerLib:: ChargerLib_GetBatteryID BATT_ID_2 = 199000 
+Unable to get hw fence Config, Not Found
+Unable to get disp op Config, Not Found
+Unable to get hfi debug Config, Not Found
+Unable to get GPU Preempt Config, Not Found
+VB: RWDeviceState: Succeed using rpmb!
+Offlining Memory Not Supported
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(5)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(6)=1 
+[KmCertStatus] km cert status check start
+[KeyManagerStartApp] Enter
+[KeyManagerStartApp] CurrentSlot suffix: _a
+[KeyManagerStartApp] Now load TargetTA partition: secure_ta_a
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+[KeyManagerStartApp] KeyManagerStartApp success AppId: 0xFFFF0004
+[KeyManagerSendCmdWithRetry] send cmd times: 1
+[KmCertStatus] km_cert_status.devcert_status: 0
+[KmCertStatus] km_cert_status.devkey_status: 0
+[KmCertStatus] km_cert_status.tlscert_status: 0
+[KmCertStatus] km_cert_status.tlskey_status: 0
+[KmCertStatus] km cert status check end. result: 0
+ RemoteObj_invoke  count 1 
+[KeyManagerShutDownApp] KeyManagerShutDownApp success
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(4)=6 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(18)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(17)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(18)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(17)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(5)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(19)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(20)=0 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(21)=1 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(22)=1 
+GetDebugPolicyStatus: SysCallRsp->allowed = (0x1)
+SysCallRsp->cookie = (0x1)
+GetDebugPolicyStatus: SysCallRsp->minidump = (0x80000000)
+get_bsp_feature flag(23)=0 
+Cmdline: video=vfb:640x400,bpp=32,memsize=3072000 nosoftlockup console=ttynull qcom_geni_serial.con_enabled=0 bootconfig  msm_drm.dsi_display0=qcom,mdss_dsi_swan_3552x3840_dsc_video: rootwait ro init=/init silent_boot.mode=nonsilent loglevel=6 pci-msm-drv Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+ Smc Invoke call failed ret 0x17 
+QseeResponse->result = 0xE
+Status = 0x7
+Secretkeeper app is loaded and ready to be used
+ RemoteObj_invoke  count 1 
+ RemoteObj_invoke  count 1 
+VB: RWDeviceState: Succeed using rpmb!
+BCC Generation is Success
+Modifying reference VM DT to add AVF data
+Final RAM Partitions
+Add Base: 0x0000000081960000 Available Length: 0x00000000000A0000 
+Add Base: 0x0000000081A60000 Available Length: 0x00000000001A0000 
+Add Base: 0x0000000081CF4000 Available Length: 0x000000000000C000 
+Add Base: 0x0000000082478000 Available Length: 0x0000000000028000 
+Add Base: 0x00000000D8800000 Available Length: 0x0000000000000000 
+Add Base: 0x00000000DFDA0000 Available Length: 0x000000001FA60000 
+Add Base: 0x0000000880000000 Available Length: 0x000000002F6FD000 
+Add Base: 0x00000008B0000000 Available Length: 0x0000000008500000 
+Add Base: 0x0000000A00000000 Available Length: 0x0000000200000000 
+Add Base: 0x00000008C0000000 Available Length: 0x0000000140000000 
+Add Base: 0x0000000082600000 Available Length: 0x0000000000100000 
+Add Base: 0x0000000082800000 Available Length: 0x0000000002200000 
+Add Base: 0x000000008A980000 Available Length: 0x000000000EC00000 
+Add Base: 0x000000009959C000 Available Length: 0x0000000000064000 
+Add Base: 0x000000009CE80000 Available Length: 0x0000000002E00000 
+Add Base: 0x000000009FFE0000 Available Length: 0x0000000000070000 
+Add Base: 0x00000000A0910000 Available Length: 0x0000000000A70000 
+Add Base: 0x00000000A5A00000 Available Length: 0x0000000031E00000 
+Add Base: 0x00000000D79C0000 Available Length: 0x0000000000040000 
+Add Base: 0x00000000D7C00000 Available Length: 0x0000000000400000 
+Unable to get disp op Config, Not Found
+PartialGoods for Multimedia: 0x1040
+Subnode: qcom,mss is not present, ignore
+Subnode: remoteproc-mss is not present, ignore
+PartialGoods Value: 0x0
+Update Device Tree total time: 20 ms 
+Modifying Host Kernel DT to add AVF data
+[24862] [STARTUP.UEFI.ABL] ABL END! 
+
+Shutting Down UEFI Boot Services: 24862 ms
+Start EBS        [24862] 
+EFI_PmicGlink_LinkStatus:: IsPMICChannelOpen = 1.
+pmic_glink_sync_send_receive:: opcode = 1. 
+ChargerLib:: ChargerLibTarget_SendHostSwStageToFW send software stage = 3 to FW, Status = Success 
+                                                                                                                                                                                                                                                                                                                                                                                                              

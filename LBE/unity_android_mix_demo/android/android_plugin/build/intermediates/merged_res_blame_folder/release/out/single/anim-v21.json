@@ -1,0 +1,38 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/m3_bottom_sheet_slide_out.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/m3_bottom_sheet_slide_out.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/m3_bottom_sheet_slide_in.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/m3_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/mtrl_bottom_sheet_slide_out.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/mtrl_bottom_sheet_slide_out.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/mtrl_bottom_sheet_slide_in.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/mtrl_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/m3_side_sheet_slide_out.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/m3_side_sheet_slide_out.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/m3_side_sheet_slide_in.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/m3_side_sheet_slide_in.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/design_bottom_sheet_slide_in.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/design_bottom_sheet_slide_in.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/fragment_fast_out_extra_slow_in.xml",
+        "source": "com.example.androidplugin.android_plugin-fragment-1.3.6-19:/anim-v21/fragment_fast_out_extra_slow_in.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/anim-v21/design_bottom_sheet_slide_out.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/anim-v21/design_bottom_sheet_slide_out.xml"
+    }
+]

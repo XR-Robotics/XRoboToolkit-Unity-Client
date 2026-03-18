@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-night-v8/material_timepicker_modebutton_tint.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-night-v8/material_timepicker_modebutton_tint.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-night-v8/material_timepicker_button_stroke.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-night-v8/material_timepicker_button_stroke.xml"
+    },
+    {
+        "merged": "com.example.androidplugin.android_plugin-merged_res-28:/color-night-v8/material_timepicker_clockface.xml",
+        "source": "com.example.androidplugin.android_plugin-material-1.9.0-2:/color-night-v8/material_timepicker_clockface.xml"
+    }
+]

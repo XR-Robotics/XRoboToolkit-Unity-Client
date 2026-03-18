@@ -1,0 +1,10 @@
+TagID 80ea0002  Index    0  TagName                                        com.qti.chi.ZSLSettings.lastDebugZSLframe  Size        4  Type 1  TagType 1  visibility 4294967295
+TagID 80ea0001  Index    1  TagName                                             com.qti.chi.ZSLSettings.lastZSLframe  Size        4  Type 1  TagType 1  visibility 4294967295
+TagID 80dd0000  Index    2  TagName                                       com.qti.chi.multicamerainfo.MultiCameraIds  Size       12  Type 0  TagType 1  visibility 4294967295
+TagID 80dd0008  Index    3  TagName                                      com.qti.chi.multicamerainfo.PhyCamFOVMargin  Size        4  Type 2  TagType 1  visibility 4294967295
+TagID 80ee0000  Index    4  TagName                                                com.qti.chi.pixelshift.PixelShift  Size        8  Type 0  TagType 1  visibility 1
+TagID 80060002  Index    5  TagName                                 org.quic.camera.eisrealtime.StabilizationMargins  Size       16  Type 0  TagType 1  visibility 1
+TagID 80870012  Index    6  TagName                    org.quic.camera2.ipeicaconfigs.ICASnapshotGridOut2InTransform  Size    27392  Type 0  TagType 1  visibility 1
+TagID 80870011  Index    7  TagName                   org.quic.camera2.ipeicaconfigs.ICASnapshotPerspectiveTransform  Size      360  Type 0  TagType 1  visibility 1
+TagID 81040001  Index    8  TagName                                org.quic.camera2.oemfdresults.OEMFDContourResults  Size    24372  Type 0  TagType 1  visibility 1
+TagID 81040000  Index    9  TagName                                       org.quic.camera2.oemfdresults.OEMFDResults  Size     2064  Type 0  TagType 1  visibility 1

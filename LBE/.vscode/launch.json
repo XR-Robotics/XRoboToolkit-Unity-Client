@@ -1,0 +1,13 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "lldb",
+      "request": "launch",
+      "args": [],
+      "cwd": "/Users/bytedance/VO/QY/LBE/LSpaceU3d/build/dist/BuildForAndroid/origin/LSpace-cn-debug_BackUpThisFolder_ButDontShipItWithYourGame/il2cppOutput",
+      "program": "/Users/bytedance/VO/QY/LBE/LSpaceU3d/build/dist/BuildForAndroid/origin/LSpace-cn-debug_BackUpThisFolder_ButDontShipItWithYourGame/il2cppOutput/build/Debug/outDebug"
+    }
+  ]
+}

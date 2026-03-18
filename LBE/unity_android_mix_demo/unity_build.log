@@ -1,0 +1,55 @@
+Unity Editor version:    2021.3.45f2 (88f88f591b2e)
+Branch:                  2021.3/respin/2021.3.45f2-0da89fac8e
+Build type:              Release
+Batch mode:              YES
+macOS version:           Version 14.8 (Build 23J21)
+Darwin version:          23.6.0
+Architecture:            arm64
+Running under Rosetta:   NO
+Available memory:        36864 MB
+[Licensing::Module] Trying to connect to existing licensing client channel...
+[Licensing::IpcConnector] Successfully connected to the License Client on channel: "LicenseClient-bytedance" at "2026-03-05T11:40:00.88518Z"
+[Licensing::Client] Error: Code 10 while verifying Licensing Client signature (process Id: 18591, path: "/Applications/Unity Hub.app/Contents/Frameworks/UnityLicensingClient_V1.app/Contents/MacOS/Unity.Licensing.Client")
+[Licensing::Module] Error: LicensingClient has failed validation; ignoring
+[Licensing::Client] Handshaking with LicensingClient:
+  Version:                 1.17.4+4293ba1
+  Session Id:              917abbb389c34c1d89554a470941db94
+  Correlation Id:          b83da9b26847a6dbeaec9cc8971391d2
+  External correlation Id: 7089101259729834065
+  Machine Id:              r1lGireR12SEN7vTpbijSgxfC04=
+[Licensing::Module] Successfully connected to LicensingClient on channel: "LicenseClient-bytedance" (connect: 0.00s, validation: 0.01s, handshake: 0.22s)
+[Licensing::IpcConnector] Successfully connected to the License Notification on channel: "LicenseClient-bytedance-notifications" at "2026-03-05T11:40:01.117407Z"
+Entitlement-based licensing initiated
+[Licensing::Module] Error: Access token is unavailable; failed to update
+[Licensing::Client] Successfully updated license
+[Licensing::Client] Successfully resolved entitlement details
+[Licensing::Module] Serial number assigned to: "18966936743449-UnityPersXXXX"
+Pro License: NO
+[Licensing::Client] Successfully resolved entitlement details
+[Package Manager] Server::Start -- Port 64481 was selected
+Launching external process: /Applications/Unity/Hub/Editor/2021.3.45f2/Unity.app/Contents/Resources/PackageManager/Server/UnityPackageManager
+
+COMMAND LINE ARGUMENTS:
+/Applications/Unity/Hub/Editor/2021.3.45f2/Unity.app/Contents/MacOS/Unity
+-quit
+-batchmode
+-nographics
+-projectPath
+/Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity
+-executeMethod
+Build.BuildAndroidAPK
+-logFile
+/Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity_build.log
+Successfully changed project path to: /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity
+/Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity
+It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity
+Fatal Error! It looks like another Unity instance is running with this project open.
+
+Multiple Unity instances cannot open the same project.
+
+Project: /Users/bytedance/VO/QY/LBE/unity_android_mix_demo/unity
+[Package Manager] Server::Kill -- Server was shutdown
