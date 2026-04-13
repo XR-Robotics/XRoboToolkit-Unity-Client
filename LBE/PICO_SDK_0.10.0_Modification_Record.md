@@ -18,6 +18,17 @@
   * 如果是曾经成功过但突然失效的图层（运行时被 Native 禁用回收），仅容忍 **5 帧**，然后迅速触发重建（`needsRecreate = true`）。
   * 将 `InitializeBuffer` 和 `UPxr_DestroyLayerByRender` 的调用推迟到 `Update()` 生命周期中执行，避开渲染阶段（`OnPreRender`）与 Native 层的跨线程时序冲突。
 
+### 1.1.5 [高危/防坑] 修复 Unity 增量编译导致本地包修改不生效的“幽灵 Bug”
+* **触发场景**：当我们直接修改了位于 `Packages/PICO-Unity-SDK-0.10.0-Preview/` 下的 SDK C# 源码后，即使在 Editor 内点击 Reimport，打出的 APK 依然是旧的 Bug 逻辑。
+* **根因分析**：
+  1. **路径混淆**：前期项目中存在两个同名的 SDK 文件夹（一个在项目外层根目录，一个在 `Packages/` 内）。若 `manifest.json` 中配置的相对路径（如 `"file:../PICO-Unity-SDK..."`）解析到了未修改的旧文件夹，则修改永远无效。
+  2. **UPM 本地包不可变缓存（Immutable Cache）**：Unity 的 Bee Compiler 将 `Packages` 目录下的包默认视为不经常变动的依赖。即使你修改了 C# 源码，只要 `package.json` 的版本号没变，Unity 就极有可能直接复用 `Library/Bee/artifacts/` 下旧的 DLL 缓存，从而引发“改了代码但死活不生效”的灵异现象。
+* **终极解决方案与标准操作流程 (SOP)**：
+  当对本地 `Packages/` 下的 SDK 源码进行任何修改后，**必须**执行以下步骤以强制 Unity 重新编译：
+  1. **修改包版本号 (Bump Version)**：打开 SDK 的 `package.json`，微调版本号（例如从 `"0.10.1"` 改为 `"0.10.1-hotfix1"`）。这是最优雅且有效的触发重编方式。
+  2. **核对路径 (Check manifest.json)**：确保项目 `Packages/manifest.json` 中的引用路径准确无误（正确示例：`"com.bytedance.pico.xr": "file:PICO-Unity-SDK-0.10.0-Preview"`）。
+  3. **核弹级清缓存 (可选，仅当 1 无效时使用)**：关闭 Unity，彻底删除 `Library/Bee` 和 `Library/ScriptAssemblies` 文件夹，重新打开工程进行全量硬编译。
+
 ### 1.2 修复 Unity 2021 编译兼容性问题
 * **文件路径**：`Packages/PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_EnvironmentDepthManager.cs`
 * **修改方案**：将已废弃的 `GetRenderTexture` 方法替换为 `GetRenderTextureForRenderPass`。
