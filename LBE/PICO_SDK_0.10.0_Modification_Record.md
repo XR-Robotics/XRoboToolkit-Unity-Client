@@ -29,6 +29,14 @@
   2. **核对路径 (Check manifest.json)**：确保项目 `Packages/manifest.json` 中的引用路径准确无误（正确示例：`"com.bytedance.pico.xr": "file:PICO-Unity-SDK-0.10.0-Preview"`）。
   3. **核弹级清缓存 (可选，仅当 1 无效时使用)**：关闭 Unity，彻底删除 `Library/Bee` 和 `Library/ScriptAssemblies` 文件夹，重新打开工程进行全量硬编译。
 
+* **如何验证 DLL 是否真正包含了最新代码？ (字符串搜索坑点)**：
+  * **不要使用普通的 `strings` 命令**：Mac/Linux 的 `strings` 默认只提取 ASCII 字符串。而 Unity C# 编译生成的 DLL 中，字符串常量是以 **UTF-16 小端序 (UTF-16LE)** 格式存储的（每个字符后面跟着一个空字节 `\0`，例如 `"PLog"` 存储为 `P\0L\0o\0g\0`）。直接 `strings` 会搜不到我们刚写的日志字符串。
+  * **正确的验证方式**：使用带有空字节占位符的正则匹配。例如，你想验证 `"hasSucceeded"` 是否编译进了 DLL，应该在终端执行：
+    ```bash
+    grep -a -o -E "h.a.s.S.u.c.c.e.e.d.e.d" Library/ScriptAssemblies/ByteDance.PICO.XR.dll
+    ```
+    如果输出了带空格样式的匹配结果（如 `h a s S u c c e e d e d`），才说明新代码真正生效了。
+
 ### 1.2 修复 Unity 2021 编译兼容性问题
 * **文件路径**：`Packages/PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_EnvironmentDepthManager.cs`
 * **修改方案**：将已废弃的 `GetRenderTexture` 方法替换为 `GetRenderTextureForRenderPass`。
