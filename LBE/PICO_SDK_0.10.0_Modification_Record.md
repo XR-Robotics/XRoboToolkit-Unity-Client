@@ -10,7 +10,7 @@
 *说明：直接修改了 PICO SDK 提供的源码，后续更新 SDK 版本时需要**重点注意重新应用这些修改**。*
 
 ### 1.1 [高危/重构] 修复大空间 Loading 阶段图层被误杀导致的死循环黑屏 (Ultimate Fix 3.0)
-* **文件路径**：`PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/Features/PXR_CompositionLayer.cs`
+* **文件路径**：`Packages/PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/Features/PXR_CompositionLayer.cs`
 * **根因**：大空间初次加载时 CPU 极度卡顿，底层 C++ 异步分配图层耗时可能长达数秒。而 SDK C# 层硬编码的 `60 帧` 超时阈值太短，导致图层在建好前被强制销毁并重新请求创建，陷入无限循环。
 * **修改方案**：
   * 在 `CreateTexture()` 的失败判定中，引入了**状态记忆机制 (`hasSucceededBefore`)**。
@@ -19,9 +19,9 @@
   * 将 `InitializeBuffer` 和 `UPxr_DestroyLayerByRender` 的调用推迟到 `Update()` 生命周期中执行，避开渲染阶段（`OnPreRender`）与 Native 层的跨线程时序冲突。
 
 ### 1.2 修复 Unity 2021 编译兼容性问题
-* **文件路径**：`PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_EnvironmentDepthManager.cs`
+* **文件路径**：`Packages/PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_EnvironmentDepthManager.cs`
 * **修改方案**：将已废弃的 `GetRenderTexture` 方法替换为 `GetRenderTextureForRenderPass`。
-* **文件路径**：`PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_LightEstimationManager.cs`
+* **文件路径**：`Packages/PICO-Unity-SDK-0.10.0-Preview/Runtime/Scripts/SensePack/PXR_LightEstimationManager.cs`
 * **修改方案**：将已废弃的 `RenderSettings.customReflectionTexture` 属性替换为 `RenderSettings.customReflection`。
 
 ---
