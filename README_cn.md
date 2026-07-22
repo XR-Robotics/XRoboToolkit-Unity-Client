@@ -51,6 +51,19 @@ Remote Vision 控制连接使用 App 内的 `OperatorControlClient`，通过 rea
 麦克风上行默认全双工。调用 `UICameraCtrl.SetMicrophoneMuted(true)` 后，本地
 仍持续消费采集环，但不会发送静音 PCM 帧，避免 G1 侧播放/duck 状态被永久激活。
 
+## 连接地址记忆
+
+- 主界面 Data & Control 的 PC Service 输入会保存最后一次确认的有效 IPv4。
+- Remote Vision 会按视频源分别保存 operator IP，并恢复最后一次成功确认的
+  视频源；读取顺序是“当前源专属地址 → 最近一次全局地址 → 旧版地址”。
+- 地址会先去除首尾空白并严格校验，只有点击 Connect/Confirm 后才显式调用
+  `PlayerPrefs.Save()`；格式错误时对话框保持打开且不会覆盖已有值。
+- App 只保存地址和视频源名称，不保存端口、音频会话令牌，也不会在启动时自动连接。
+
+同包名、同签名的 `adb install -r` 会保留这些设置；卸载 App 或执行 `pm clear`
+会清空。正式版 `com.xrobotoolkit.client` 与 Beta
+`com.xrobotoolkit.client.voicebeta` 使用独立存储，因此两者不会自动迁移地址。
+
 ## 平面与全景远端视频
 
 operator bridge 会在同一份协商配置里声明
@@ -170,13 +183,24 @@ Android API 30/31 和 Unity 开发调试签名，不读取或修改正式版 key
 
 可选环境变量为 `XRBT_BETA_VERSION_NAME`、`XRBT_BETA_VERSION_CODE` 和
 `XRBT_BETA_APK_PATH`。默认输出为
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk`。
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk`，默认
+versionCode 为 `3`。
+
+构建前可先执行地址存储自检：
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod RemoteVisionAddressStoreSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-address-store-test.log
+```
 
 Pico 开启开发者模式和 USB 调试后安装：
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```

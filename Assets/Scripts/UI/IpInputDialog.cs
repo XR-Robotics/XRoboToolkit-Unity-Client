@@ -1,4 +1,3 @@
-using System.Net;
 using Robot;
 using TMPro;
 using UnityEngine;
@@ -25,8 +24,15 @@ public class IpInputDialog : MonoBehaviour
     private void OnEnable()
     {
         Remind.text = "";
+        TmpInput.SetTextWithoutNotify(PcServiceAddressStore.Load());
         ConnectBtn.gameObject.SetActive(true);
         _connecting = false;
+    }
+
+    private void OnDestroy()
+    {
+        ConnectBtn.onClick.RemoveListener(OnConnectBtn);
+        CloseBtn.onClick.RemoveListener(OnCloseBtn);
     }
 
     private void OnCloseBtn()
@@ -36,13 +42,13 @@ public class IpInputDialog : MonoBehaviour
 
     public void OnConnectBtn()
     {
-        string ip = TmpInput.text;
-        if (!IPAddress.TryParse(ip, out _))
+        if (!PcServiceAddressStore.TrySave(TmpInput.text, out string ip))
         {
             SetRemind(LogType.Error, "The IP format is incorrect!");
             return;
         }
 
+        TmpInput.SetTextWithoutNotify(ip);
         SetRemind(LogType.Log, "Connecting...");
         _connecting = true;
         TcpHandler.Connect(ip);

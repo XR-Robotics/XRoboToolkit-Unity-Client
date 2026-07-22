@@ -601,7 +601,11 @@ public partial class UICameraCtrl : MonoBehaviour
             videoSourceManager.UpdateVideoSource(cameraSource);
 
             // send video stream request to the server
-            CameraSendInputDialog.Show(RequestCameraStream);
+            CameraSendInputDialog.Show(
+                RequestCameraStream,
+                cameraSource,
+                () => listenBtn.SetOn(false)
+            );
         }
         else
         {

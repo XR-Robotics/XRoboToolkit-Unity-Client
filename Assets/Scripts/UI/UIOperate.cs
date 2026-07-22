@@ -91,6 +91,16 @@ public class UIOperate : MonoBehaviour
         print("OnSourceConfigOnOnInitialized");
         videoSourceDropdown.ClearOptions();
         videoSourceDropdown.AddOptions(sourceConfig.GetVideoSourceNames());
+
+        string lastVideoSource = RemoteVisionAddressStore.LoadLastVideoSource();
+        for (int i = 0; i < videoSourceDropdown.options.Count; i++)
+        {
+            if (videoSourceDropdown.options[i].text == lastVideoSource)
+            {
+                videoSourceDropdown.SetValueWithoutNotify(i);
+                break;
+            }
+        }
     }
 
     private void OnAndroidCallBack(string key, string value)
@@ -118,6 +128,13 @@ public class UIOperate : MonoBehaviour
 
     public void TcpConnect(string ip)
     {
+        if (!PcServiceAddressStore.TrySave(ip, out string normalizedIp))
+        {
+            LogWindow.Warn("Ignoring a PC service announcement with an invalid IPv4 address.");
+            return;
+        }
+
+        ip = normalizedIp;
         TargetIP.text = "PC Service: " + ip;
         ReconnectBtn.gameObject.SetActive(true);
         TcpHandler.Connect(ip);

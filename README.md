@@ -153,6 +153,24 @@ The microphone uplink is full-duplex by default. Calling
 `UICameraCtrl.SetMicrophoneMuted(true)` keeps local capture running but sends no
 PCM frames, so robot-side playback/ducking does not remain falsely active.
 
+### Connection address persistence
+
+- Data & Control remembers the last valid IPv4 confirmed for PC Service.
+- Remote Vision stores a separate operator IP for each video source and restores
+  the last successfully confirmed source. Lookup order is current-source address,
+  global last address, then the valid legacy address.
+- Input is trimmed and strictly validated. Only an explicit Connect/Confirm flushes
+  the value with `PlayerPrefs.Save()`; invalid input keeps the dialog open and does
+  not overwrite a saved address.
+- The app stores only addresses and the video-source name. It never persists ports,
+  audio session tokens, or an automatic-connect instruction.
+
+`adb install -r` preserves these preferences only when package id and signing key
+remain unchanged. Uninstalling the app or running `pm clear` removes them. The
+release package `com.xrobotoolkit.client` and beta package
+`com.xrobotoolkit.client.voicebeta` have separate storage and do not migrate values
+between each other.
+
 ### Flat and panoramic remote video
 
 The operator bridge can advertise `video_projection=flat|equirectangular` and
@@ -302,13 +320,23 @@ development signing key. It does not use or modify the production keystore.
 
 Optional environment variables are `XRBT_BETA_VERSION_NAME`,
 `XRBT_BETA_VERSION_CODE`, and `XRBT_BETA_APK_PATH`. The default output is
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk`.
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk`, with versionCode `3`.
+
+Run the address-store self-test before building:
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod RemoteVisionAddressStoreSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-address-store-test.log
+```
 
 Install it after enabling PICO developer mode and USB debugging:
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```
