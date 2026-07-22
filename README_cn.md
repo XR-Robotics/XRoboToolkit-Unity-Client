@@ -6,6 +6,54 @@
 - **训练数据录制**可以将VST图像与位姿数据同步录制为mp4文件保存到本机的Download目录。
 - **机器人遥控**：将本机位姿数据传输到PC机器人端，用来遥控机器人。
 - **图像的编解码**：可以将本机的VST图像进行编码发送，也可以将PC端的图像进行解码显示。
+- **机器人麦克风播放**：远端视觉开启后，会用同一个PC/operator IP连接原始PCM音频端口，在头显内播放机器人侧麦克风声音。
+- **Pico 麦克风上行**：将头显麦克风转为 `s16le`、`16 kHz`、单声道、20 ms PCM 帧发送到 operator bridge。
+
+## G1-Wuji operator 音频
+当 G1-Wuji operator 栈使用 `--with-audio` 启动时，operator 侧头显桥会把
+G1 自带麦克风转成原始 `s16le`、`16 kHz`、单声道 PCM，并默认暴露在 TCP
+`13580` 端口。Pico App 在 Remote Vision 点击 Listen 并输入 operator IP 后，
+会自动连接同一个 IP 的音频端口；关闭远端相机窗口会同时停止视频和音频。
+Pico 麦克风在同一 Listen 生命周期内默认全双工上行。运行时会明确请求
+`RECORD_AUDIO`；若用户拒绝，只停用麦克风上行，不阻塞相机或原有遥操。
+上行不是匿名裸 PCM 端口：当前控制连接必须先发送 `AUDIO_SESSION`，并拿到
+与本次请求匹配的一次性令牌，Pico 才会连接和发送。
+
+下行 fallback 可在 `Assets/StreamingAssets/video_source.yml` 里通过
+`AudioStreamPort` 调整。麦克风端口不再采用静态 fallback，必须由 schema 为
+`g1_wuji_audio_ports_v2` 的安全 `AUDIO_CONFIG` 下发。当前 Inspire profile
+协商为 `13680/13681`。
+
+协议 payload 示例：
+
+```json
+{
+  "schema": "g1_wuji_audio_ports_v2",
+  "audio_request_id": "<本次32字符请求ID>",
+  "audio_stream_port": 13680,
+  "microphone_upload_port": 13681,
+  "microphone_upload_protocol": "g1_wuji_audio_uplink_v1",
+  "microphone_upload_token": "<一次性会话令牌>",
+  "sample_rate": 16000,
+  "channels": 1,
+  "sample_format": "s16le"
+}
+```
+
+上行 TCP 首帧是带长度的 `G1AT` 鉴权记录；语音用 `G1AF` 记录携带序号、
+采集时间和固定 640 字节 PCM；静音/空闲时用 `G1AH` 心跳保活。operator 会在
+进入云链路前丢弃错误来源、错误令牌、乱序、畸形和陈旧帧，状态文件不会写入令牌。
+Remote Vision 控制连接使用 App 内的 `OperatorControlClient`，通过 read-exact
+和每次连接独立 socket 避开 vendor AAR 的长度头短读与快速重连串线问题。
+
+麦克风上行默认全双工。调用 `UICameraCtrl.SetMicrophoneMuted(true)` 后，本地
+仍持续消费采集环，但不会发送静音 PCM 帧，避免 G1 侧播放/duck 状态被永久激活。
+
+在 `g1_wuji_teleoperation` operator 仓库中启动：
+
+```bash
+scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
+```
 
 ## 目录结构
 
@@ -15,6 +63,7 @@ Unity 项目的核心资源文件夹，包含了项目中使用的所有资源�
 - **Plugins**：包含了提供Android接口的robotassistant_lib.aar和其他android平台配置。
 - **Resources**：本项目相关的资源。
 - **Scripts**：存放项目的脚本文件。
+  - **Audio**：机器人麦克风播放和 Pico 麦克风 PCM 上行逻辑。
   - **Camera**：与Camera相关的逻辑代码。
   - **ExtraDev**：用来读取PICO追踪器外设的相关逻辑。
   - **Network**：网络相关逻辑。

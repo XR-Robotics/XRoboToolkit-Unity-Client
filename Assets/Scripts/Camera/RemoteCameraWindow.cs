@@ -24,6 +24,9 @@ public class RemoteCameraWindow : MonoBehaviour
     private byte[] _imageBuffer;
     private CancellationTokenSource _receiveImageTs = null;
     private Task _imageReceiveTask;
+    private bool _listening;
+
+    public bool IsListening => _listening;
 
     private int _resolutionWidth = 2160;
     private int _resolutionHeight = 2160 / 2 * 4 / 3;
@@ -40,6 +43,12 @@ public class RemoteCameraWindow : MonoBehaviour
 
     public void StartListen(int width, int height, int fps, int bitrate, int port)
     {
+        if (_listening)
+        {
+            return;
+        }
+
+        _listening = true;
         _resolutionWidth = width;
         _resolutionHeight = height;
         _videoFps = fps;
@@ -50,17 +59,21 @@ public class RemoteCameraWindow : MonoBehaviour
 
     private void OnDisable()
     {
-        MediaDecoder.release();
+        if (_listening)
+        {
+            MediaDecoder.release();
+            _listening = false;
+        }
         Debug.Log("RemoteCameraWindow OnDisable");
         TcpHandler.SendFunctionValue("StopReceivePcCamera", "");
     }
 
     public void OnCloseBtn()
     {
-        // Reset listen button
-        listenBtn.SetOn(false);
-        // send close event to server
-        NetworkCommander.Instance.CloseCamera();
+        // Notify the owner instead of changing only the visual toggle. The
+        // Listen-off callback sends CLOSE_CAMERA, revokes audio, and disconnects
+        // the managed control socket before this window is hidden.
+        listenBtn.SetOnAndNotify(false);
         gameObject.SetActive(false);
     }
 

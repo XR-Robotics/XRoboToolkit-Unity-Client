@@ -394,6 +394,7 @@ public class VideoSourceConfigManager : MonoBehaviour
     /// Get camera bitrate from the current video source
     /// </summary>
     public int CamBitrate => CurrentVideoSource?.GetIntProperty("CamBitrate") ?? 5000000;
+    public int AudioStreamPort => CurrentVideoSource?.GetIntProperty("AudioStreamPort") ?? 13580;
 
     public float RectWidth
     {

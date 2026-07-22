@@ -10,7 +10,12 @@ namespace Network
     public static class NetworkCommand
     {
         public const string OPEN_CAMERA = "OPEN_CAMERA";
+        public const string AUDIO_CONFIG = "AUDIO_CONFIG";
+        public const string AUDIO_SESSION = "AUDIO_SESSION";
+        public const string OPEN_CAMERA_ACK = "OPEN_CAMERA_ACK";
         public const string CLOSE_CAMERA = "CLOSE_CAMERA";
+        public const string PING = "PING";
+        public const string PONG = "PONG";
     }
 
     public class NetworkCommander : MonoBehaviour

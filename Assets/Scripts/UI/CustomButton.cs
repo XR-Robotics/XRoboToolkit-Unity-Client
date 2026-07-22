@@ -28,6 +28,12 @@ public class CustomButton : MonoBehaviour, IPointerClickHandler
         _image.color = On ? selectedColor : _defaultColor;
     }
 
+    public void SetOnAndNotify(bool value)
+    {
+        SetOn(value);
+        OnChange?.Invoke(value);
+    }
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (OnChange != null)

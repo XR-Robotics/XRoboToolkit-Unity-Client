@@ -231,8 +231,7 @@ public class UIOperate : MonoBehaviour
     {
         if (CameraObj != null)
         {
-            if (Permission.HasUserAuthorizedPermission(Permission.Camera) &&
-                Permission.HasUserAuthorizedPermission(Permission.Microphone))
+            if (Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
                 CameraObj.SetActive(!CameraObj.activeSelf);
             }
@@ -242,7 +241,9 @@ public class UIOperate : MonoBehaviour
                 permissionCallbacks.PermissionGranted += PermissionGranted;
                 permissionCallbacks.PermissionDenied += PermissionDenied;
 
-                string[] permissions = { Permission.Camera, Permission.Microphone };
+                // Microphone permission is requested only after the operator
+                // negotiates an authenticated audio session in UICameraCtrl.
+                string[] permissions = { Permission.Camera };
                 Permission.RequestUserPermissions(permissions, permissionCallbacks);
             }
 
@@ -260,12 +261,22 @@ public class UIOperate : MonoBehaviour
 
     private void PermissionDenied(string obj)
     {
-        Toast.Show("Permission denied!");
+        if (obj == Permission.Microphone)
+        {
+            Toast.Show("Microphone permission denied; voice upload is disabled.");
+            if (CameraObj != null && Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
+                CameraObj.SetActive(true);
+            }
+            return;
+        }
+
+        Toast.Show("Camera permission denied!");
     }
 
     private void PermissionGranted(string obj)
     {
-        if (CameraObj != null)
+        if (CameraObj != null && Permission.HasUserAuthorizedPermission(Permission.Camera))
         {
             CameraObj.SetActive(true);
         }

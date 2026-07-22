@@ -1,0 +1,522 @@
+using System;
+using System.IO;
+using System.Net.Sockets;
+using System.Threading;
+using UnityEngine;
+
+using NetTcpClient = System.Net.Sockets.TcpClient;
+
+public class RemotePcmAudioPlayer : MonoBehaviour
+{
+    public const int DefaultPort = 13580;
+    private const int SampleRate = 16000;
+    private const int Channels = 1;
+    private const int PrebufferMs = 80;
+    private const int TargetBufferMs = 100;
+    private const int HardBufferMs = 200;
+    private const int PrebufferSamples = SampleRate * PrebufferMs / 1000;
+    private const int TargetBufferSamples = SampleRate * TargetBufferMs / 1000;
+    private const int HardBufferSamples = SampleRate * HardBufferMs / 1000;
+    private const int ConnectTimeoutMs = 2000;
+    private const int ReadTimeoutMs = 1000;
+    private const int ReconnectDelayMs = 1000;
+
+    private readonly object _ringLock = new object();
+    private readonly object _clientLock = new object();
+    private readonly object _statusLock = new object();
+
+    private float[] _ringBuffer = new float[HardBufferSamples];
+    private int _readIndex;
+    private int _writeIndex;
+    private int _bufferedSamples;
+    private bool _playbackPrimed;
+
+    private AudioSource _audioSource;
+    private AudioClip _audioClip;
+    private Thread _receiveThread;
+    private NetTcpClient _client;
+    private volatile bool _stopRequested = true;
+    private volatile bool _connected;
+    private string _host;
+    private int _port = DefaultPort;
+    private int _runId;
+    private byte _pendingByte;
+    private bool _hasPendingByte;
+    private long _receivedSamples;
+    private long _droppedSamples;
+    private long _underrunSamples;
+
+    private string _pendingStatusMessage;
+    private bool _pendingStatusWarning;
+
+    public bool IsConnected => _connected;
+    public long ReceivedSamples => Interlocked.Read(ref _receivedSamples);
+    public long DroppedSamples => Interlocked.Read(ref _droppedSamples);
+    public long UnderrunSamples => Interlocked.Read(ref _underrunSamples);
+
+    public void StartAudio(string host, int port = DefaultPort)
+    {
+        if (string.IsNullOrWhiteSpace(host))
+        {
+            LogWindow.Warn("Remote audio skipped: empty host.");
+            return;
+        }
+
+        StopAudio(false);
+        ResetRingBuffer();
+
+        _host = host.Trim();
+        _port = port > 0 && port <= 65535 ? port : DefaultPort;
+        int runId = Interlocked.Increment(ref _runId);
+        _stopRequested = false;
+        _connected = false;
+
+        EnsureAudioSource();
+        if (!_audioSource.isPlaying)
+        {
+            _audioSource.Play();
+        }
+
+        _receiveThread = new Thread(() => ReceiveLoop(runId));
+        _receiveThread.IsBackground = true;
+        _receiveThread.Name = "RemotePcmAudioPlayer";
+        _receiveThread.Start();
+
+        LogWindow.Info($"Remote audio connecting to {_host}:{_port} (s16le {SampleRate}Hz mono).");
+    }
+
+    public void StopAudio()
+    {
+        StopAudio(true);
+    }
+
+    private void StopAudio(bool log)
+    {
+        bool wasRunning = !_stopRequested || _connected || _receiveThread != null;
+        _stopRequested = true;
+        Interlocked.Increment(ref _runId);
+        CloseClient();
+
+        if (_receiveThread != null && _receiveThread.IsAlive && Thread.CurrentThread != _receiveThread)
+        {
+            _receiveThread.Join(500);
+        }
+
+        _receiveThread = null;
+        _connected = false;
+        _hasPendingByte = false;
+        ResetRingBuffer(false);
+
+        if (_audioSource != null && _audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+        }
+
+        if (log && wasRunning)
+        {
+            LogWindow.Info("Remote audio stopped.");
+        }
+    }
+
+    private void EnsureAudioSource()
+    {
+        if (_audioSource == null)
+        {
+            _audioSource = GetComponent<AudioSource>();
+            if (_audioSource == null)
+            {
+                _audioSource = gameObject.AddComponent<AudioSource>();
+            }
+
+            _audioSource.playOnAwake = false;
+            _audioSource.loop = true;
+            _audioSource.spatialBlend = 0f;
+            _audioSource.volume = 1f;
+        }
+
+        if (_audioClip == null)
+        {
+            _audioClip = AudioClip.Create(
+                "G1RemoteMicPcm",
+                SampleRate,
+                Channels,
+                SampleRate,
+                true,
+                OnAudioRead);
+        }
+
+        _audioSource.clip = _audioClip;
+    }
+
+    private void ReceiveLoop(int runId)
+    {
+        byte[] readBuffer = new byte[1280];
+
+        while (IsRunActive(runId))
+        {
+            NetTcpClient tcp = null;
+            try
+            {
+                tcp = ConnectWithTimeout(_host, _port, ConnectTimeoutMs);
+                tcp.NoDelay = true;
+                tcp.ReceiveTimeout = ReadTimeoutMs;
+                tcp.ReceiveBufferSize = 4096;
+
+                bool acceptedClient;
+                lock (_clientLock)
+                {
+                    acceptedClient = IsRunActive(runId);
+                    if (acceptedClient)
+                    {
+                        _client = tcp;
+                    }
+                }
+
+                if (!acceptedClient)
+                {
+                    tcp.Close();
+                    tcp = null;
+                    break;
+                }
+
+                if (IsRunActive(runId))
+                {
+                    ResetRingBuffer(false);
+                    bool markedConnected = false;
+                    lock (_clientLock)
+                    {
+                        if (IsRunActive(runId) && _client == tcp)
+                        {
+                            _connected = true;
+                            markedConnected = true;
+                        }
+                    }
+                    if (markedConnected)
+                    {
+                        SetPendingStatus($"Remote audio connected: {_host}:{_port}", false);
+                    }
+                }
+
+                NetworkStream stream = tcp.GetStream();
+                while (IsRunActive(runId))
+                {
+                    int bytesRead = stream.Read(readBuffer, 0, readBuffer.Length);
+                    if (bytesRead <= 0)
+                    {
+                        break;
+                    }
+                    if (!IsRunActive(runId))
+                    {
+                        break;
+                    }
+
+                    QueuePcmBytes(readBuffer, bytesRead);
+                }
+            }
+            catch (SocketException e)
+            {
+                SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
+            }
+            catch (IOException e)
+            {
+                SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
+            }
+            catch (TimeoutException e)
+            {
+                SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
+            }
+            catch (ObjectDisposedException)
+            {
+                if (IsRunActive(runId))
+                {
+                    SetPendingStatus("Remote audio reconnecting: socket closed.", true);
+                }
+            }
+            catch (Exception e)
+            {
+                SetPendingStatusForRun(runId, $"Remote audio error: {e.Message}", true);
+            }
+            finally
+            {
+                if (IsRunActive(runId))
+                {
+                    // An older connect attempt may outlive StopAudio's short join.
+                    // Never let that stale run clear a newer session's jitter buffer.
+                    ResetRingBuffer(false);
+                    _connected = false;
+                }
+
+                lock (_clientLock)
+                {
+                    if (_client == tcp)
+                    {
+                        _client = null;
+                    }
+                }
+
+                if (tcp != null)
+                {
+                    tcp.Close();
+                }
+            }
+
+            if (IsRunActive(runId))
+            {
+                Thread.Sleep(ReconnectDelayMs);
+            }
+        }
+    }
+
+    private bool IsRunActive(int runId)
+    {
+        return !_stopRequested && runId == Interlocked.CompareExchange(ref _runId, 0, 0);
+    }
+
+    private NetTcpClient ConnectWithTimeout(string host, int port, int timeoutMs)
+    {
+        NetTcpClient tcp = new NetTcpClient();
+        IAsyncResult result = tcp.BeginConnect(host, port, null, null);
+        try
+        {
+            bool connected = result.AsyncWaitHandle.WaitOne(timeoutMs);
+            if (!connected)
+            {
+                throw new TimeoutException($"connect timeout to {host}:{port}");
+            }
+            tcp.EndConnect(result);
+            return tcp;
+        }
+        catch
+        {
+            tcp.Close();
+            throw;
+        }
+        finally
+        {
+            result.AsyncWaitHandle.Close();
+        }
+    }
+
+    private void QueuePcmBytes(byte[] bytes, int count)
+    {
+        int offset = 0;
+
+        if (_hasPendingByte && count > 0)
+        {
+            EnqueueSample(ToFloatSample(_pendingByte, bytes[0]));
+            _hasPendingByte = false;
+            offset = 1;
+        }
+
+        int evenEnd = offset + ((count - offset) / 2) * 2;
+        int sampleCount = (evenEnd - offset) / 2;
+        if (sampleCount > 0)
+        {
+            float[] samples = new float[sampleCount];
+            int sampleIndex = 0;
+            for (int i = offset; i < evenEnd; i += 2)
+            {
+                samples[sampleIndex++] = ToFloatSample(bytes[i], bytes[i + 1]);
+            }
+
+            EnqueueSamples(samples, sampleCount);
+        }
+
+        if (evenEnd < count)
+        {
+            _pendingByte = bytes[count - 1];
+            _hasPendingByte = true;
+        }
+    }
+
+    private static float ToFloatSample(byte low, byte high)
+    {
+        short sample = (short)(low | (high << 8));
+        return sample / 32768f;
+    }
+
+    private void EnqueueSample(float sample)
+    {
+        lock (_ringLock)
+        {
+            WriteSampleLocked(sample);
+        }
+
+        Interlocked.Increment(ref _receivedSamples);
+    }
+
+    private void EnqueueSamples(float[] samples, int count)
+    {
+        lock (_ringLock)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                WriteSampleLocked(samples[i]);
+            }
+        }
+
+        Interlocked.Add(ref _receivedSamples, count);
+    }
+
+    private void WriteSampleLocked(float sample)
+    {
+        if (_bufferedSamples == _ringBuffer.Length)
+        {
+            int dropCount = Math.Max(1, _bufferedSamples - TargetBufferSamples + 1);
+            _readIndex = (_readIndex + dropCount) % _ringBuffer.Length;
+            _bufferedSamples -= dropCount;
+            Interlocked.Add(ref _droppedSamples, dropCount);
+            _playbackPrimed = false;
+        }
+
+        _ringBuffer[_writeIndex] = sample;
+        _writeIndex = (_writeIndex + 1) % _ringBuffer.Length;
+        _bufferedSamples++;
+    }
+
+    private void OnAudioRead(float[] data)
+    {
+        int readCount = 0;
+
+        lock (_ringLock)
+        {
+            if (!_playbackPrimed)
+            {
+                if (_bufferedSamples < Math.Max(PrebufferSamples, data.Length))
+                {
+                    readCount = 0;
+                }
+                else
+                {
+                    _playbackPrimed = true;
+                }
+            }
+
+            int count = _playbackPrimed ? Math.Min(data.Length, _bufferedSamples) : 0;
+            for (int i = 0; i < count; i++)
+            {
+                data[i] = _ringBuffer[_readIndex];
+                _readIndex = (_readIndex + 1) % _ringBuffer.Length;
+            }
+
+            _bufferedSamples -= count;
+            readCount = count;
+            if (count < data.Length)
+            {
+                _playbackPrimed = false;
+            }
+        }
+
+        for (int i = readCount; i < data.Length; i++)
+        {
+            data[i] = 0f;
+        }
+
+        if (readCount < data.Length)
+        {
+            Interlocked.Add(ref _underrunSamples, data.Length - readCount);
+        }
+    }
+
+    private void ResetRingBuffer(bool resetCounters = true)
+    {
+        lock (_ringLock)
+        {
+            Array.Clear(_ringBuffer, 0, _ringBuffer.Length);
+            _readIndex = 0;
+            _writeIndex = 0;
+            _bufferedSamples = 0;
+            _playbackPrimed = false;
+        }
+
+        if (resetCounters)
+        {
+            Interlocked.Exchange(ref _receivedSamples, 0);
+            Interlocked.Exchange(ref _droppedSamples, 0);
+            Interlocked.Exchange(ref _underrunSamples, 0);
+        }
+        _hasPendingByte = false;
+    }
+
+    private void CloseClient()
+    {
+        lock (_clientLock)
+        {
+            if (_client != null)
+            {
+                _client.Close();
+                _client = null;
+            }
+        }
+    }
+
+    private void SetPendingStatus(string message, bool warning)
+    {
+        lock (_statusLock)
+        {
+            _pendingStatusMessage = message;
+            _pendingStatusWarning = warning;
+        }
+    }
+
+    private void SetPendingStatusForRun(int runId, string message, bool warning)
+    {
+        if (IsRunActive(runId))
+        {
+            SetPendingStatus(message, warning);
+        }
+    }
+
+    private void Update()
+    {
+        string message = null;
+        bool warning = false;
+
+        lock (_statusLock)
+        {
+            if (!string.IsNullOrEmpty(_pendingStatusMessage))
+            {
+                message = _pendingStatusMessage;
+                warning = _pendingStatusWarning;
+                _pendingStatusMessage = null;
+            }
+        }
+
+        if (message == null)
+        {
+            return;
+        }
+
+        if (warning)
+        {
+            LogWindow.Warn(message);
+        }
+        else
+        {
+            LogWindow.Info(message);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        StopAudio(false);
+    }
+
+    private void OnDisable()
+    {
+        StopAudio(false);
+    }
+
+    private void OnApplicationQuit()
+    {
+        StopAudio(false);
+    }
+
+    private void OnApplicationPause(bool pauseStatus)
+    {
+        if (pauseStatus)
+        {
+            StopAudio(false);
+        }
+    }
+}

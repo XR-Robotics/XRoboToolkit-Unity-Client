@@ -25,7 +25,7 @@
 | Tracking - Status                              | Panel to show tracking related information                                                      |
 | Remote Vision - State                          | Show the state of camera                                                                        |
 | Remote Vision - Dropdown (Video Source)        | Select a supported video source                                                                 |
-| Remote Vision - Listen                         | Open a connection to receive the video stream to the selected video source                      |
+| Remote Vision - Listen                         | Open video plus full-duplex raw PCM audio when the PC/operator bridge exposes it          |
 | Data Collection - Tracking                     | Whether to record pose tracking data                                                            |
 | Data Collection - Vision                       | Whether to record vision data                                                                   |
 | Data Collection - Record                       | Start/Stop recording                                                                            |
@@ -40,6 +40,10 @@
   Transmits stereo vision from the robot-side headset to operator-side for 3D display.
 - **Remote stereo vision sync between PC camera and XR headset**
   Transmits stereo vision from the robot-side PC camera to operator-side headset for 3D display.
+- **Remote robot microphone audio playback**
+  Connects to the PC/operator bridge raw PCM audio port and plays robot-side microphone audio in the headset while remote vision is open.
+- **Pico microphone audio uplink**
+  Captures the headset microphone and sends bounded-latency 20 ms PCM frames to the operator bridge.
 ## Feature instructions
 
 ### Pose sync between XR device and robot PC
@@ -96,6 +100,63 @@ On the main panel, select preferred pose data to be collected, click Record. You
 8. If you close the live camera window, you can simply repeat Step 6.
 9. If you want to stop the camera streaming, quit **XRRoboToolkit** on the XR headset and stop the OrinVideoSender on Orin.
 
+### Full-duplex audio with the operator bridge
+
+When the G1-Wuji operator stack is started with audio enabled, the operator-side
+headset bridge exposes the relayed G1 built-in microphone as raw `s16le`
+`16 kHz` mono PCM on TCP port `13580` by default. The headset uses the same IP
+entered for Remote Vision and automatically starts audio playback after Listen
+is confirmed. Closing the remote camera window stops both the video stream and
+the audio client.
+
+At the same time, `PicoMicrophoneStreamer` captures the headset microphone,
+downmixes/resamples it to `s16le` `16 kHz` mono, and sends timestamped 20 ms
+frames to the operator bridge. The uplink is not an anonymous raw PCM socket:
+it is enabled only after the current Remote Vision control connection sends an
+`AUDIO_SESSION` request and receives a matching, one-session token. Android
+`RECORD_AUDIO` permission is requested at runtime; denying it disables only the
+microphone uplink and does not block the camera or robot teleoperation UI.
+
+The downlink fallback can be changed per video source through `AudioStreamPort`.
+The microphone port is intentionally not taken from static configuration: it
+must arrive in an authenticated `AUDIO_CONFIG` message using schema
+`g1_wuji_audio_ports_v2`. The current Inspire profile negotiates `13680/13681`.
+
+The payload of the framed `AUDIO_CONFIG` command is:
+
+```json
+{
+  "schema": "g1_wuji_audio_ports_v2",
+  "audio_request_id": "<matching-32-char-request-id>",
+  "audio_stream_port": 13680,
+  "microphone_upload_port": 13681,
+  "microphone_upload_protocol": "g1_wuji_audio_uplink_v1",
+  "microphone_upload_token": "<ephemeral-session-token>",
+  "sample_rate": 16000,
+  "channels": 1,
+  "sample_format": "s16le"
+}
+```
+
+The upload TCP stream begins with a length-framed `G1AT` authentication record.
+Audio uses `G1AF` records containing a sequence number, capture timestamp, and
+exactly 640 bytes of PCM; an idle/muted client sends `G1AH` heartbeats. The
+operator drops wrong-peer, wrong-token, malformed, out-of-order, and stale
+records before cloud relay. The token is never written to the status file.
+Remote Vision control itself uses the managed `OperatorControlClient`, whose
+read-exact framing and per-run socket ownership avoid the vendor AAR client's
+partial-length-read and rapid-reconnect races.
+
+The microphone uplink is full-duplex by default. Calling
+`UICameraCtrl.SetMicrophoneMuted(true)` keeps local capture running but sends no
+PCM frames, so robot-side playback/ducking does not remain falsely active.
+
+Run this from the `g1_wuji_teleoperation` operator repository:
+
+```bash
+scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
+```
+
 
 ## Directory Structure
 
@@ -115,6 +176,8 @@ Core resource folder containing all project assets:
     PICO tracker peripheral integration.
   - **Network**
     Network communication implementation.
+  - **Audio**
+    Remote robot-microphone playback and Pico microphone PCM upload clients.
   - **UI**
     User interface components.
 

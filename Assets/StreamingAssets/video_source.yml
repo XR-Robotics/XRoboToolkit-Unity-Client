@@ -35,6 +35,10 @@
       type: "int"
       description: "Bitrate of the video stream in bps"
       value: 20971520 # 20 x 1024 x 1024
+    - name: "AudioStreamPort"
+      type: "int"
+      description: "Raw PCM audio stream port from the operator bridge"
+      value: 13580
   
 - name: "ZEDMINI"
   camera: "ZED"
@@ -72,3 +76,7 @@
       type: "int"
       description: "Bitrate of the video stream in bps"
       value: 4000000
+    - name: "AudioStreamPort"
+      type: "int"
+      description: "Raw PCM audio stream port from the operator bridge"
+      value: 13580
