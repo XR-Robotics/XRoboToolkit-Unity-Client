@@ -60,6 +60,27 @@ public static class RemoteVisionAddressStoreSelfTest
         AssertRejected("192.168.1.256", true);
         AssertRejected("192.168.1.1:13579", true);
         AssertRejected("2001:db8::1", false);
+        AssertRejected("0.0.0.0", true);
+        AssertRejected("224.0.0.1", true);
+        AssertRejected("255.255.255.255", true);
+        AssertRejected("::", true);
+        AssertRejected("ff02::1", true);
+        AssertTrue(
+            !string.Equals(
+                RemoteVisionAddressStore.GetSourceKey("A-B"),
+                RemoteVisionAddressStore.GetSourceKey("A_B"),
+                StringComparison.Ordinal
+            ),
+            "punctuation-distinct source keys"
+        );
+        AssertTrue(
+            !string.Equals(
+                RemoteVisionAddressStore.GetSourceKey("全景一"),
+                RemoteVisionAddressStore.GetSourceKey("全景二"),
+                StringComparison.Ordinal
+            ),
+            "Unicode-distinct source keys"
+        );
 
         AssertEqual(string.Empty, RemoteVisionAddressStore.Load(SourceA), "empty install");
         AssertTrue(
@@ -76,16 +97,26 @@ public static class RemoteVisionAddressStoreSelfTest
         AssertEqual("10.0.0.2", RemoteVisionAddressStore.Load(SourceB), "source B isolation");
         AssertEqual(SourceB, RemoteVisionAddressStore.LoadLastVideoSource(), "last source");
 
-        string previousGlobal = PlayerPrefs.GetString(RemoteVisionAddressStore.LastAddressKey);
+        string[] invalidSaveKeys =
+        {
+            RemoteVisionAddressStore.GetSourceKey(SourceA),
+            RemoteVisionAddressStore.LastAddressKey,
+            RemoteVisionAddressStore.LastVideoSourceKey,
+            RemoteVisionAddressStore.LegacyAddressKey,
+        };
+        var invalidSaveSnapshot = new Dictionary<string, SavedPreference>();
+        foreach (string key in invalidSaveKeys)
+        {
+            invalidSaveSnapshot[key] = SavedPreference.Capture(key);
+        }
         AssertTrue(
             !RemoteVisionAddressStore.TrySave(SourceA, "not-an-ip", out _),
             "invalid save must fail"
         );
-        AssertEqual(
-            previousGlobal,
-            PlayerPrefs.GetString(RemoteVisionAddressStore.LastAddressKey),
-            "invalid save must not mutate prefs"
-        );
+        foreach (KeyValuePair<string, SavedPreference> item in invalidSaveSnapshot)
+        {
+            AssertTrue(item.Value.Matches(item.Key), $"invalid save mutated {item.Key}");
+        }
 
         PlayerPrefs.SetString(RemoteVisionAddressStore.GetSourceKey(SourceA), "invalid");
         PlayerPrefs.SetString(RemoteVisionAddressStore.LastAddressKey, "10.0.0.3");
@@ -181,6 +212,21 @@ public static class RemoteVisionAddressStoreSelfTest
             {
                 PlayerPrefs.DeleteKey(key);
             }
+        }
+
+        public bool Matches(string key)
+        {
+            if (exists != PlayerPrefs.HasKey(key))
+            {
+                return false;
+            }
+
+            return !exists ||
+                   string.Equals(
+                       value,
+                       PlayerPrefs.GetString(key, string.Empty),
+                       StringComparison.Ordinal
+                   );
         }
     }
 }

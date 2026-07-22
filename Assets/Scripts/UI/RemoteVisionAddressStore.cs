@@ -24,7 +24,9 @@ public static class IpAddressNormalizer
             }
 
             if (!IPAddress.TryParse(candidate, out IPAddress ipv6) ||
-                ipv6.AddressFamily != AddressFamily.InterNetworkV6)
+                ipv6.AddressFamily != AddressFamily.InterNetworkV6 ||
+                ipv6.Equals(IPAddress.IPv6Any) ||
+                ipv6.IsIPv6Multicast)
             {
                 return false;
             }
@@ -63,6 +65,12 @@ public static class IpAddressNormalizer
         string canonicalIpv4 = string.Join(".", normalizedParts);
         if (!IPAddress.TryParse(canonicalIpv4, out IPAddress ipv4) ||
             ipv4.AddressFamily != AddressFamily.InterNetwork)
+        {
+            return false;
+        }
+
+        byte[] addressBytes = ipv4.GetAddressBytes();
+        if (addressBytes[0] == 0 || addressBytes[0] >= 224)
         {
             return false;
         }
@@ -133,7 +141,7 @@ public static class RemoteVisionAddressStore
 
     public static string GetSourceKey(string videoSourceName)
     {
-        return SourceAddressKeyPrefix + NormalizeSourceName(videoSourceName);
+        return SourceAddressKeyPrefix + EncodeSourceName(videoSourceName);
     }
 
     private static string LoadValidAddress(string key, bool allowIpv6)
@@ -152,37 +160,15 @@ public static class RemoteVisionAddressStore
             : string.Empty;
     }
 
-    private static string NormalizeSourceName(string videoSourceName)
+    private static string EncodeSourceName(string videoSourceName)
     {
         string sourceName = string.IsNullOrWhiteSpace(videoSourceName)
             ? "default"
             : videoSourceName.Trim();
-        var normalized = new StringBuilder(sourceName.Length);
-        bool previousWasSeparator = false;
-
-        foreach (char character in sourceName)
-        {
-            char lower = char.ToLowerInvariant(character);
-            bool isAsciiLetter = lower >= 'a' && lower <= 'z';
-            bool isDigit = lower >= '0' && lower <= '9';
-            if (isAsciiLetter || isDigit)
-            {
-                normalized.Append(lower);
-                previousWasSeparator = false;
-            }
-            else if (!previousWasSeparator && normalized.Length > 0)
-            {
-                normalized.Append('_');
-                previousWasSeparator = true;
-            }
-        }
-
-        while (normalized.Length > 0 && normalized[normalized.Length - 1] == '_')
-        {
-            normalized.Length--;
-        }
-
-        return normalized.Length == 0 ? "default" : normalized.ToString();
+        return Convert.ToBase64String(Encoding.UTF8.GetBytes(sourceName))
+            .TrimEnd('=')
+            .Replace('+', '-')
+            .Replace('/', '_');
     }
 }
 

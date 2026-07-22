@@ -18,6 +18,7 @@ public class CameraSendInputDialog : MonoBehaviour
     private string videoSourceName;
     private Color defaultInputTextColor;
     private Color defaultRemindColor;
+    private string defaultRemindText;
 
     private void Awake()
     {
@@ -40,6 +41,7 @@ public class CameraSendInputDialog : MonoBehaviour
         if (Remind != null)
         {
             defaultRemindColor = Remind.color;
+            defaultRemindText = Remind.text;
         }
 
         CloseBtn.onClick.AddListener(OnCloseBtn);
@@ -53,6 +55,18 @@ public class CameraSendInputDialog : MonoBehaviour
         ConfirmBtn.onClick.RemoveListener(OnConfirmBtn);
         TmpInput.onValueChanged.RemoveListener(OnInputValueChanged);
         ClearCallbacks();
+    }
+
+    private void OnDisable()
+    {
+        if (OnCancelCall == null)
+        {
+            return;
+        }
+
+        Action cancelCall = OnCancelCall;
+        ClearCallbacks();
+        cancelCall.Invoke();
     }
 
     public void Show(Action<string> onConfirmCall)
@@ -138,7 +152,7 @@ public class CameraSendInputDialog : MonoBehaviour
         if (Remind != null)
         {
             Remind.color = defaultRemindColor;
-            Remind.text = string.Empty;
+            Remind.text = defaultRemindText;
         }
         if (TmpInput != null && TmpInput.textComponent != null)
         {
