@@ -41,6 +41,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private int streamingPort = 12345;
     private RemotePcmAudioPlayer remoteAudioPlayer;
     private PicoMicrophoneStreamer microphoneStreamer;
+    private RemoteVideoProjectionRenderer videoProjectionRenderer;
     private OperatorControlClient operatorControlClient;
     private Coroutine cameraRequestCoroutine;
     private Coroutine microphoneStartCoroutine;
@@ -92,6 +93,7 @@ public partial class UICameraCtrl : MonoBehaviour
         operatorControlClient.Disconnected += OnControlClientDisconnected;
         operatorControlClient.DataReceived += OnClientDataReceived;
         operatorControlClient.Error += OnControlClientError;
+        EnsureVideoProjectionRenderer();
     }
 
     private void OnServerReceived(byte[] data)
@@ -329,7 +331,9 @@ public partial class UICameraCtrl : MonoBehaviour
                 out int audioStreamPort,
                 out int microphoneUploadPort,
                 out string microphoneUploadToken,
-                out string audioRequestId))
+                out string audioRequestId,
+                out string videoProjection,
+                out string videoStereoLayout))
         {
             return;
         }
@@ -379,6 +383,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
         audioPortAckReceived = true;
         acceptAudioPortConfig = false;
+        ApplyVideoProjection(videoProjection, videoStereoLayout);
         LogWindow.Info(
             $"Audio ports negotiated: downlink={GetRemoteAudioPort()}, " +
             $"microphone_upload={GetMicrophoneUploadPort()}.");
@@ -394,12 +399,16 @@ public partial class UICameraCtrl : MonoBehaviour
         out int audioStreamPort,
         out int microphoneUploadPort,
         out string microphoneUploadToken,
-        out string audioRequestId)
+        out string audioRequestId,
+        out string videoProjection,
+        out string videoStereoLayout)
     {
         audioStreamPort = 0;
         microphoneUploadPort = 0;
         microphoneUploadToken = null;
         audioRequestId = null;
+        videoProjection = RemoteVideoProjectionRenderer.FlatProjection;
+        videoStereoLayout = RemoteVideoProjectionRenderer.MonoLayout;
         byte[] jsonPayload = null;
 
         if (NetworkDataProtocolSerializer.TryDeserialize(data, out NetworkDataProtocol protocol))
@@ -452,6 +461,17 @@ public partial class UICameraCtrl : MonoBehaviour
                 !MatchesOptionalString(json, "sample_format", "s16le"))
             {
                 return false;
+            }
+
+            if (json.ContainsKey("video_projection"))
+            {
+                videoProjection = RemoteVideoProjectionRenderer.NormalizeProjection(
+                    json["video_projection"].ToString());
+            }
+            if (json.ContainsKey("video_stereo_layout"))
+            {
+                videoStereoLayout = RemoteVideoProjectionRenderer.NormalizeStereoLayout(
+                    json["video_stereo_layout"].ToString());
             }
 
             if (!json.ContainsKey("audio_request_id"))
@@ -534,6 +554,37 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         return !json.ContainsKey(key) ||
                string.Equals(json[key].ToString(), expected, StringComparison.Ordinal);
+    }
+
+    private void EnsureVideoProjectionRenderer()
+    {
+        if (RemoteCameraWindowObj == null)
+        {
+            return;
+        }
+        if (videoProjectionRenderer == null)
+        {
+            videoProjectionRenderer =
+                RemoteCameraWindowObj.GetComponent<RemoteVideoProjectionRenderer>();
+            if (videoProjectionRenderer == null)
+            {
+                videoProjectionRenderer =
+                    RemoteCameraWindowObj.AddComponent<RemoteVideoProjectionRenderer>();
+            }
+        }
+        videoProjectionRenderer.SetLegacyStereoRenderer(setLere);
+    }
+
+    private void ApplyVideoProjection(string projection, string stereoLayout)
+    {
+        EnsureVideoProjectionRenderer();
+        if (videoProjectionRenderer == null)
+        {
+            return;
+        }
+        videoProjectionRenderer.Configure(projection, stereoLayout);
+        LogWindow.Info(
+            $"Remote video projection={projection}, stereo_layout={stereoLayout}.");
     }
 
     public void OnListenCameraBtn(bool on)
@@ -753,6 +804,9 @@ public partial class UICameraCtrl : MonoBehaviour
         microphonePermissionRequested = false;
         clientProtocolBuffer.Clear();
         currentAudioRequestId = Guid.NewGuid().ToString("N");
+        ApplyVideoProjection(
+            RemoteVideoProjectionRenderer.FlatProjection,
+            RemoteVideoProjectionRenderer.MonoLayout);
         return ++audioSessionId;
     }
 

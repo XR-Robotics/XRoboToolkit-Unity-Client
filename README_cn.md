@@ -36,7 +36,9 @@ Pico 麦克风在同一 Listen 生命周期内默认全双工上行。运行时�
   "microphone_upload_token": "<一次性会话令牌>",
   "sample_rate": 16000,
   "channels": 1,
-  "sample_format": "s16le"
+  "sample_format": "s16le",
+  "video_projection": "flat",
+  "video_stereo_layout": "mono"
 }
 ```
 
@@ -48,6 +50,25 @@ Remote Vision 控制连接使用 App 内的 `OperatorControlClient`，通过 rea
 
 麦克风上行默认全双工。调用 `UICameraCtrl.SetMicrophoneMuted(true)` 后，本地
 仍持续消费采集环，但不会发送静音 PCM 帧，避免 G1 侧播放/duck 状态被永久激活。
+
+## 平面与全景远端视频
+
+operator bridge 会在同一份协商配置里声明
+`video_projection=flat|equirectangular` 和
+`video_stereo_layout=mono|side_by_side|top_bottom`。字段缺失或值未知时会
+安全回退到 `flat/mono`，保留原有悬浮屏显示。`equirectangular` 会把收到的
+纹理交给 Unity `Skybox/Panoramic`，暂停旧的左右眼平面画布并隐藏平面
+`RawImage`；停止 Listen 后恢复进入全景前的 skybox、相机和 UI 状态。
+
+App 不负责把普通画面拼成全景。只有真实全景源才能声明
+`equirectangular`：单目通常为 2:1；左右双目为两个 2:1 画面，整体通常
+4:1；上下双目整体通常 1:1。当前 G1 普通相机必须保持 `flat`。这套显式协议
+同时为后续仿真直接输出全景纹理预留了统一入口。
+operator/G1 生产端还必须配置匹配的尺寸（例如单目 `1280x640`）；全景源或
+输出比例不匹配时会在 resize 前拒绝，不能把普通画面强拉伸后冒充全景。
+点击 Listen 前还需要选择匹配的内置 Remote Vision 源：
+`PANORAMA_MONO_1280x640`、`PANORAMA_SBS_2560x640` 或
+`PANORAMA_TOP_BOTTOM_1280x1280`。
 
 在 `g1_wuji_teleoperation` operator 仓库中启动：
 

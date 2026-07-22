@@ -19,6 +19,12 @@ public class SetLERE : MonoBehaviour
     private float visibleRatio = 0.555f;
     private float contentRatio = 1.8f;
     private float heightCompressionFactor = 1.333333f; // 4:3 aspect ratio
+    private bool projectionSuspended;
+    private bool canvasStateCaptured;
+    private bool canvLEWasActive;
+    private bool canvREWasActive;
+
+    public bool ProjectionSuspended => projectionSuspended;
 
     public void UpdateParameters(float visible, float content, float heightCompression)
     {
@@ -37,8 +43,63 @@ public class SetLERE : MonoBehaviour
         CanvRE.SetActive(false);
     }
 
+    public void SetProjectionSuspended(bool suspended)
+    {
+        if (suspended == projectionSuspended)
+        {
+            return;
+        }
+
+        if (suspended)
+        {
+            canvLEWasActive = CanvLE != null && CanvLE.activeSelf;
+            canvREWasActive = CanvRE != null && CanvRE.activeSelf;
+            canvasStateCaptured = true;
+            projectionSuspended = true;
+            if (CanvLE != null)
+            {
+                CanvLE.SetActive(false);
+            }
+            if (CanvRE != null)
+            {
+                CanvRE.SetActive(false);
+            }
+            return;
+        }
+
+        projectionSuspended = false;
+        if (canvasStateCaptured)
+        {
+            if (CanvLE != null)
+            {
+                CanvLE.SetActive(canvLEWasActive);
+            }
+            if (CanvRE != null)
+            {
+                CanvRE.SetActive(canvREWasActive);
+            }
+        }
+        canvasStateCaptured = false;
+    }
+
     void Update()
     {
+        if (projectionSuspended)
+        {
+            // Keep the legacy eye canvases off for the complete panoramic
+            // lifecycle. ResetCanvases() and another component may run in a
+            // different frame, so this invariant is enforced continuously.
+            if (CanvLE != null && CanvLE.activeSelf)
+            {
+                CanvLE.SetActive(false);
+            }
+            if (CanvRE != null && CanvRE.activeSelf)
+            {
+                CanvRE.SetActive(false);
+            }
+            return;
+        }
+
         if ((!CanvLE.activeSelf) || (!CanvRE.activeSelf))
         {
             CanvLE.SetActive(true);

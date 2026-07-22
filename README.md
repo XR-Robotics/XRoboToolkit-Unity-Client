@@ -134,7 +134,9 @@ The payload of the framed `AUDIO_CONFIG` command is:
   "microphone_upload_token": "<ephemeral-session-token>",
   "sample_rate": 16000,
   "channels": 1,
-  "sample_format": "s16le"
+  "sample_format": "s16le",
+  "video_projection": "flat",
+  "video_stereo_layout": "mono"
 }
 ```
 
@@ -150,6 +152,26 @@ partial-length-read and rapid-reconnect races.
 The microphone uplink is full-duplex by default. Calling
 `UICameraCtrl.SetMicrophoneMuted(true)` keeps local capture running but sends no
 PCM frames, so robot-side playback/ducking does not remain falsely active.
+
+### Flat and panoramic remote video
+
+The operator bridge can advertise `video_projection=flat|equirectangular` and
+`video_stereo_layout=mono|side_by_side|top_bottom` in the same negotiated
+configuration. Missing or unknown values fall back to `flat/mono`, preserving
+the existing floating-screen behavior. `equirectangular` binds the received
+texture to Unity's `Skybox/Panoramic`, suspends both legacy eye canvases, hides
+the flat `RawImage`, and restores the previous skybox/camera/UI state when
+Listen stops.
+
+The app does not stitch a panorama. Use `equirectangular` only when the source
+is a real panorama: 2:1 for mono, normally 4:1 overall for two side-by-side 2:1
+eyes, or normally 1:1 overall for two top-bottom 2:1 eyes. Current ordinary G1
+camera streams must stay `flat`; the explicit contract is also intended for a
+future simulation panorama producer. The operator/G1 producer configuration
+must use matching dimensions (for example `1280x640` for mono); panoramic
+source/output ratios are rejected before resize rather than stretched.
+Select the matching built-in Remote Vision source (`PANORAMA_MONO_1280x640`,
+`PANORAMA_SBS_2560x640`, or `PANORAMA_TOP_BOTTOM_1280x1280`) before Listen.
 
 Run this from the `g1_wuji_teleoperation` operator repository:
 

@@ -80,3 +80,99 @@
       type: "int"
       description: "Raw PCM audio stream port from the operator bridge"
       value: 13580
+
+- name: "PANORAMA_MONO_1280x640"
+  camera: "PANORAMA"
+  description: "Equirectangular mono panorama (operator metadata must match)"
+  properties:
+    - name: "visibleRatio"
+      type: "float"
+      value: 1.0
+    - name: "contentRatio"
+      type: "float"
+      value: 2.0
+    - name: "heightCompressionFactor"
+      type: "float"
+      value: 1.0
+    - name: "RawImageRectSize"
+      type: "string"
+      value: "600x300"
+    - name: "CamWidth"
+      type: "int"
+      value: 1280
+    - name: "CamHeight"
+      type: "int"
+      value: 640
+    - name: "CamFPS"
+      type: "int"
+      value: 30
+    - name: "CamBitrate"
+      type: "int"
+      value: 4000000
+    - name: "AudioStreamPort"
+      type: "int"
+      value: 13580
+
+- name: "PANORAMA_SBS_2560x640"
+  camera: "PANORAMA"
+  description: "Equirectangular side-by-side stereo panorama"
+  properties:
+    - name: "visibleRatio"
+      type: "float"
+      value: 1.0
+    - name: "contentRatio"
+      type: "float"
+      value: 4.0
+    - name: "heightCompressionFactor"
+      type: "float"
+      value: 1.0
+    - name: "RawImageRectSize"
+      type: "string"
+      value: "600x150"
+    - name: "CamWidth"
+      type: "int"
+      value: 2560
+    - name: "CamHeight"
+      type: "int"
+      value: 640
+    - name: "CamFPS"
+      type: "int"
+      value: 30
+    - name: "CamBitrate"
+      type: "int"
+      value: 6000000
+    - name: "AudioStreamPort"
+      type: "int"
+      value: 13580
+
+- name: "PANORAMA_TOP_BOTTOM_1280x1280"
+  camera: "PANORAMA"
+  description: "Equirectangular top-bottom stereo panorama"
+  properties:
+    - name: "visibleRatio"
+      type: "float"
+      value: 1.0
+    - name: "contentRatio"
+      type: "float"
+      value: 1.0
+    - name: "heightCompressionFactor"
+      type: "float"
+      value: 1.0
+    - name: "RawImageRectSize"
+      type: "string"
+      value: "600x600"
+    - name: "CamWidth"
+      type: "int"
+      value: 1280
+    - name: "CamHeight"
+      type: "int"
+      value: 1280
+    - name: "CamFPS"
+      type: "int"
+      value: 30
+    - name: "CamBitrate"
+      type: "int"
+      value: 6000000
+    - name: "AudioStreamPort"
+      type: "int"
+      value: 13580
