@@ -132,6 +132,34 @@ PICO Unity官方SDK，官方下载地址：https://developer.picoxr.com/zh/resou
 - macOS：在 Finder 中显示构建文件
 - 显示构建结果弹窗
 
+### 双向语音 Beta 测试包
+
+为了在不覆盖头显现有正式版 App 的情况下测试双向语音，可以构建并行安装的
+Beta 包。它使用包名 `com.xrobotoolkit.client.voicebeta`、ARM64 + IL2CPP、
+Android API 30/31 和 Unity 开发调试签名，不读取或修改正式版 keystore。
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -buildTarget Android \
+  -executeMethod VoiceDuplexBetaBuilder.BuildBatch \
+  -logFile /tmp/xrobotoolkit-voice-beta-unity.log
+```
+
+可选环境变量为 `XRBT_BETA_VERSION_NAME`、`XRBT_BETA_VERSION_CODE` 和
+`XRBT_BETA_APK_PATH`。默认输出为
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk`。
+
+Pico 开启开发者模式和 USB 调试后安装：
+
+```bash
+adb devices -l
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk
+adb shell monkey -p com.xrobotoolkit.client.voicebeta \
+  -c android.intent.category.LAUNCHER 1
+```
+
 ### 核心接口
 - 硬件交互层
   - PICO企业级接口调用（需设备权限）

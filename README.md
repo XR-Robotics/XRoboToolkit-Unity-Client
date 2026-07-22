@@ -262,6 +262,35 @@ ProjectRoot/
 - **Universal**:
   Displays build result dialog
 
+### Voice Duplex Beta Build
+
+For headset testing without replacing the currently installed release app, build the
+side-by-side beta package. It uses application id
+`com.xrobotoolkit.client.voicebeta`, ARM64 + IL2CPP, Android API 30/31, and Unity's
+development signing key. It does not use or modify the production keystore.
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -buildTarget Android \
+  -executeMethod VoiceDuplexBetaBuilder.BuildBatch \
+  -logFile /tmp/xrobotoolkit-voice-beta-unity.log
+```
+
+Optional environment variables are `XRBT_BETA_VERSION_NAME`,
+`XRBT_BETA_VERSION_CODE`, and `XRBT_BETA_APK_PATH`. The default output is
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk`.
+
+Install it after enabling PICO developer mode and USB debugging:
+
+```bash
+adb devices -l
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.1.apk
+adb shell monkey -p com.xrobotoolkit.client.voicebeta \
+  -c android.intent.category.LAUNCHER 1
+```
+
 ### Core Interfaces
 - **Hardware Interaction Layer**
   - PICO Enterprise API Calls (Requires Device Permissions)
