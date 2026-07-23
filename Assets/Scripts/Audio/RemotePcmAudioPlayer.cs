@@ -18,8 +18,9 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     private const int TargetBufferSamples = SampleRate * TargetBufferMs / 1000;
     private const int HardBufferSamples = SampleRate * HardBufferMs / 1000;
     private const int ConnectTimeoutMs = 2000;
-    private const int ReadTimeoutMs = 1000;
+    private const int ReadTimeoutMs = 5000;
     private const int ReconnectDelayMs = 1000;
+    private const int ReceiveBufferBytes = 64 * 1024;
 
     private readonly object _ringLock = new object();
     private readonly object _clientLock = new object();
@@ -135,6 +136,9 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             _audioSource.loop = true;
             _audioSource.spatialBlend = 0f;
             _audioSource.volume = 1f;
+            _audioSource.mute = false;
+            _audioSource.ignoreListenerPause = true;
+            _audioSource.ignoreListenerVolume = true;
         }
 
         if (_audioClip == null)
@@ -163,7 +167,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
                 tcp = ConnectWithTimeout(_host, _port, ConnectTimeoutMs);
                 tcp.NoDelay = true;
                 tcp.ReceiveTimeout = ReadTimeoutMs;
-                tcp.ReceiveBufferSize = 4096;
+                tcp.ReceiveBufferSize = ReceiveBufferBytes;
 
                 bool acceptedClient;
                 lock (_clientLock)
@@ -214,19 +218,38 @@ public class RemotePcmAudioPlayer : MonoBehaviour
                         break;
                     }
 
+                    bool firstPayload = Interlocked.Read(ref _receivedSamples) == 0;
                     QueuePcmBytes(readBuffer, bytesRead);
+                    if (firstPayload)
+                    {
+                        CrashProbe.Breadcrumb(
+                            "remote_audio.first_payload",
+                            $"bytes={bytesRead} buffered_samples={ReceivedSamples}");
+                    }
                 }
             }
             catch (SocketException e)
             {
+                CrashProbe.Breadcrumb(
+                    "remote_audio.reconnecting",
+                    $"socket={e.SocketErrorCode} received_samples={ReceivedSamples}",
+                    LogType.Warning);
                 SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
             }
             catch (IOException e)
             {
+                CrashProbe.Breadcrumb(
+                    "remote_audio.reconnecting",
+                    $"io={e.Message} received_samples={ReceivedSamples}",
+                    LogType.Warning);
                 SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
             }
             catch (TimeoutException e)
             {
+                CrashProbe.Breadcrumb(
+                    "remote_audio.reconnecting",
+                    $"timeout={e.Message} received_samples={ReceivedSamples}",
+                    LogType.Warning);
                 SetPendingStatusForRun(runId, $"Remote audio reconnecting: {e.Message}", true);
             }
             catch (ObjectDisposedException)

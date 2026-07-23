@@ -12,6 +12,11 @@ using UnityEngine.UI;
 
 public class UIOperate : MonoBehaviour
 {
+    private const string HeadTogglePreferenceKey = "UIOperate.HeadTracking";
+    private const string ControllerTogglePreferenceKey = "UIOperate.ControllerTracking";
+    private const string HandTrackingTogglePreferenceKey = "UIOperate.HandTracking";
+    private const string SendTogglePreferenceKey = "UIOperate.SendTrackingData";
+
     public Text SN;
     public Text LocalIP;
     public Text TargetIP;
@@ -50,6 +55,8 @@ public class UIOperate : MonoBehaviour
         }
 #endif
         // ReconnectBtn.gameObject.SetActive(false);
+
+        RestoreTrackingTogglePreferences();
 
         bodyModeDrop.onValueChanged.AddListener(OnBodyModeDrop);
         HeadTog.onValueChanged.AddListener(OnHeadTog);
@@ -325,26 +332,59 @@ public class UIOperate : MonoBehaviour
     private void OnHeadTog(bool on)
     {
         TrackingData.SetHeadOn(on);
+        SaveTogglePreference(HeadTogglePreferenceKey, on);
     }
 
     private void OnControllerTog(bool on)
     {
         TrackingData.SetControllerOn(on);
+        SaveTogglePreference(ControllerTogglePreferenceKey, on);
     }
 
     private void OnHandTrackingTog(bool on)
     {
         TrackingData.SetHandTrackingOn(on);
+        SaveTogglePreference(HandTrackingTogglePreferenceKey, on);
     }
 
     private void OnSendTog(bool on)
     {
         TcpHandler.SendTrackingData = on;
+        SaveTogglePreference(SendTogglePreferenceKey, on);
         // Reset FPS
         if (!on)
         {
             FPSDisplay.Reset();
         }
+    }
+
+    private void RestoreTrackingTogglePreferences()
+    {
+        bool headOn = LoadTogglePreference(HeadTogglePreferenceKey, HeadTog.isOn);
+        bool controllerOn = LoadTogglePreference(ControllerTogglePreferenceKey, ControllerTog.isOn);
+        bool handTrackingOn = LoadTogglePreference(HandTrackingTogglePreferenceKey, HandTrackingTog.isOn);
+        bool sendTrackingData = LoadTogglePreference(SendTogglePreferenceKey, SendTog.isOn);
+
+        HeadTog.SetIsOnWithoutNotify(headOn);
+        ControllerTog.SetIsOnWithoutNotify(controllerOn);
+        HandTrackingTog.SetIsOnWithoutNotify(handTrackingOn);
+        SendTog.SetIsOnWithoutNotify(sendTrackingData);
+
+        TrackingData.SetHeadOn(headOn);
+        TrackingData.SetControllerOn(controllerOn);
+        TrackingData.SetHandTrackingOn(handTrackingOn);
+        TcpHandler.SendTrackingData = sendTrackingData;
+    }
+
+    private static bool LoadTogglePreference(string key, bool fallback)
+    {
+        return PlayerPrefs.HasKey(key) ? PlayerPrefs.GetInt(key) != 0 : fallback;
+    }
+
+    private static void SaveTogglePreference(string key, bool on)
+    {
+        PlayerPrefs.SetInt(key, on ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     private void OnHighAccuracy(bool on)

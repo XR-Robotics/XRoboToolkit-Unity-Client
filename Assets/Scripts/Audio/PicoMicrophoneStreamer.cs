@@ -28,6 +28,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private const int SendBufferBytes = 4096;
     private const int HeartbeatIntervalMs = 1000;
     private const int MaxCaptureBacklogMs = 100;
+    private const float CaptureHealthIntervalSeconds = 5f;
     private const byte ProtocolVersion = 1;
     private const long UnixEpochTicks = 621355968000000000L;
     private static readonly byte[] AuthMagic = Encoding.ASCII.GetBytes("G1AT");
@@ -69,6 +70,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private long _capturedFrames;
     private long _sentFrames;
     private long _droppedFrames;
+    private float _nextCaptureHealthRealtime;
 
     private string _pendingStatusMessage;
     private bool _pendingStatusWarning;
@@ -172,6 +174,8 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             StopMicrophoneCapture();
             return false;
         }
+
+        _nextCaptureHealthRealtime = Time.realtimeSinceStartup + CaptureHealthIntervalSeconds;
 
         int runId = Interlocked.Increment(ref _runId);
         _stopRequested = false;
@@ -280,8 +284,11 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
 
         if (currentPosition < 0 || currentPosition == _capturePosition)
         {
+            EmitCaptureHealthIfDue(currentPosition);
             return;
         }
+
+        EmitCaptureHealthIfDue(currentPosition);
 
         int clipFrames = _microphoneClip.samples;
         if (clipFrames <= 0 || currentPosition >= clipFrames)
@@ -440,6 +447,38 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
 
         long sequence = Interlocked.Increment(ref _capturedFrames);
         EnqueueFrame(BuildAudioFrameRecord(pcmFrame, sequence, _outputFrameCaptureUnixNs));
+        if (sequence == 1)
+        {
+            CrashProbe.Breadcrumb(
+                "pico_microphone.first_frame",
+                $"capture_unix_ns={_outputFrameCaptureUnixNs}");
+        }
+    }
+
+    private void EmitCaptureHealthIfDue(int currentPosition)
+    {
+        float now = Time.realtimeSinceStartup;
+        if (now < _nextCaptureHealthRealtime)
+        {
+            return;
+        }
+
+        _nextCaptureHealthRealtime = now + CaptureHealthIntervalSeconds;
+        bool recording = false;
+        try
+        {
+            recording = Microphone.IsRecording(_microphoneDevice);
+        }
+        catch (Exception)
+        {
+            // The counters and position still provide useful diagnostics.
+        }
+
+        CrashProbe.Breadcrumb(
+            "pico_microphone.health",
+            $"recording={recording} position={currentPosition} " +
+            $"captured={CapturedFrames} sent={SentFrames} dropped={DroppedFrames} " +
+            $"connected={IsConnected}");
     }
 
     private void EnqueueFrame(byte[] frame)
