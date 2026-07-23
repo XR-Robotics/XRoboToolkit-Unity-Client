@@ -120,10 +120,7 @@ namespace Robot
                 Socket socket = (Socket)async.AsyncState;
                 if (socket.Connected)
                 {
-                    _reconnectEnable = true;
                     socket.EndConnect(async);
-                    _state = SocketState.WORKING;
-                    LogWindow.Info("TCP socket connection established successfully");
 
                     if (_sendThread.ThreadState == ThreadState.Unstarted)
                     {
@@ -131,15 +128,18 @@ namespace Robot
                     }
 
                     receiveBuffer = new ByteBuffer(BUFFER_LEN);
+                    _connectInited = false;
+                    _state = SocketState.WORKING;
+                    _reconnectEnable = true;
                     socket.BeginReceive(receiveBuffer.data, receiveBuffer.GetReadableCount(),
                         receiveBuffer.GetRemainCapacity(), SocketFlags.None, OnDataReceived,
                         socket);
-                    _connectInited = false;
                     if (!string.IsNullOrEmpty(_deviceSN))
                     {
                         ConnectInit();
                     }
 
+                    LogWindow.Info("TCP socket connection established successfully");
                     Debug.Log(Tag + "Socket Connected!  ");
                 }
                 else
@@ -152,10 +152,10 @@ namespace Robot
             }
             catch (Exception e)
             {
+                _state = SocketState.CONNECT_ERROR;
                 ConnectErrorInfo = e.ToString();
                 LogWindow.Error($"TCP connection exception: {e.Message}");
                 Debug.LogError(Tag + "Connect error,Exception " + e);
-                _state = SocketState.CONNECT_ERROR;
             }
         }
 

@@ -344,8 +344,11 @@ development signing key. It does not use or modify the production keystore.
 ```
 
 Optional environment variables are `XRBT_BETA_VERSION_NAME`,
-`XRBT_BETA_VERSION_CODE`, and `XRBT_BETA_APK_PATH`. The default output is
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk`, with versionCode `4`.
+`XRBT_BETA_VERSION_CODE`, `XRBT_BETA_APK_PATH`, and
+`XRBT_BETA_DEVELOPMENT_BUILD`. The beta is a release build by default; set
+`XRBT_BETA_DEVELOPMENT_BUILD=1` only when Unity development diagnostics are
+required. The default output is
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.4.apk`, with versionCode `5`.
 
 Run the address-store self-test before building:
 
@@ -361,7 +364,7 @@ Install it after enabling PICO developer mode and USB debugging:
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.4.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```

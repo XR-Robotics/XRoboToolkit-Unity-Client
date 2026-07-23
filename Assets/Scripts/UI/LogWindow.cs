@@ -1,21 +1,43 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
+using System.Text;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class LogWindow : MonoBehaviour
 {
+    private const int MaxMessagesPerFrame = 200;
+    private static readonly ConcurrentQueue<string> PendingMessages = new ConcurrentQueue<string>();
+
     public TextMeshProUGUI text;
 
     public ScrollRect scrollRect;
 
-    private static LogWindow _instance;
-
     public RectTransform rectTransform;
 
-    private void Awake()
+    private void Update()
     {
-        _instance = this;
+        if (text == null || PendingMessages.IsEmpty)
+        {
+            return;
+        }
+
+        var builder = new StringBuilder();
+        int count = 0;
+        while (count < MaxMessagesPerFrame && PendingMessages.TryDequeue(out string message))
+        {
+            builder.Append(message);
+            count++;
+        }
+
+        if (builder.Length == 0)
+        {
+            return;
+        }
+
+        text.text += builder.ToString();
+        StartCoroutine(AutoScrollCoroutine());
     }
 
     private IEnumerator AutoScrollCoroutine()
@@ -48,22 +70,15 @@ public class LogWindow : MonoBehaviour
 
     public void AppendText(string message)
     {
-        if (_instance != null)
-        {
-            // add time prefix of local timezone to the message
-            string timePrefix = $"[{System.DateTime.Now:HH:mm:ss}] ";
-            _instance.text.text += $"{timePrefix}{message}\n";
-
-            StartCoroutine(AutoScrollCoroutine());
-        }
+        Message(message);
     }
 
     private static void Message(string message)
     {
-        if (_instance != null)
-        {
-            _instance.AppendText(message);
-        }
+        // Network and audio callbacks may run outside Unity's main thread.
+        // Queue the already-formatted line and let Update() perform all UI work.
+        string timePrefix = $"[{System.DateTime.Now:HH:mm:ss}] ";
+        PendingMessages.Enqueue($"{timePrefix}{message}\n");
     }
 
     public static void Info(string info)

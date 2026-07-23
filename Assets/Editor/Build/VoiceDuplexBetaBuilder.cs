@@ -10,8 +10,8 @@ public static class VoiceDuplexBetaBuilder
 {
     private const string DefaultApplicationIdentifier = "com.xrobotoolkit.client.voicebeta";
     private const string DefaultProductName = "XRoboToolkit Voice Beta";
-    private const string DefaultVersionName = "1.1.2-beta.3";
-    private const int DefaultVersionCode = 4;
+    private const string DefaultVersionName = "1.1.2-beta.4";
+    private const int DefaultVersionCode = 5;
     private const int TargetSdkApiLevel = 31;
 
     [MenuItem("Build/Voice Duplex Beta APK")]
@@ -48,6 +48,10 @@ public static class VoiceDuplexBetaBuilder
         int versionCode = GetPositiveIntEnvironmentOrDefault(
             "XRBT_BETA_VERSION_CODE",
             DefaultVersionCode
+        );
+        bool developmentBuild = GetBooleanEnvironmentOrDefault(
+            "XRBT_BETA_DEVELOPMENT_BUILD",
+            false
         );
         string projectRoot = Directory.GetParent(Application.dataPath).FullName;
         string outputPath = GetOutputPath(versionName);
@@ -102,7 +106,7 @@ public static class VoiceDuplexBetaBuilder
                     scenes = scenes,
                     locationPathName = outputPath,
                     target = BuildTarget.Android,
-                    options = BuildOptions.Development,
+                    options = developmentBuild ? BuildOptions.Development : BuildOptions.None,
                 }
             );
 
@@ -113,7 +117,9 @@ public static class VoiceDuplexBetaBuilder
                 );
             }
 
-            Debug.Log($"VOICE_DUPLEX_BETA_APK={outputPath}");
+            Debug.Log(
+                $"VOICE_DUPLEX_BETA_APK={outputPath} development_build={developmentBuild}"
+            );
         }
         finally
         {
@@ -168,5 +174,32 @@ public static class VoiceDuplexBetaBuilder
         }
 
         return parsed;
+    }
+
+    private static bool GetBooleanEnvironmentOrDefault(string name, bool fallback)
+    {
+        string value = Environment.GetEnvironmentVariable(name);
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return fallback;
+        }
+
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "1":
+            case "true":
+            case "yes":
+            case "on":
+                return true;
+            case "0":
+            case "false":
+            case "no":
+            case "off":
+                return false;
+            default:
+                throw new BuildFailedException(
+                    $"{name} must be one of: 1, 0, true, false, yes, no, on, off."
+                );
+        }
     }
 }
