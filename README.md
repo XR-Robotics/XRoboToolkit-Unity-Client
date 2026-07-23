@@ -197,6 +197,31 @@ Run this from the `g1_wuji_teleoperation` operator repository:
 scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
 ```
 
+### Pico Crash Diagnostics
+
+The app writes local crash breadcrumbs under
+`Application.persistentDataPath/g1_wuji_crash_probe/`:
+
+- `breadcrumbs.jsonl`: startup, lifecycle, Listen, `AUDIO_CONFIG`, duplex audio,
+  panorama, warnings, errors, and exceptions.
+- `active_session.json`: the current session sentinel. A clean
+  `OnApplicationQuit` marks `clean_exit=true`; the next launch detects a missing
+  clean exit and writes `last_exit.json`.
+- `last_exit.json`: previous unclean exit marker.
+
+Export a Pico debugging bundle from the workstation:
+
+```bash
+scripts/pico/export_crash_probe.sh /tmp/pico-crash-$(date +%Y%m%d-%H%M%S)
+```
+
+The script captures the app probe files, `adb logcat -d`, device metadata, and
+any accessible tombstone/ANR/Dropbox clues. Non-root Pico firmware usually
+blocks direct `/data/tombstones` and `/data/anr` reads, so use
+`breadcrumbs.jsonl`, `last_exit.json`, and `logcat_threadtime.txt` as the first
+debugging surface. The script auto-detects an installed beta package first; set
+`PICO_APP_PACKAGE=...` to override the package id explicitly.
+
 
 ## Directory Structure
 
@@ -320,7 +345,7 @@ development signing key. It does not use or modify the production keystore.
 
 Optional environment variables are `XRBT_BETA_VERSION_NAME`,
 `XRBT_BETA_VERSION_CODE`, and `XRBT_BETA_APK_PATH`. The default output is
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk`, with versionCode `3`.
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk`, with versionCode `4`.
 
 Run the address-store self-test before building:
 
@@ -336,7 +361,7 @@ Install it after enabling PICO developer mode and USB debugging:
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```

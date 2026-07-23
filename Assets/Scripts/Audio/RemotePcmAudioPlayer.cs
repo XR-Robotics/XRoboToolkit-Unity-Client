@@ -58,6 +58,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(host))
         {
+            CrashProbe.Breadcrumb("remote_audio.start_skipped", "empty host", LogType.Warning);
             LogWindow.Warn("Remote audio skipped: empty host.");
             return;
         }
@@ -83,6 +84,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         _receiveThread.Start();
 
         LogWindow.Info($"Remote audio connecting to {_host}:{_port} (s16le {SampleRate}Hz mono).");
+        CrashProbe.Breadcrumb("remote_audio.connecting", $"{_host}:{_port}");
     }
 
     public void StopAudio()
@@ -115,6 +117,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         if (log && wasRunning)
         {
             LogWindow.Info("Remote audio stopped.");
+            CrashProbe.Breadcrumb("remote_audio.stopped");
         }
     }
 
@@ -193,6 +196,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
                     }
                     if (markedConnected)
                     {
+                        CrashProbe.Breadcrumb("remote_audio.connected", $"{_host}:{_port}");
                         SetPendingStatus($"Remote audio connected: {_host}:{_port}", false);
                     }
                 }
@@ -234,6 +238,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             }
             catch (Exception e)
             {
+                CrashProbe.Exception("remote_audio.receive_loop_exception", e);
                 SetPendingStatusForRun(runId, $"Remote audio error: {e.Message}", true);
             }
             finally

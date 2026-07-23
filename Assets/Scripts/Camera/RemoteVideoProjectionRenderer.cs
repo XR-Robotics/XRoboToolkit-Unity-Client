@@ -56,6 +56,9 @@ public sealed class RemoteVideoProjectionRenderer : MonoBehaviour
     {
         projection = NormalizeProjection(requestedProjection);
         stereoLayout = NormalizeStereoLayout(requestedStereoLayout);
+        CrashProbe.Breadcrumb(
+            "projection_renderer.configure",
+            $"projection={projection} layout={stereoLayout}");
         ResolveComponents();
 
         if (projection == EquirectangularProjection)
@@ -128,6 +131,10 @@ public sealed class RemoteVideoProjectionRenderer : MonoBehaviour
         Shader shader = Shader.Find("Skybox/Panoramic");
         if (shader == null)
         {
+            CrashProbe.Breadcrumb(
+                "projection_renderer.panorama_shader_missing",
+                "Skybox/Panoramic",
+                LogType.Error);
             Debug.LogError("Skybox/Panoramic shader is unavailable; keeping flat remote video.");
             projection = FlatProjection;
             RestoreFlatScreen();
@@ -176,6 +183,7 @@ public sealed class RemoteVideoProjectionRenderer : MonoBehaviour
         {
             ApplyTexture(texture);
         }
+        CrashProbe.Breadcrumb("projection_renderer.panorama_applied", stereoLayout);
         Debug.Log($"Remote video projection=equirectangular layout={stereoLayout}");
     }
 
@@ -200,6 +208,10 @@ public sealed class RemoteVideoProjectionRenderer : MonoBehaviour
         float actual = (float)texture.width / texture.height;
         if (Mathf.Abs(actual - expected) > 0.08f)
         {
+            CrashProbe.Breadcrumb(
+                "projection_renderer.unexpected_aspect",
+                $"actual={actual:F2} expected={expected:F2} layout={stereoLayout}",
+                LogType.Warning);
             Debug.LogWarning(
                 $"Equirectangular texture aspect is {actual:F2}; expected {expected:F2} " +
                 $"for layout={stereoLayout}. Source metadata/resolution may be wrong.");
@@ -221,6 +233,10 @@ public sealed class RemoteVideoProjectionRenderer : MonoBehaviour
 
     public void RestoreFlatScreen()
     {
+        if (panoramaApplied)
+        {
+            CrashProbe.Breadcrumb("projection_renderer.restore_flat");
+        }
         // A disabled remote window can later be re-used by the legacy PC-camera
         // path, which does not negotiate projection metadata. Clear the desired
         // mode here so re-enabling that window cannot resurrect a stale panorama.

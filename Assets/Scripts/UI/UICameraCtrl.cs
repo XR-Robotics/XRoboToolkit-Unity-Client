@@ -79,6 +79,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void Awake()
     {
+        CrashProbe.Breadcrumb("camera_ctrl.awake");
         RecordBtn.OnChange += OnRecordBtn;
         TcpHandler.ReceiveFunctionEvent += OnNetReceive;
         CameraHandle.AddStateListener(OnCameraStateChanged);
@@ -168,6 +169,7 @@ public partial class UICameraCtrl : MonoBehaviour
             }
             controlClientConnected = true;
             controlReconnectSuppressed = false;
+            CrashProbe.Breadcrumb("operator_control.connected");
         });
     }
 
@@ -188,7 +190,10 @@ public partial class UICameraCtrl : MonoBehaviour
     private void OnControlClientError(string message)
     {
         EventExecutor.ExecuteInUpdate(() =>
-            LogWindow.Warn($"Operator control client error: {message}"));
+        {
+            CrashProbe.Breadcrumb("operator_control.error", message, LogType.Warning);
+            LogWindow.Warn($"Operator control client error: {message}");
+        });
     }
 
     private void HandleControlConnectionLost(string reason)
@@ -204,6 +209,7 @@ public partial class UICameraCtrl : MonoBehaviour
         }
 
         LogWindow.Warn($"Operator control connection lost ({reason}); renegotiating session.");
+        CrashProbe.Breadcrumb("operator_control.lost", reason, LogType.Warning);
         StopCameraRequestCoroutine();
         StopDuplexAudio(false);
         cameraRequestCoroutine = StartCoroutine(
@@ -335,11 +341,13 @@ public partial class UICameraCtrl : MonoBehaviour
                 out string videoProjection,
                 out string videoStereoLayout))
         {
+            CrashProbe.Breadcrumb("audio_config.invalid", $"bytes={data?.Length ?? 0}", LogType.Warning);
             return;
         }
 
         if (!string.Equals(audioRequestId, currentAudioRequestId, StringComparison.Ordinal))
         {
+            CrashProbe.Breadcrumb("audio_config.stale", audioRequestId, LogType.Warning);
             LogWindow.Warn("Ignoring stale AUDIO_CONFIG from an older control request.");
             return;
         }
@@ -384,6 +392,9 @@ public partial class UICameraCtrl : MonoBehaviour
         audioPortAckReceived = true;
         acceptAudioPortConfig = false;
         ApplyVideoProjection(videoProjection, videoStereoLayout);
+        CrashProbe.Breadcrumb(
+            "audio_config.applied",
+            $"downlink={GetRemoteAudioPort()} mic={GetMicrophoneUploadPort()} projection={videoProjection} layout={videoStereoLayout}");
         LogWindow.Info(
             $"Audio ports negotiated: downlink={GetRemoteAudioPort()}, " +
             $"microphone_upload={GetMicrophoneUploadPort()}.");
@@ -583,6 +594,9 @@ public partial class UICameraCtrl : MonoBehaviour
             return;
         }
         videoProjectionRenderer.Configure(projection, stereoLayout);
+        CrashProbe.Breadcrumb(
+            "video_projection.apply",
+            $"projection={projection} layout={stereoLayout}");
         LogWindow.Info(
             $"Remote video projection={projection}, stereo_layout={stereoLayout}.");
     }
@@ -596,6 +610,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
             // get the camera source from the dropdown
             var cameraSource = cameraDropdown.options[cameraDropdown.value].text;
+            CrashProbe.Breadcrumb("listen.on", cameraSource);
 
             // Update camera source, including shaders, etc.
             videoSourceManager.UpdateVideoSource(cameraSource);
@@ -609,6 +624,7 @@ public partial class UICameraCtrl : MonoBehaviour
         }
         else
         {
+            CrashProbe.Breadcrumb("listen.off");
             controlReconnectSuppressed = true;
             if (controlClientConnected && operatorControlClient != null)
             {
@@ -632,10 +648,12 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         if (listenBtn == null || !listenBtn.On || string.IsNullOrWhiteSpace(ip))
         {
+            CrashProbe.Breadcrumb("camera_request.ignored", ip, LogType.Warning);
             LogWindow.Warn("Camera/audio request ignored because Listen is off or the operator IP is empty.");
             return;
         }
 
+        CrashProbe.Breadcrumb("camera_request.start", ip);
         StopCameraRequestCoroutine();
         cameraRequestCoroutine = StartCoroutine(RequestCameraStreamCoroutine(ip));
     }
@@ -808,6 +826,9 @@ public partial class UICameraCtrl : MonoBehaviour
         microphonePermissionRequested = false;
         clientProtocolBuffer.Clear();
         currentAudioRequestId = Guid.NewGuid().ToString("N");
+        CrashProbe.Breadcrumb(
+            "audio_session.begin",
+            $"host={activeAudioHost} request_id={currentAudioRequestId}");
         ApplyVideoProjection(
             RemoteVideoProjectionRenderer.FlatProjection,
             RemoteVideoProjectionRenderer.MonoLayout);
@@ -829,10 +850,12 @@ public partial class UICameraCtrl : MonoBehaviour
         int remoteAudioPort = GetRemoteAudioPort();
         if (remoteAudioPort > 0)
         {
+            CrashProbe.Breadcrumb("audio_downlink.start", $"{activeAudioHost}:{remoteAudioPort}");
             remoteAudioPlayer.StartAudio(activeAudioHost, remoteAudioPort);
         }
         else
         {
+            CrashProbe.Breadcrumb("audio_downlink.disabled");
             remoteAudioPlayer.StopAudio();
         }
 
@@ -850,6 +873,7 @@ public partial class UICameraCtrl : MonoBehaviour
             }
             LogWindow.Warn(
                 "Secure Pico microphone session was not negotiated; uplink remains disabled.");
+            CrashProbe.Breadcrumb("microphone_uplink.not_negotiated", "", LogType.Warning);
             duplexAudioStarted = true;
             return;
         }
@@ -865,6 +889,7 @@ public partial class UICameraCtrl : MonoBehaviour
                 GetMicrophoneUploadPort(),
                 negotiatedMicrophoneUploadToken,
                 sessionId));
+        CrashProbe.Breadcrumb("microphone_uplink.authorizing", $"{activeAudioHost}:{GetMicrophoneUploadPort()}");
         duplexAudioStarted = true;
     }
 
@@ -906,6 +931,7 @@ public partial class UICameraCtrl : MonoBehaviour
         if (!PicoMicrophoneStreamer.HasRecordPermission())
         {
             LogWindow.Warn("Pico microphone upload not started: RECORD_AUDIO permission was denied or timed out.");
+            CrashProbe.Breadcrumb("microphone_uplink.permission_denied", "", LogType.Warning);
             Toast.Show("Microphone permission denied; voice upload is disabled.");
             microphoneStartCoroutine = null;
             yield break;
@@ -913,11 +939,15 @@ public partial class UICameraCtrl : MonoBehaviour
 
         microphoneStreamer.SetMuted(microphoneMuted);
         microphoneStreamer.StartStreaming(host, port, sessionToken);
+        CrashProbe.Breadcrumb("microphone_uplink.start", $"{host}:{port}");
         microphoneStartCoroutine = null;
     }
 
     private void StopDuplexAudio(bool clearHost = true)
     {
+        CrashProbe.Breadcrumb(
+            "duplex_audio.stop",
+            $"clear_host={clearHost} had_host={!string.IsNullOrEmpty(activeAudioHost)}");
         audioSessionId++;
         duplexAudioStarted = false;
 
@@ -1205,6 +1235,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnApplicationPause(bool pauseStatus)
     {
+        CrashProbe.Breadcrumb("camera_ctrl.pause", pauseStatus.ToString());
         if (pauseStatus)
         {
             resumeDuplexAudioAfterPause = listenBtn != null &&
@@ -1252,6 +1283,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnDisable()
     {
+        CrashProbe.Breadcrumb("camera_ctrl.disable");
         resumeDuplexAudioAfterPause = resumeDuplexAudioAfterPause ||
                                       (listenBtn != null &&
                                        listenBtn.On &&
@@ -1268,6 +1300,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void OnEnable()
     {
+        CrashProbe.Breadcrumb("camera_ctrl.enable");
         if (resumeDuplexAudioAfterPause &&
             listenBtn != null &&
             listenBtn.On &&

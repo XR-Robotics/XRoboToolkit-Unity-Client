@@ -103,6 +103,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     {
         if (string.IsNullOrWhiteSpace(host))
         {
+            CrashProbe.Breadcrumb("pico_microphone.start_skipped", "empty host", LogType.Warning);
             LogWindow.Warn("Pico microphone upload skipped: empty host.");
             return false;
         }
@@ -111,12 +112,14 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             Encoding.ASCII.GetByteCount(sessionToken) < 16 ||
             Encoding.ASCII.GetByteCount(sessionToken) > 256)
         {
+            CrashProbe.Breadcrumb("pico_microphone.start_skipped", "invalid token", LogType.Warning);
             LogWindow.Warn("Pico microphone upload skipped: secure session token is missing or invalid.");
             return false;
         }
 
         if (!HasRecordPermission())
         {
+            CrashProbe.Breadcrumb("pico_microphone.start_skipped", "record permission missing", LogType.Warning);
             LogWindow.Warn("Pico microphone upload skipped: RECORD_AUDIO permission is not granted.");
             return false;
         }
@@ -141,12 +144,14 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         }
         catch (Exception e)
         {
+            CrashProbe.Exception("pico_microphone.microphone_start_exception", e);
             LogWindow.Warn($"Pico microphone could not start: {e.Message}");
             _microphoneClip = null;
         }
 
         if (_microphoneClip == null)
         {
+            CrashProbe.Breadcrumb("pico_microphone.no_capture_device", "", LogType.Warning);
             LogWindow.Warn("Pico microphone upload skipped: no microphone capture device is available.");
             return false;
         }
@@ -162,6 +167,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         }
         catch (Exception e)
         {
+            CrashProbe.Exception("pico_microphone.position_query_exception", e);
             LogWindow.Warn($"Pico microphone position query failed: {e.Message}");
             StopMicrophoneCapture();
             return false;
@@ -180,6 +186,9 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             $"Pico microphone streaming to {_host}:{_port} " +
             $"(source {_sourceSampleRate}Hz/{_sourceChannels}ch -> s16le {OutputSampleRate}Hz mono, " +
             $"{FrameDurationMs}ms frames).");
+        CrashProbe.Breadcrumb(
+            "pico_microphone.streaming",
+            $"{_host}:{_port} source={_sourceSampleRate}Hz/{_sourceChannels}ch");
         return true;
     }
 
@@ -229,6 +238,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         if (log && wasRunning)
         {
             LogWindow.Info("Pico microphone upload stopped.");
+            CrashProbe.Breadcrumb("pico_microphone.stopped");
         }
     }
 
@@ -263,6 +273,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         }
         catch (Exception e)
         {
+            CrashProbe.Exception("pico_microphone.read_position_exception", e);
             SetPendingStatus($"Pico microphone read error: {e.Message}", true);
             return;
         }
@@ -299,6 +310,10 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             SetPendingStatus(
                 $"Pico microphone capture backlog dropped: {skippedFrames} source frames.",
                 true);
+            CrashProbe.Breadcrumb(
+                "pico_microphone.capture_backlog_dropped",
+                $"source_frames={skippedFrames}",
+                LogType.Warning);
         }
 
         long readUnixNs = GetUnixTimeNs();
@@ -335,6 +350,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         float[] interleaved = new float[frameCount * _sourceChannels];
         if (!_microphoneClip.GetData(interleaved, offsetFrames))
         {
+            CrashProbe.Breadcrumb("pico_microphone.get_data_failed", "", LogType.Warning);
             SetPendingStatus("Pico microphone AudioClip.GetData failed; dropping the unread capture segment.", true);
             return false;
         }

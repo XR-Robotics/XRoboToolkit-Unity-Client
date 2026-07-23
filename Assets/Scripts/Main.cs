@@ -8,6 +8,8 @@ public class Main : MonoBehaviour
 {
     private void Awake()
     {
+        CrashProbe.Initialize();
+        CrashProbe.Breadcrumb("main.awake");
         DebugManager.instance.enableRuntimeUI = false;
         Application.logMessageReceived += OnLogMessageReceived;
         XRSettings.eyeTextureResolutionScale = 1.5f;
@@ -19,14 +21,20 @@ public class Main : MonoBehaviour
     private void OnLogMessageReceived(string condition, string stackTrace, LogType type)
     {
         LogView.Push(condition, stackTrace, type);
-        if (type == LogType.Error)
+        if (type == LogType.Error || type == LogType.Exception)
         {
             Toast.Show(condition);
         }
     }
 
+    private void Update()
+    {
+        CrashProbe.Tick();
+    }
+
     private void OnEnable()
     {
+        CrashProbe.Lifecycle("enable");
         if (Application.platform == RuntimePlatform.Android)
         {
             Debug.Log("OnEnable");
@@ -36,6 +44,7 @@ public class Main : MonoBehaviour
 
     private void OnDisable()
     {
+        CrashProbe.Lifecycle("disable");
         if (Application.platform == RuntimePlatform.Android)
         {
             Debug.Log("OnDisable");
@@ -45,6 +54,7 @@ public class Main : MonoBehaviour
 
     private void OnApplicationPause(bool pauseStatus)
     {
+        CrashProbe.Lifecycle(pauseStatus ? "pause" : "resume");
         Debug.Log("OnApplicationPause " + pauseStatus);
         if (pauseStatus)
         {
@@ -62,5 +72,10 @@ public class Main : MonoBehaviour
 
             Debug.Log("openVstRes:" + openVstRes);
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        CrashProbe.MarkCleanExit("Main.OnApplicationQuit");
     }
 }

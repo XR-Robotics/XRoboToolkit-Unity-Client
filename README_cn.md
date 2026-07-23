@@ -89,6 +89,30 @@ operator/G1 生产端还必须配置匹配的尺寸（例如单目 `1280x640`）
 scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
 ```
 
+## Pico 闪退诊断
+
+App 启动时会在 `Application.persistentDataPath/g1_wuji_crash_probe/`
+写入本地诊断文件：
+
+- `breadcrumbs.jsonl`：关键阶段 JSONL，包含启动、生命周期、Listen、
+  `AUDIO_CONFIG`、音频上下行、全景渲染、warning/error/exception。
+- `active_session.json`：当前 session sentinel。正常 `OnApplicationQuit`
+  会标记 `clean_exit=true`；如果下次启动发现上一轮没有 clean exit，会写
+  `last_exit.json` 并在日志里提示。
+- `last_exit.json`：上一轮异常退出或系统杀进程的检测结果。
+
+从电脑导出 Pico 现场：
+
+```bash
+scripts/pico/export_crash_probe.sh /tmp/pico-crash-$(date +%Y%m%d-%H%M%S)
+```
+
+脚本会导出 App probe 文件、`adb logcat -d`、设备信息，以及可访问的
+tombstone/ANR/Dropbox 线索。非 root Pico 固件通常不能直接读取
+`/data/tombstones` 或 `/data/anr`，这种情况下以 `breadcrumbs.jsonl`、
+`last_exit.json` 和 `logcat_threadtime.txt` 作为第一调试面。脚本会优先自动
+识别已安装的 beta 包；也可以用 `PICO_APP_PACKAGE=...` 显式指定包名。
+
 ## 目录结构
 
 ### Assets
@@ -183,8 +207,8 @@ Android API 30/31 和 Unity 开发调试签名，不读取或修改正式版 key
 
 可选环境变量为 `XRBT_BETA_VERSION_NAME`、`XRBT_BETA_VERSION_CODE` 和
 `XRBT_BETA_APK_PATH`。默认输出为
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk`，默认
-versionCode 为 `3`。
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk`，默认
+versionCode 为 `4`。
 
 构建前可先执行地址存储自检：
 
@@ -200,7 +224,7 @@ Pico 开启开发者模式和 USB 调试后安装：
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.2.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.3.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```
