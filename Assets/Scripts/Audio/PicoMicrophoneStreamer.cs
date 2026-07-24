@@ -23,9 +23,9 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private const int BytesPerFrame = SamplesPerFrame * sizeof(short);
     private const int MaxQueuedFrames = 5;
     private const int ConnectTimeoutMs = 2000;
-    private const int SendTimeoutMs = 250;
+    private const int SendTimeoutMs = 1000;
     private const int ReconnectDelayMs = 1000;
-    private const int SendBufferBytes = 4096;
+    private const int SendBufferBytes = 64 * 1024;
     private const int HeartbeatIntervalMs = 1000;
     private const int MaxCaptureBacklogMs = 100;
     private const float CaptureHealthIntervalSeconds = 5f;
@@ -70,6 +70,9 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private long _capturedFrames;
     private long _sentFrames;
     private long _droppedFrames;
+    private long _sendFailures;
+    private long _lastWriteMs;
+    private long _maxWriteMs;
     private float _nextCaptureHealthRealtime;
 
     private string _pendingStatusMessage;
@@ -478,7 +481,10 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             "pico_microphone.health",
             $"recording={recording} position={currentPosition} " +
             $"captured={CapturedFrames} sent={SentFrames} dropped={DroppedFrames} " +
-            $"connected={IsConnected}");
+            $"connected={IsConnected} queued={QueuedFrames()} " +
+            $"send_failures={Interlocked.Read(ref _sendFailures)} " +
+            $"write_ms={Interlocked.Read(ref _lastWriteMs)} " +
+            $"max_write_ms={Interlocked.Read(ref _maxWriteMs)}");
     }
 
     private void EnqueueFrame(byte[] frame)
@@ -507,8 +513,24 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
                 return false;
             }
 
+            // TCP can recover after a short Wi-Fi stall with several captured
+            // frames waiting in user space.  Speech is real-time media, so keep
+            // only the newest complete record instead of replaying stale audio.
+            while (_sendQueue.Count > 1)
+            {
+                _sendQueue.Dequeue();
+                Interlocked.Increment(ref _droppedFrames);
+            }
             frame = _sendQueue.Dequeue();
             return true;
+        }
+    }
+
+    private int QueuedFrames()
+    {
+        lock (_queueLock)
+        {
+            return _sendQueue.Count;
         }
     }
 
@@ -593,21 +615,38 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
                         continue;
                     }
 
+                    long writeStartedTicks = DateTime.UtcNow.Ticks;
                     stream.Write(frame, 0, frame.Length);
+                    long writeMs = Math.Max(
+                        0L,
+                        (DateTime.UtcNow.Ticks - writeStartedTicks) /
+                        TimeSpan.TicksPerMillisecond);
+                    Interlocked.Exchange(ref _lastWriteMs, writeMs);
+                    UpdateMaximum(ref _maxWriteMs, writeMs);
+                    if (writeMs >= 100)
+                    {
+                        CrashProbe.Breadcrumb(
+                            "pico_microphone.slow_write",
+                            $"write_ms={writeMs} queued={QueuedFrames()}",
+                            LogType.Warning);
+                    }
                     lastWriteTicks = DateTime.UtcNow.Ticks;
                     Interlocked.Increment(ref _sentFrames);
                 }
             }
             catch (SocketException e)
             {
+                RecordSendFailure("socket", e.Message);
                 SetPendingStatusForRun(runId, $"Pico microphone reconnecting: {e.Message}", true);
             }
             catch (IOException e)
             {
+                RecordSendFailure("io", e.Message);
                 SetPendingStatusForRun(runId, $"Pico microphone reconnecting: {e.Message}", true);
             }
             catch (TimeoutException e)
             {
+                RecordSendFailure("timeout", e.Message);
                 SetPendingStatusForRun(runId, $"Pico microphone reconnecting: {e.Message}", true);
             }
             catch (ObjectDisposedException)
@@ -619,6 +658,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             }
             catch (Exception e)
             {
+                RecordSendFailure("unexpected", e.Message);
                 SetPendingStatusForRun(runId, $"Pico microphone error: {e.Message}", true);
             }
             finally
@@ -676,6 +716,29 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         finally
         {
             result.AsyncWaitHandle.Close();
+        }
+    }
+
+    private void RecordSendFailure(string kind, string message)
+    {
+        long failures = Interlocked.Increment(ref _sendFailures);
+        CrashProbe.Breadcrumb(
+            "pico_microphone.send_failure",
+            $"kind={kind} count={failures} message={message}",
+            LogType.Warning);
+    }
+
+    private static void UpdateMaximum(ref long target, long value)
+    {
+        long current = Interlocked.Read(ref target);
+        while (value > current)
+        {
+            long observed = Interlocked.CompareExchange(ref target, value, current);
+            if (observed == current)
+            {
+                return;
+            }
+            current = observed;
         }
     }
 
@@ -791,6 +854,9 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         Interlocked.Exchange(ref _capturedFrames, 0);
         Interlocked.Exchange(ref _sentFrames, 0);
         Interlocked.Exchange(ref _droppedFrames, 0);
+        Interlocked.Exchange(ref _sendFailures, 0);
+        Interlocked.Exchange(ref _lastWriteMs, 0);
+        Interlocked.Exchange(ref _maxWriteMs, 0);
     }
 
     private void ResetResampler()

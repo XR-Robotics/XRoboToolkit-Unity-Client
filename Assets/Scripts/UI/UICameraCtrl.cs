@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading;
 using LitJson;
 using Network;
 using Robot;
@@ -60,12 +61,15 @@ public partial class UICameraCtrl : MonoBehaviour
     private bool resumeDuplexAudioAfterPause;
     private bool controlClientConnected;
     private bool controlReconnectSuppressed;
+    private float nextControlWatchdogRealtime;
+    private long controlPingCount;
     private readonly List<byte> clientProtocolBuffer = new List<byte>();
 
     private const float AudioPortAckTimeoutSeconds = 1.5f;
     private const float MicrophonePermissionTimeoutSeconds = 10f;
     private const float ControlConnectTimeoutSeconds = 3f;
     private const float ControlReconnectDelaySeconds = 1f;
+    private const float ControlWatchdogIntervalSeconds = 1f;
     private const string AudioPortConfigSchema = "g1_wuji_audio_ports_v2";
     private const string MicrophoneUploadProtocol = "g1_wuji_audio_uplink_v1";
     private const int MaxControlCommandBytes = 1024;
@@ -230,6 +234,27 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         if (data == null || data.Length == 0)
         {
+            return;
+        }
+
+        // PING is a transport heartbeat, not a UI event.  Reply on the receive
+        // thread so a busy Unity frame cannot revoke video and both audio
+        // directions merely because the main-thread event queue was delayed.
+        if (NetworkDataProtocolSerializer.TryDeserialize(
+                data,
+                out NetworkDataProtocol protocol) &&
+            string.Equals(protocol.command, NetworkCommand.PING, StringComparison.Ordinal))
+        {
+            bool sent = operatorControlClient != null &&
+                        operatorControlClient.SendCommand(NetworkCommand.PONG, protocol.data);
+            long count = Interlocked.Increment(ref controlPingCount);
+            if (count == 1 || count % 10 == 0 || !sent)
+            {
+                CrashProbe.Breadcrumb(
+                    sent ? "operator_control.pong" : "operator_control.pong_failed",
+                    $"count={count}",
+                    sent ? LogType.Log : LogType.Warning);
+            }
             return;
         }
 
@@ -1223,6 +1248,7 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void Update()
     {
+        RunControlConnectionWatchdog();
         if (_recordTrackingData)
         {
             if (_writer != null)
@@ -1231,6 +1257,34 @@ public partial class UICameraCtrl : MonoBehaviour
                 _writer.WriteLine(_trackingJsonData.ToJson());
             }
         }
+    }
+
+    private void RunControlConnectionWatchdog()
+    {
+        float now = Time.realtimeSinceStartup;
+        if (now < nextControlWatchdogRealtime)
+        {
+            return;
+        }
+        nextControlWatchdogRealtime = now + ControlWatchdogIntervalSeconds;
+
+        if (controlReconnectSuppressed ||
+            cameraRequestCoroutine != null ||
+            listenBtn == null ||
+            !listenBtn.On ||
+            string.IsNullOrEmpty(activeAudioHost) ||
+            operatorControlClient == null ||
+            operatorControlClient.IsConnected)
+        {
+            return;
+        }
+
+        CrashProbe.Breadcrumb(
+            "operator_control.watchdog_reconnect",
+            activeAudioHost,
+            LogType.Warning);
+        LogWindow.Warn("Operator control watchdog detected a lost session; renegotiating.");
+        RequestCameraStream(activeAudioHost);
     }
 
     private void OnApplicationPause(bool pauseStatus)

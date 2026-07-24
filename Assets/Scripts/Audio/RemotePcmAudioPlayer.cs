@@ -21,10 +21,14 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     private const int ReadTimeoutMs = 5000;
     private const int ReconnectDelayMs = 1000;
     private const int ReceiveBufferBytes = 64 * 1024;
+    private const float DefaultDigitalGain = 6f;
+    private const float PlaybackHealthIntervalSeconds = 5f;
+    private const float NonZeroThreshold = 1f / 32768f;
 
     private readonly object _ringLock = new object();
     private readonly object _clientLock = new object();
     private readonly object _statusLock = new object();
+    private readonly object _healthLock = new object();
 
     private float[] _ringBuffer = new float[HardBufferSamples];
     private int _readIndex;
@@ -46,6 +50,14 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     private long _receivedSamples;
     private long _droppedSamples;
     private long _underrunSamples;
+    private long _playedSamples;
+    private long _nonZeroPlayedSamples;
+    private long _audioReadCallbacks;
+    private double _lastOutputRms;
+    private float _lastOutputPeak;
+    private float _nextPlaybackHealthRealtime;
+
+    [SerializeField] [Range(1f, 12f)] private float digitalGain = DefaultDigitalGain;
 
     private string _pendingStatusMessage;
     private bool _pendingStatusWarning;
@@ -54,6 +66,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     public long ReceivedSamples => Interlocked.Read(ref _receivedSamples);
     public long DroppedSamples => Interlocked.Read(ref _droppedSamples);
     public long UnderrunSamples => Interlocked.Read(ref _underrunSamples);
+    public long PlayedSamples => Interlocked.Read(ref _playedSamples);
 
     public void StartAudio(string host, int port = DefaultPort)
     {
@@ -74,6 +87,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         _connected = false;
 
         EnsureAudioSource();
+        _nextPlaybackHealthRealtime = Time.realtimeSinceStartup + PlaybackHealthIntervalSeconds;
         if (!_audioSource.isPlaying)
         {
             _audioSource.Play();
@@ -440,6 +454,35 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             data[i] = 0f;
         }
 
+        float gain = Mathf.Clamp(digitalGain, 1f, 12f);
+        double sumSquares = 0d;
+        float peak = 0f;
+        long nonZero = 0;
+        for (int i = 0; i < readCount; i++)
+        {
+            float output = Mathf.Clamp(data[i] * gain, -1f, 1f);
+            data[i] = output;
+            float magnitude = Mathf.Abs(output);
+            if (magnitude > NonZeroThreshold)
+            {
+                nonZero++;
+            }
+            if (magnitude > peak)
+            {
+                peak = magnitude;
+            }
+            sumSquares += output * output;
+        }
+
+        Interlocked.Increment(ref _audioReadCallbacks);
+        Interlocked.Add(ref _playedSamples, readCount);
+        Interlocked.Add(ref _nonZeroPlayedSamples, nonZero);
+        lock (_healthLock)
+        {
+            _lastOutputRms = readCount > 0 ? Math.Sqrt(sumSquares / readCount) : 0d;
+            _lastOutputPeak = peak;
+        }
+
         if (readCount < data.Length)
         {
             Interlocked.Add(ref _underrunSamples, data.Length - readCount);
@@ -462,6 +505,14 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             Interlocked.Exchange(ref _receivedSamples, 0);
             Interlocked.Exchange(ref _droppedSamples, 0);
             Interlocked.Exchange(ref _underrunSamples, 0);
+            Interlocked.Exchange(ref _playedSamples, 0);
+            Interlocked.Exchange(ref _nonZeroPlayedSamples, 0);
+            Interlocked.Exchange(ref _audioReadCallbacks, 0);
+            lock (_healthLock)
+            {
+                _lastOutputRms = 0d;
+                _lastOutputPeak = 0f;
+            }
         }
         _hasPendingByte = false;
     }
@@ -497,6 +548,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
 
     private void Update()
     {
+        EmitPlaybackHealthIfDue();
         string message = null;
         bool warning = false;
 
@@ -523,6 +575,38 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         {
             LogWindow.Info(message);
         }
+    }
+
+    private void EmitPlaybackHealthIfDue()
+    {
+        float now = Time.realtimeSinceStartup;
+        if (now < _nextPlaybackHealthRealtime)
+        {
+            return;
+        }
+        _nextPlaybackHealthRealtime = now + PlaybackHealthIntervalSeconds;
+
+        int buffered;
+        lock (_ringLock)
+        {
+            buffered = _bufferedSamples;
+        }
+        double rms;
+        float peak;
+        lock (_healthLock)
+        {
+            rms = _lastOutputRms;
+            peak = _lastOutputPeak;
+        }
+        bool sourcePlaying = _audioSource != null && _audioSource.isPlaying;
+        CrashProbe.Breadcrumb(
+            "remote_audio.health",
+            $"connected={IsConnected} source_playing={sourcePlaying} " +
+            $"received={ReceivedSamples} played={PlayedSamples} " +
+            $"nonzero={Interlocked.Read(ref _nonZeroPlayedSamples)} " +
+            $"underrun={UnderrunSamples} dropped={DroppedSamples} " +
+            $"callbacks={Interlocked.Read(ref _audioReadCallbacks)} buffered={buffered} " +
+            $"rms={rms:F6} peak={peak:F6} gain={Mathf.Clamp(digitalGain, 1f, 12f):F2}");
     }
 
     private void OnDestroy()
