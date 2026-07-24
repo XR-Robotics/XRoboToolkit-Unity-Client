@@ -22,19 +22,19 @@
     - name: "CamWidth"
       type: "int"
       description: "Camera width for the video stream"
-      value: 2160
+      value: 1280
     - name: "CamHeight"
       type: "int"
       description: "Camera height for the video stream"
-      value: 810
+      value: 480
     - name: "CamFPS"
       type: "int"
       description: "Frame rate of the video stream in FPS"
-      value: 60
+      value: 15
     - name: "CamBitrate"
       type: "int"
       description: "Bitrate of the video stream in bps"
-      value: 20971520 # 20 x 1024 x 1024
+      value: 1000000 # Match the G1 cloud H.264 low-latency profile
     - name: "AudioStreamPort"
       type: "int"
       description: "Raw PCM audio stream port from the operator bridge"

@@ -48,6 +48,8 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private int _capturePosition;
     private int _sourceChannels = 1;
     private int _sourceSampleRate = OutputSampleRate;
+    private int _captureChunkFrames;
+    private float[] _captureReadBuffer;
     private int _outputFrameCount;
 
     private bool _hasPreviousSourceSample;
@@ -165,6 +167,14 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         _sourceSampleRate = _microphoneClip.frequency > 0
             ? _microphoneClip.frequency
             : OutputSampleRate;
+        _captureChunkFrames = MicrophoneCapturePlan.ChunkFrames(
+            _sourceSampleRate,
+            FrameDurationMs);
+        int captureBufferSamples = _captureChunkFrames * _sourceChannels;
+        if (_captureReadBuffer == null || _captureReadBuffer.Length != captureBufferSamples)
+        {
+            _captureReadBuffer = new float[captureBufferSamples];
+        }
         try
         {
             int initialPosition = Microphone.GetPosition(_microphoneDevice);
@@ -299,16 +309,19 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             return;
         }
 
-        int availableFrames = currentPosition >= _capturePosition
-            ? currentPosition - _capturePosition
-            : clipFrames - _capturePosition + currentPosition;
+        int availableFrames = MicrophoneCapturePlan.AvailableFrames(
+            currentPosition,
+            _capturePosition,
+            clipFrames);
 
         int maxBacklogFrames = Math.Max(1, _sourceSampleRate * MaxCaptureBacklogMs / 1000);
-        if (availableFrames > maxBacklogFrames)
+        int skippedFrames = MicrophoneCapturePlan.BacklogSkipFrames(
+            availableFrames,
+            maxBacklogFrames);
+        if (skippedFrames > 0)
         {
-            int skippedFrames = availableFrames - maxBacklogFrames;
             _capturePosition = (_capturePosition + skippedFrames) % clipFrames;
-            availableFrames = maxBacklogFrames;
+            availableFrames -= skippedFrames;
             ResetResampler();
             long droppedOutputFrames = Math.Max(
                 1L,
@@ -328,12 +341,11 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
 
         long readUnixNs = GetUnixTimeNs();
 
-        while (availableFrames > 0 && !_stopRequested)
+        while (availableFrames >= _captureChunkFrames && !_stopRequested)
         {
-            int contiguousFrames = Math.Min(availableFrames, clipFrames - _capturePosition);
             if (!ReadCaptureSegment(
                     _capturePosition,
-                    contiguousFrames,
+                    _captureChunkFrames,
                     availableFrames,
                     readUnixNs))
             {
@@ -341,8 +353,8 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
                 return;
             }
 
-            _capturePosition = (_capturePosition + contiguousFrames) % clipFrames;
-            availableFrames -= contiguousFrames;
+            _capturePosition = (_capturePosition + _captureChunkFrames) % clipFrames;
+            availableFrames -= _captureChunkFrames;
         }
     }
 
@@ -357,8 +369,12 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             return true;
         }
 
-        float[] interleaved = new float[frameCount * _sourceChannels];
-        if (!_microphoneClip.GetData(interleaved, offsetFrames))
+        int requiredSamples = frameCount * _sourceChannels;
+        if (_captureReadBuffer == null || _captureReadBuffer.Length != requiredSamples)
+        {
+            _captureReadBuffer = new float[requiredSamples];
+        }
+        if (!_microphoneClip.GetData(_captureReadBuffer, offsetFrames))
         {
             CrashProbe.Breadcrumb("pico_microphone.get_data_failed", "", LogType.Warning);
             SetPendingStatus("Pico microphone AudioClip.GetData failed; dropping the unread capture segment.", true);
@@ -371,7 +387,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             float sum = 0f;
             for (int channel = 0; channel < _sourceChannels; channel++)
             {
-                sum += interleaved[baseIndex + channel];
+                sum += _captureReadBuffer[baseIndex + channel];
             }
 
             int framesBehindCurrent = Math.Max(0, framesBehindCurrentAtStart - frame);
@@ -482,6 +498,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             $"recording={recording} position={currentPosition} " +
             $"captured={CapturedFrames} sent={SentFrames} dropped={DroppedFrames} " +
             $"connected={IsConnected} queued={QueuedFrames()} " +
+            $"capture_chunk_frames={_captureChunkFrames} " +
             $"send_failures={Interlocked.Read(ref _sendFailures)} " +
             $"write_ms={Interlocked.Read(ref _lastWriteMs)} " +
             $"max_write_ms={Interlocked.Read(ref _maxWriteMs)}");

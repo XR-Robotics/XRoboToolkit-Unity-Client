@@ -348,7 +348,7 @@ Optional environment variables are `XRBT_BETA_VERSION_NAME`,
 `XRBT_BETA_DEVELOPMENT_BUILD`. The beta is a release build by default; set
 `XRBT_BETA_DEVELOPMENT_BUILD=1` only when Unity development diagnostics are
 required. The default output is
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk`, with versionCode `8`.
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.8.apk`, with versionCode `9`.
 
 Run the address-store self-test before building:
 
@@ -360,11 +360,25 @@ Run the address-store self-test before building:
   -logFile /tmp/xrobotoolkit-address-store-test.log
 ```
 
+Run the low-latency stream-profile and microphone chunking self-test as well:
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod PicoStreamPerformanceSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-stream-performance-test.log
+```
+
+When upgrading from beta.7 with `adb install -r`, beta.8 migrates only the exact
+legacy PICO4U profile (`2160x810@60`, 20 MiB/s) once. Manually customized video
+profiles and the saved operator address/preferences are preserved.
+
 Install it after enabling PICO developer mode and USB debugging:
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.8.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```
