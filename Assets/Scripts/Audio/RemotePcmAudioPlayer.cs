@@ -11,9 +11,9 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     public const int DefaultPort = 13580;
     private const int SampleRate = 16000;
     private const int Channels = 1;
-    private const int PrebufferMs = 80;
-    private const int TargetBufferMs = 100;
-    private const int HardBufferMs = 200;
+    private const int PrebufferMs = 160;
+    private const int TargetBufferMs = 300;
+    private const int HardBufferMs = 1000;
     private const int PrebufferSamples = SampleRate * PrebufferMs / 1000;
     private const int TargetBufferSamples = SampleRate * TargetBufferMs / 1000;
     private const int HardBufferSamples = SampleRate * HardBufferMs / 1000;
@@ -52,6 +52,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
     private long _underrunSamples;
     private long _playedSamples;
     private long _nonZeroPlayedSamples;
+    private long _stretchedSamples;
     private long _audioReadCallbacks;
     private double _lastOutputRms;
     private float _lastOutputPeak;
@@ -408,7 +409,6 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             _readIndex = (_readIndex + dropCount) % _ringBuffer.Length;
             _bufferedSamples -= dropCount;
             Interlocked.Add(ref _droppedSamples, dropCount);
-            _playbackPrimed = false;
         }
 
         _ringBuffer[_writeIndex] = sample;
@@ -418,15 +418,17 @@ public class RemotePcmAudioPlayer : MonoBehaviour
 
     private void OnAudioRead(float[] data)
     {
-        int readCount = 0;
+        int outputCount = 0;
+        int sourceCount = 0;
 
         lock (_ringLock)
         {
             if (!_playbackPrimed)
             {
-                if (_bufferedSamples < Math.Max(PrebufferSamples, data.Length))
+                int required = Math.Min(data.Length, PrebufferSamples);
+                if (_bufferedSamples < required)
                 {
-                    readCount = 0;
+                    outputCount = 0;
                 }
                 else
                 {
@@ -434,22 +436,48 @@ public class RemotePcmAudioPlayer : MonoBehaviour
                 }
             }
 
-            int count = _playbackPrimed ? Math.Min(data.Length, _bufferedSamples) : 0;
-            for (int i = 0; i < count; i++)
+            sourceCount = _playbackPrimed ? Math.Min(data.Length, _bufferedSamples) : 0;
+            int minimumStretchSource = Math.Max(1, data.Length * 2 / 3);
+            if (sourceCount > 0 && sourceCount < minimumStretchSource)
             {
-                data[i] = _ringBuffer[_readIndex];
-                _readIndex = (_readIndex + 1) % _ringBuffer.Length;
-            }
-
-            _bufferedSamples -= count;
-            readCount = count;
-            if (count < data.Length)
-            {
+                sourceCount = 0;
                 _playbackPrimed = false;
             }
+
+            if (sourceCount == data.Length)
+            {
+                for (int i = 0; i < sourceCount; i++)
+                {
+                    data[i] = _ringBuffer[(_readIndex + i) % _ringBuffer.Length];
+                }
+                outputCount = data.Length;
+            }
+            else if (sourceCount > 1 && data.Length > 1)
+            {
+                // The Unitree multicast microphone can arrive below its declared
+                // 16 kHz cadence.  Stretch a bounded near-full callback instead
+                // of appending a periodic block of zeros, which is perceived as
+                // missing syllables.  Severe gaps still fall back to rebuffering.
+                float scale = (sourceCount - 1f) / (data.Length - 1f);
+                for (int i = 0; i < data.Length; i++)
+                {
+                    float sourcePosition = i * scale;
+                    int lower = Mathf.FloorToInt(sourcePosition);
+                    int upper = Math.Min(sourceCount - 1, lower + 1);
+                    float fraction = sourcePosition - lower;
+                    float a = _ringBuffer[(_readIndex + lower) % _ringBuffer.Length];
+                    float b = _ringBuffer[(_readIndex + upper) % _ringBuffer.Length];
+                    data[i] = Mathf.Lerp(a, b, fraction);
+                }
+                outputCount = data.Length;
+                Interlocked.Add(ref _stretchedSamples, data.Length - sourceCount);
+            }
+
+            _readIndex = (_readIndex + sourceCount) % _ringBuffer.Length;
+            _bufferedSamples -= sourceCount;
         }
 
-        for (int i = readCount; i < data.Length; i++)
+        for (int i = outputCount; i < data.Length; i++)
         {
             data[i] = 0f;
         }
@@ -458,7 +486,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         double sumSquares = 0d;
         float peak = 0f;
         long nonZero = 0;
-        for (int i = 0; i < readCount; i++)
+        for (int i = 0; i < outputCount; i++)
         {
             float output = Mathf.Clamp(data[i] * gain, -1f, 1f);
             data[i] = output;
@@ -475,17 +503,17 @@ public class RemotePcmAudioPlayer : MonoBehaviour
         }
 
         Interlocked.Increment(ref _audioReadCallbacks);
-        Interlocked.Add(ref _playedSamples, readCount);
+        Interlocked.Add(ref _playedSamples, outputCount);
         Interlocked.Add(ref _nonZeroPlayedSamples, nonZero);
         lock (_healthLock)
         {
-            _lastOutputRms = readCount > 0 ? Math.Sqrt(sumSquares / readCount) : 0d;
+            _lastOutputRms = outputCount > 0 ? Math.Sqrt(sumSquares / outputCount) : 0d;
             _lastOutputPeak = peak;
         }
 
-        if (readCount < data.Length)
+        if (outputCount < data.Length)
         {
-            Interlocked.Add(ref _underrunSamples, data.Length - readCount);
+            Interlocked.Add(ref _underrunSamples, data.Length - outputCount);
         }
     }
 
@@ -507,6 +535,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             Interlocked.Exchange(ref _underrunSamples, 0);
             Interlocked.Exchange(ref _playedSamples, 0);
             Interlocked.Exchange(ref _nonZeroPlayedSamples, 0);
+            Interlocked.Exchange(ref _stretchedSamples, 0);
             Interlocked.Exchange(ref _audioReadCallbacks, 0);
             lock (_healthLock)
             {
@@ -604,6 +633,7 @@ public class RemotePcmAudioPlayer : MonoBehaviour
             $"connected={IsConnected} source_playing={sourcePlaying} " +
             $"received={ReceivedSamples} played={PlayedSamples} " +
             $"nonzero={Interlocked.Read(ref _nonZeroPlayedSamples)} " +
+            $"stretched={Interlocked.Read(ref _stretchedSamples)} " +
             $"underrun={UnderrunSamples} dropped={DroppedSamples} " +
             $"callbacks={Interlocked.Read(ref _audioReadCallbacks)} buffered={buffered} " +
             $"rms={rms:F6} peak={peak:F6} gain={Mathf.Clamp(digitalGain, 1f, 12f):F2}");

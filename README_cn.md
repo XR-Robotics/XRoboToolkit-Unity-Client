@@ -209,8 +209,8 @@ Android API 30/31 和 Unity 开发调试签名，不读取或修改正式版 key
 `XRBT_BETA_APK_PATH` 和 `XRBT_BETA_DEVELOPMENT_BUILD`。Beta 默认使用
 Release 构建；仅在需要 Unity 开发诊断时显式设置
 `XRBT_BETA_DEVELOPMENT_BUILD=1`。默认输出为
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.6.apk`，默认
-versionCode 为 `7`。
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk`，默认
+versionCode 为 `8`。
 
 构建前可先执行地址存储自检：
 
@@ -226,7 +226,7 @@ Pico 开启开发者模式和 USB 调试后安装：
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.6.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```

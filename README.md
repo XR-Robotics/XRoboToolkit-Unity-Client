@@ -348,7 +348,7 @@ Optional environment variables are `XRBT_BETA_VERSION_NAME`,
 `XRBT_BETA_DEVELOPMENT_BUILD`. The beta is a release build by default; set
 `XRBT_BETA_DEVELOPMENT_BUILD=1` only when Unity development diagnostics are
 required. The default output is
-`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.6.apk`, with versionCode `7`.
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk`, with versionCode `8`.
 
 Run the address-store self-test before building:
 
@@ -364,7 +364,7 @@ Install it after enabling PICO developer mode and USB debugging:
 
 ```bash
 adb devices -l
-adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.6.apk
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.7.apk
 adb shell monkey -p com.xrobotoolkit.client.voicebeta \
   -c android.intent.category.LAUNCHER 1
 ```

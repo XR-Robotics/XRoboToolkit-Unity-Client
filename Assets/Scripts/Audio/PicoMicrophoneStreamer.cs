@@ -513,14 +513,11 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
                 return false;
             }
 
-            // TCP can recover after a short Wi-Fi stall with several captured
-            // frames waiting in user space.  Speech is real-time media, so keep
-            // only the newest complete record instead of replaying stale audio.
-            while (_sendQueue.Count > 1)
-            {
-                _sendQueue.Dequeue();
-                Interlocked.Increment(ref _droppedFrames);
-            }
+            // Preserve normal Unity capture bursts.  CaptureAvailableSamples can
+            // legitimately enqueue two adjacent 20 ms frames in one Update;
+            // dropping all but the newest frame here turned that batching into a
+            // deterministic 20 ms hole.  EnqueueFrame already bounds the queue to
+            // MaxQueuedFrames and drops only when TCP is genuinely backlogged.
             frame = _sendQueue.Dequeue();
             return true;
         }
