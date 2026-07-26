@@ -191,6 +191,13 @@ source/output ratios are rejected before resize rather than stretched.
 Select the matching built-in Remote Vision source (`PANORAMA_MONO_1280x640`,
 `PANORAMA_SBS_2560x640`, or `PANORAMA_TOP_BOTTOM_1280x1280`) before Listen.
 
+Recorder state is a separate control-plane update. The operator sends a bounded
+`RECORD_STATUS` / `g1_wuji_record_status_v1` JSON message after camera setup and
+at the control heartbeat rate; the app renders it with the operator date/time in
+a per-eye HUD. G1 H.264 packets stay compressed and untouched through the relay
+and operator bridge, so this overlay does not require workstation decode and
+re-encode or add image payloads to the control connection.
+
 Run this from the `g1_wuji_teleoperation` operator repository:
 
 ```bash

@@ -43,6 +43,7 @@ public static class VoiceDuplexBetaBuilder
 
         RemoteVisionAddressStoreSelfTest.Run();
         PicoStreamPerformanceSelfTest.Run();
+        RemoteRecordStatusSelfTest.Run();
 
         string versionName = GetEnvironmentOrDefault(
             "XRBT_BETA_VERSION_NAME",

@@ -43,6 +43,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private RemotePcmAudioPlayer remoteAudioPlayer;
     private PicoMicrophoneStreamer microphoneStreamer;
     private RemoteVideoProjectionRenderer videoProjectionRenderer;
+    private RemoteRecordStatusOverlay recordStatusOverlay;
     private OperatorControlClient operatorControlClient;
     private Coroutine cameraRequestCoroutine;
     private Coroutine microphoneStartCoroutine;
@@ -99,6 +100,7 @@ public partial class UICameraCtrl : MonoBehaviour
         operatorControlClient.DataReceived += OnClientDataReceived;
         operatorControlClient.Error += OnControlClientError;
         EnsureVideoProjectionRenderer();
+        EnsureRecordStatusOverlay();
     }
 
     private void OnServerReceived(byte[] data)
@@ -280,11 +282,21 @@ public partial class UICameraCtrl : MonoBehaviour
     {
         if (NetworkDataProtocolSerializer.TryDeserialize(
                 frame,
-                out NetworkDataProtocol protocol) &&
-            string.Equals(protocol.command, NetworkCommand.PING, StringComparison.Ordinal))
+                out NetworkDataProtocol protocol))
         {
-            operatorControlClient?.SendCommand(NetworkCommand.PONG, protocol.data);
-            return;
+            if (string.Equals(protocol.command, NetworkCommand.PING, StringComparison.Ordinal))
+            {
+                operatorControlClient?.SendCommand(NetworkCommand.PONG, protocol.data);
+                return;
+            }
+            if (string.Equals(
+                    protocol.command,
+                    NetworkCommand.RECORD_STATUS,
+                    StringComparison.Ordinal))
+            {
+                ApplyRecordStatus(protocol.data);
+                return;
+            }
         }
 
         ApplyAudioPortConfig(frame);
@@ -611,6 +623,43 @@ public partial class UICameraCtrl : MonoBehaviour
         videoProjectionRenderer.SetLegacyStereoRenderer(setLere);
     }
 
+    private void EnsureRecordStatusOverlay()
+    {
+        if (RemoteCameraWindowObj == null)
+        {
+            return;
+        }
+        if (recordStatusOverlay == null)
+        {
+            recordStatusOverlay =
+                RemoteCameraWindowObj.GetComponent<RemoteRecordStatusOverlay>();
+            if (recordStatusOverlay == null)
+            {
+                recordStatusOverlay =
+                    RemoteCameraWindowObj.AddComponent<RemoteRecordStatusOverlay>();
+            }
+        }
+        if (setLere != null)
+        {
+            recordStatusOverlay.Configure(setLere.CanvLE, setLere.CanvRE);
+        }
+    }
+
+    private void ApplyRecordStatus(byte[] payload)
+    {
+        EnsureRecordStatusOverlay();
+        if (recordStatusOverlay == null ||
+            !RemoteRecordStatusSnapshot.TryParse(payload, out RemoteRecordStatusSnapshot status))
+        {
+            CrashProbe.Breadcrumb(
+                "record_status.invalid",
+                $"bytes={payload?.Length ?? 0}",
+                LogType.Warning);
+            return;
+        }
+        recordStatusOverlay.Apply(status);
+    }
+
     private void ApplyVideoProjection(string projection, string stereoLayout)
     {
         EnsureVideoProjectionRenderer();
@@ -662,6 +711,7 @@ public partial class UICameraCtrl : MonoBehaviour
             controlClientConnected = false;
             StopCameraRequestCoroutine();
             StopDuplexAudio();
+            recordStatusOverlay?.Clear();
             RemoteCameraWindowObj.SetActive(false);
         }
 
@@ -850,6 +900,7 @@ public partial class UICameraCtrl : MonoBehaviour
         duplexAudioStarted = false;
         microphonePermissionRequested = false;
         clientProtocolBuffer.Clear();
+        recordStatusOverlay?.Clear();
         currentAudioRequestId = Guid.NewGuid().ToString("N");
         CrashProbe.Breadcrumb(
             "audio_session.begin",

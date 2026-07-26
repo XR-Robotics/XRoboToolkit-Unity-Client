@@ -13,6 +13,7 @@ namespace Network
         public const string AUDIO_CONFIG = "AUDIO_CONFIG";
         public const string AUDIO_SESSION = "AUDIO_SESSION";
         public const string OPEN_CAMERA_ACK = "OPEN_CAMERA_ACK";
+        public const string RECORD_STATUS = "RECORD_STATUS";
         public const string CLOSE_CAMERA = "CLOSE_CAMERA";
         public const string PING = "PING";
         public const string PONG = "PONG";
