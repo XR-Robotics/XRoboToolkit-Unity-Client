@@ -280,26 +280,37 @@ public partial class UICameraCtrl : MonoBehaviour
 
     private void HandleClientProtocolFrame(byte[] frame)
     {
-        if (NetworkDataProtocolSerializer.TryDeserialize(
+        if (!NetworkDataProtocolSerializer.TryDeserialize(
                 frame,
                 out NetworkDataProtocol protocol))
         {
-            if (string.Equals(protocol.command, NetworkCommand.PING, StringComparison.Ordinal))
-            {
-                operatorControlClient?.SendCommand(NetworkCommand.PONG, protocol.data);
-                return;
-            }
-            if (string.Equals(
-                    protocol.command,
-                    NetworkCommand.RECORD_STATUS,
-                    StringComparison.Ordinal))
-            {
-                ApplyRecordStatus(protocol.data);
-                return;
-            }
+            CrashProbe.Breadcrumb(
+                "operator_control.invalid_frame",
+                $"bytes={frame?.Length ?? 0}",
+                LogType.Warning);
+            return;
         }
 
-        ApplyAudioPortConfig(frame);
+        if (string.Equals(protocol.command, NetworkCommand.PING, StringComparison.Ordinal))
+        {
+            operatorControlClient?.SendCommand(NetworkCommand.PONG, protocol.data);
+            return;
+        }
+        if (string.Equals(
+                protocol.command,
+                NetworkCommand.RECORD_STATUS,
+                StringComparison.Ordinal))
+        {
+            ApplyRecordStatus(protocol.data);
+            return;
+        }
+        if (string.Equals(
+                protocol.command,
+                NetworkCommand.AUDIO_CONFIG,
+                StringComparison.Ordinal))
+        {
+            ApplyAudioPortConfig(protocol.data);
+        }
     }
 
     private bool TryTakeClientProtocolFrame(out byte[] frame)

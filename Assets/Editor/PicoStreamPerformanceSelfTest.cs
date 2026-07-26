@@ -76,6 +76,26 @@ public static class PicoStreamPerformanceSelfTest
         AssertEqual(100, MicrophoneCapturePlan.AvailableFrames(200, 100, 1000), "linear");
         AssertEqual(150, MicrophoneCapturePlan.AvailableFrames(50, 900, 1000), "wrapped");
         AssertEqual(400, MicrophoneCapturePlan.BacklogSkipFrames(2000, 1600), "backlog");
+        AssertEqual(
+            0,
+            MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(319, 320),
+            "short latest chunk");
+        AssertEqual(
+            0,
+            MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(320, 320),
+            "exact latest chunk");
+        AssertEqual(
+            0,
+            MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(640, 320),
+            "normal two chunk buffer");
+        AssertEqual(
+            321,
+            MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(641, 320),
+            "backlog latest chunk");
+        AssertEqual(
+            1680,
+            MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(2000, 320),
+            "large backlog latest chunk");
         AssertEqual(0, MicrophoneCapturePlan.ConsumableFrames(319, 320), "short chunk");
         AssertEqual(320, MicrophoneCapturePlan.ConsumableFrames(320, 320), "exact chunk");
         AssertEqual(960, MicrophoneCapturePlan.ConsumableFrames(1000, 320), "whole chunks");

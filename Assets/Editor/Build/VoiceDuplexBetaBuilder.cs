@@ -10,8 +10,8 @@ public static class VoiceDuplexBetaBuilder
 {
     private const string DefaultApplicationIdentifier = "com.xrobotoolkit.client.voicebeta";
     private const string DefaultProductName = "XRoboToolkit Voice Beta";
-    private const string DefaultVersionName = "1.1.2-beta.8";
-    private const int DefaultVersionCode = 9;
+    private const string DefaultVersionName = "1.1.2-beta.10";
+    private const int DefaultVersionCode = 11;
     private const int TargetSdkApiLevel = 31;
 
     [MenuItem("Build/Voice Duplex Beta APK")]

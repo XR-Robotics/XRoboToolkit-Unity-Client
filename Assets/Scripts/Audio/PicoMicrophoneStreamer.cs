@@ -5,6 +5,7 @@ using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using UnityEngine;
+using Stopwatch = System.Diagnostics.Stopwatch;
 #if UNITY_ANDROID
 using UnityEngine.Android;
 #endif
@@ -27,7 +28,6 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private const int ReconnectDelayMs = 1000;
     private const int SendBufferBytes = 64 * 1024;
     private const int HeartbeatIntervalMs = 1000;
-    private const int MaxCaptureBacklogMs = 100;
     private const float CaptureHealthIntervalSeconds = 5f;
     private const byte ProtocolVersion = 1;
     private const long UnixEpochTicks = 621355968000000000L;
@@ -75,6 +75,16 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
     private long _sendFailures;
     private long _lastWriteMs;
     private long _maxWriteMs;
+    private long _captureBacklogSkipEvents;
+    private long _captureBacklogSkippedSourceFrames;
+    private long _captureHealthPreviousSkipEvents;
+    private long _captureHealthPreviousSkippedSourceFrames;
+    private long _lastCaptureUpdateUs;
+    private long _maxCaptureUpdateUs;
+    private long _lastPositionQueryUs;
+    private long _maxPositionQueryUs;
+    private long _lastGetDataUs;
+    private long _maxGetDataUs;
     private float _nextCaptureHealthRealtime;
 
     private string _pendingStatusMessage;
@@ -272,7 +282,17 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
 
     private void Update()
     {
-        CaptureAvailableSamples();
+        long captureStarted = Stopwatch.GetTimestamp();
+        try
+        {
+            CaptureAvailableSamples();
+        }
+        finally
+        {
+            long captureUpdateUs = ElapsedMicroseconds(captureStarted);
+            Interlocked.Exchange(ref _lastCaptureUpdateUs, captureUpdateUs);
+            UpdateMaximum(ref _maxCaptureUpdateUs, captureUpdateUs);
+        }
         FlushPendingStatus();
     }
 
@@ -284,6 +304,7 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         }
 
         int currentPosition;
+        long positionQueryStarted = Stopwatch.GetTimestamp();
         try
         {
             currentPosition = Microphone.GetPosition(_microphoneDevice);
@@ -293,6 +314,12 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             CrashProbe.Exception("pico_microphone.read_position_exception", e);
             SetPendingStatus($"Pico microphone read error: {e.Message}", true);
             return;
+        }
+        finally
+        {
+            long positionQueryUs = ElapsedMicroseconds(positionQueryStarted);
+            Interlocked.Exchange(ref _lastPositionQueryUs, positionQueryUs);
+            UpdateMaximum(ref _maxPositionQueryUs, positionQueryUs);
         }
 
         if (currentPosition < 0 || currentPosition == _capturePosition)
@@ -314,10 +341,12 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             _capturePosition,
             clipFrames);
 
-        int maxBacklogFrames = Math.Max(1, _sourceSampleRate * MaxCaptureBacklogMs / 1000);
-        int skippedFrames = MicrophoneCapturePlan.BacklogSkipFrames(
+        // Audio capture runs on Unity's main thread. Never let a slow frame make
+        // the next frame process another large batch: jump to the newest complete
+        // 20 ms chunk and process exactly one chunk per Update.
+        int skippedFrames = MicrophoneCapturePlan.BacklogSkipForSingleChunkBudget(
             availableFrames,
-            maxBacklogFrames);
+            _captureChunkFrames);
         if (skippedFrames > 0)
         {
             _capturePosition = (_capturePosition + skippedFrames) % clipFrames;
@@ -330,32 +359,27 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
                     (double)_sourceSampleRate /
                     SamplesPerFrame));
             Interlocked.Add(ref _droppedFrames, droppedOutputFrames);
-            SetPendingStatus(
-                $"Pico microphone capture backlog dropped: {skippedFrames} source frames.",
-                true);
-            CrashProbe.Breadcrumb(
-                "pico_microphone.capture_backlog_dropped",
-                $"source_frames={skippedFrames}",
-                LogType.Warning);
+            Interlocked.Increment(ref _captureBacklogSkipEvents);
+            Interlocked.Add(ref _captureBacklogSkippedSourceFrames, skippedFrames);
+        }
+
+        if (availableFrames < _captureChunkFrames || _stopRequested)
+        {
+            return;
         }
 
         long readUnixNs = GetUnixTimeNs();
-
-        while (availableFrames >= _captureChunkFrames && !_stopRequested)
+        if (!ReadCaptureSegment(
+                _capturePosition,
+                _captureChunkFrames,
+                availableFrames,
+                readUnixNs))
         {
-            if (!ReadCaptureSegment(
-                    _capturePosition,
-                    _captureChunkFrames,
-                    availableFrames,
-                    readUnixNs))
-            {
-                _capturePosition = currentPosition;
-                return;
-            }
-
-            _capturePosition = (_capturePosition + _captureChunkFrames) % clipFrames;
-            availableFrames -= _captureChunkFrames;
+            _capturePosition = currentPosition;
+            return;
         }
+
+        _capturePosition = (_capturePosition + _captureChunkFrames) % clipFrames;
     }
 
     private bool ReadCaptureSegment(
@@ -374,7 +398,20 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         {
             _captureReadBuffer = new float[requiredSamples];
         }
-        if (!_microphoneClip.GetData(_captureReadBuffer, offsetFrames))
+        bool readSucceeded;
+        long getDataStarted = Stopwatch.GetTimestamp();
+        try
+        {
+            readSucceeded = _microphoneClip.GetData(_captureReadBuffer, offsetFrames);
+        }
+        finally
+        {
+            long getDataUs = ElapsedMicroseconds(getDataStarted);
+            Interlocked.Exchange(ref _lastGetDataUs, getDataUs);
+            UpdateMaximum(ref _maxGetDataUs, getDataUs);
+        }
+
+        if (!readSucceeded)
         {
             CrashProbe.Breadcrumb("pico_microphone.get_data_failed", "", LogType.Warning);
             SetPendingStatus("Pico microphone AudioClip.GetData failed; dropping the unread capture segment.", true);
@@ -493,12 +530,30 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
             // The counters and position still provide useful diagnostics.
         }
 
+        long skipEvents = Interlocked.Read(ref _captureBacklogSkipEvents);
+        long skippedSourceFrames = Interlocked.Read(ref _captureBacklogSkippedSourceFrames);
+        long intervalSkipEvents = skipEvents - _captureHealthPreviousSkipEvents;
+        long intervalSkippedSourceFrames =
+            skippedSourceFrames - _captureHealthPreviousSkippedSourceFrames;
+        _captureHealthPreviousSkipEvents = skipEvents;
+        _captureHealthPreviousSkippedSourceFrames = skippedSourceFrames;
+
         CrashProbe.Breadcrumb(
             "pico_microphone.health",
             $"recording={recording} position={currentPosition} " +
             $"captured={CapturedFrames} sent={SentFrames} dropped={DroppedFrames} " +
             $"connected={IsConnected} queued={QueuedFrames()} " +
             $"capture_chunk_frames={_captureChunkFrames} " +
+            $"backlog_skip_events={skipEvents} " +
+            $"backlog_skipped_source_frames={skippedSourceFrames} " +
+            $"interval_skip_events={intervalSkipEvents} " +
+            $"interval_skipped_source_frames={intervalSkippedSourceFrames} " +
+            $"capture_update_us={Interlocked.Read(ref _lastCaptureUpdateUs)} " +
+            $"max_capture_update_us={Interlocked.Read(ref _maxCaptureUpdateUs)} " +
+            $"position_query_us={Interlocked.Read(ref _lastPositionQueryUs)} " +
+            $"max_position_query_us={Interlocked.Read(ref _maxPositionQueryUs)} " +
+            $"get_data_us={Interlocked.Read(ref _lastGetDataUs)} " +
+            $"max_get_data_us={Interlocked.Read(ref _maxGetDataUs)} " +
             $"send_failures={Interlocked.Read(ref _sendFailures)} " +
             $"write_ms={Interlocked.Read(ref _lastWriteMs)} " +
             $"max_write_ms={Interlocked.Read(ref _maxWriteMs)}");
@@ -756,6 +811,12 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         }
     }
 
+    private static long ElapsedMicroseconds(long startedTimestamp)
+    {
+        long elapsedTicks = Math.Max(0L, Stopwatch.GetTimestamp() - startedTimestamp);
+        return elapsedTicks * 1000000L / Stopwatch.Frequency;
+    }
+
     private static byte[] BuildAuthRecord(string sessionToken)
     {
         byte[] token = Encoding.ASCII.GetBytes(sessionToken);
@@ -871,6 +932,16 @@ public sealed class PicoMicrophoneStreamer : MonoBehaviour
         Interlocked.Exchange(ref _sendFailures, 0);
         Interlocked.Exchange(ref _lastWriteMs, 0);
         Interlocked.Exchange(ref _maxWriteMs, 0);
+        Interlocked.Exchange(ref _captureBacklogSkipEvents, 0);
+        Interlocked.Exchange(ref _captureBacklogSkippedSourceFrames, 0);
+        _captureHealthPreviousSkipEvents = 0;
+        _captureHealthPreviousSkippedSourceFrames = 0;
+        Interlocked.Exchange(ref _lastCaptureUpdateUs, 0);
+        Interlocked.Exchange(ref _maxCaptureUpdateUs, 0);
+        Interlocked.Exchange(ref _lastPositionQueryUs, 0);
+        Interlocked.Exchange(ref _maxPositionQueryUs, 0);
+        Interlocked.Exchange(ref _lastGetDataUs, 0);
+        Interlocked.Exchange(ref _maxGetDataUs, 0);
     }
 
     private void ResetResampler()
