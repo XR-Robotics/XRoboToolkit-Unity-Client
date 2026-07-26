@@ -39,37 +39,22 @@ public static class RemoteRecordStatusSelfTest
             "wrong schema rejected");
 
         GameObject host = new GameObject("record-status-test-host");
-        GameObject leftCameraObject = new GameObject("record-status-test-left-camera");
-        GameObject rightCameraObject = new GameObject("record-status-test-right-camera");
-        GameObject leftCanvasObject = new GameObject("record-status-test-left-canvas");
-        GameObject rightCanvasObject = new GameObject("record-status-test-right-canvas");
+        GameObject cameraObject = new GameObject("record-status-test-camera");
         try
         {
-            Camera leftCamera = leftCameraObject.AddComponent<Camera>();
-            Camera rightCamera = rightCameraObject.AddComponent<Camera>();
-            Canvas leftCanvas = leftCanvasObject.AddComponent<Canvas>();
-            Canvas rightCanvas = rightCanvasObject.AddComponent<Canvas>();
-            leftCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-            leftCanvas.worldCamera = leftCamera;
-            leftCanvas.planeDistance = 0.31f;
-            rightCanvas.renderMode = RenderMode.ScreenSpaceCamera;
-            rightCanvas.worldCamera = rightCamera;
-            rightCanvas.planeDistance = 0.31f;
+            Camera camera = cameraObject.AddComponent<Camera>();
 
             RemoteRecordStatusOverlay overlay =
                 host.AddComponent<RemoteRecordStatusOverlay>();
-            overlay.Configure(leftCanvasObject, rightCanvasObject);
-            Assert(overlay.IsConfigured, "per-eye HUD creation");
-            overlay.Apply(status);
+            Assert(overlay.Configure(camera), "head-locked HUD creation");
+            Assert(overlay.IsConfigured, "head-locked HUD configured");
+            Assert(overlay.Apply(status), "record status rendered");
             overlay.Clear();
         }
         finally
         {
             UnityEngine.Object.DestroyImmediate(host);
-            UnityEngine.Object.DestroyImmediate(leftCanvasObject);
-            UnityEngine.Object.DestroyImmediate(rightCanvasObject);
-            UnityEngine.Object.DestroyImmediate(leftCameraObject);
-            UnityEngine.Object.DestroyImmediate(rightCameraObject);
+            UnityEngine.Object.DestroyImmediate(cameraObject);
         }
 
         Debug.Log("REMOTE_RECORD_STATUS_SELF_TEST_OK");

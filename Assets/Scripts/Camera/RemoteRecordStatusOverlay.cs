@@ -92,42 +92,66 @@ public sealed class RemoteRecordStatusSnapshot
 }
 
 /// <summary>
-/// Renders the operator recorder state as one screen-space camera HUD per eye.
-/// The HUD remains visible for both the legacy flat canvases and panoramic
-/// skybox rendering, without touching or re-encoding a video frame.
+/// Renders recorder state on one head-locked world-space HUD.  It deliberately
+/// does not depend on the legacy CanvLE/CanvRE video canvases because SetLERE
+/// disables those objects when switching flat/panoramic video modes.
 /// </summary>
 public sealed class RemoteRecordStatusOverlay : MonoBehaviour
 {
-    private sealed class EyeHud
+    private sealed class HeadsetHud
     {
         public GameObject Root;
         public Text Text;
         public Image Background;
     }
 
-    private EyeHud leftHud;
-    private EyeHud rightHud;
+    private HeadsetHud hud;
+    private Camera targetCamera;
+    private string lastAppliedState = string.Empty;
 
-    public bool IsConfigured => leftHud != null || rightHud != null;
+    public bool IsConfigured => hud != null && hud.Root != null;
 
-    public void Configure(GameObject leftVideoCanvas, GameObject rightVideoCanvas)
+    public bool Configure(Camera camera = null)
     {
         if (IsConfigured)
         {
-            return;
+            return true;
         }
 
-        leftHud = CreateEyeHud(leftVideoCanvas, "Left");
-        rightHud = CreateEyeHud(rightVideoCanvas, "Right");
+        targetCamera = camera != null ? camera : Camera.main;
+        if (targetCamera == null)
+        {
+            CrashProbe.Breadcrumb(
+                "record_status.overlay_unavailable",
+                "Camera.main not ready",
+                LogType.Warning);
+            return false;
+        }
+
+        hud = CreateHeadsetHud(targetCamera);
+        if (hud == null)
+        {
+            CrashProbe.Breadcrumb(
+                "record_status.overlay_unavailable",
+                targetCamera.name,
+                LogType.Warning);
+            return false;
+        }
         SetVisible(false);
+        CrashProbe.Breadcrumb("record_status.overlay_ready", targetCamera.name);
+        return true;
     }
 
-    public void Apply(RemoteRecordStatusSnapshot snapshot)
+    public bool Apply(RemoteRecordStatusSnapshot snapshot)
     {
         if (snapshot == null)
         {
             SetVisible(false);
-            return;
+            return false;
+        }
+        if (!IsConfigured && !Configure())
+        {
+            return false;
         }
 
         string label;
@@ -135,7 +159,7 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
         switch (snapshot.State)
         {
             case "RECORDING":
-                label = "REC";
+                label = "RECORDING";
                 color = new Color(1f, 0.28f, 0.28f, 1f);
                 break;
             case "WAITING_FOR_START":
@@ -160,9 +184,17 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
         string text =
             $"{label}  {snapshot.OperatorTime}\n" +
             $"EP {snapshot.Episode}  frames {snapshot.FrameCount}";
-        ApplyToEye(leftHud, text, color);
-        ApplyToEye(rightHud, text, color);
+        hud.Text.text = text;
+        hud.Text.color = color;
         SetVisible(true);
+        if (!string.Equals(lastAppliedState, snapshot.State, StringComparison.Ordinal))
+        {
+            lastAppliedState = snapshot.State;
+            CrashProbe.Breadcrumb(
+                "record_status.applied",
+                $"state={snapshot.State} ep={snapshot.Episode} frames={snapshot.FrameCount}");
+        }
+        return true;
     }
 
     public void Clear()
@@ -170,42 +202,37 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
         SetVisible(false);
     }
 
-    private EyeHud CreateEyeHud(GameObject videoCanvasObject, string eyeName)
+    private static HeadsetHud CreateHeadsetHud(Camera camera)
     {
-        if (videoCanvasObject == null)
-        {
-            return null;
-        }
-
-        Canvas videoCanvas = videoCanvasObject.GetComponent<Canvas>();
-        if (videoCanvas == null || videoCanvas.worldCamera == null)
+        if (camera == null)
         {
             return null;
         }
 
         GameObject root = new GameObject(
-            $"RemoteRecordStatusOverlay.{eyeName}",
+            "RemoteRecordStatusOverlay.Headset",
             typeof(RectTransform),
             typeof(Canvas),
             typeof(CanvasScaler));
-        // Keep screen-space canvases at scene root. RemoteCamera has a small
-        // world-space scale for its legacy floating panel; inheriting that
-        // transform would incorrectly shrink a screen-space HUD.
-        root.transform.SetParent(null, false);
-        root.layer = videoCanvasObject.layer;
+        root.transform.SetParent(camera.transform, false);
+        root.layer = camera.gameObject.layer;
+        root.transform.localPosition = new Vector3(-0.42f, 0.25f, 1.05f);
+        root.transform.localRotation = Quaternion.identity;
+        root.transform.localScale = Vector3.one * 0.001f;
 
         Canvas canvas = root.GetComponent<Canvas>();
-        canvas.renderMode = RenderMode.ScreenSpaceCamera;
-        canvas.worldCamera = videoCanvas.worldCamera;
-        canvas.planeDistance = Mathf.Max(0.01f, videoCanvas.planeDistance - 0.01f);
+        canvas.renderMode = RenderMode.WorldSpace;
+        canvas.worldCamera = camera;
         canvas.overrideSorting = true;
-        canvas.sortingOrder = videoCanvas.sortingOrder + 100;
+        canvas.sortingOrder = short.MaxValue;
+
+        RectTransform rootRect = root.GetComponent<RectTransform>();
+        rootRect.sizeDelta = new Vector2(760f, 140f);
+        rootRect.pivot = new Vector2(0f, 1f);
 
         CanvasScaler scaler = root.GetComponent<CanvasScaler>();
-        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
-        scaler.referenceResolution = new Vector2(1920f, 1080f);
-        scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ConstantPixelSize;
+        scaler.dynamicPixelsPerUnit = 12f;
 
         GameObject panel = new GameObject(
             "Panel",
@@ -215,8 +242,8 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
         panel.transform.SetParent(root.transform, false);
         panel.layer = root.layer;
         RectTransform panelRect = panel.GetComponent<RectTransform>();
-        panelRect.anchorMin = new Vector2(0.03f, 0.86f);
-        panelRect.anchorMax = new Vector2(0.72f, 0.98f);
+        panelRect.anchorMin = Vector2.zero;
+        panelRect.anchorMax = Vector2.one;
         panelRect.offsetMin = Vector2.zero;
         panelRect.offsetMax = Vector2.zero;
         Image background = panel.GetComponent<Image>();
@@ -248,28 +275,14 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
         outline.effectColor = new Color(0f, 0f, 0f, 0.9f);
         outline.effectDistance = new Vector2(2f, -2f);
 
-        return new EyeHud { Root = root, Text = text, Background = background };
-    }
-
-    private static void ApplyToEye(EyeHud hud, string text, Color color)
-    {
-        if (hud == null)
-        {
-            return;
-        }
-        hud.Text.text = text;
-        hud.Text.color = color;
+        return new HeadsetHud { Root = root, Text = text, Background = background };
     }
 
     private void SetVisible(bool visible)
     {
-        if (leftHud != null)
+        if (hud != null && hud.Root != null)
         {
-            leftHud.Root.SetActive(visible);
-        }
-        if (rightHud != null)
-        {
-            rightHud.Root.SetActive(visible);
+            hud.Root.SetActive(visible);
         }
     }
 
@@ -280,13 +293,12 @@ public sealed class RemoteRecordStatusOverlay : MonoBehaviour
 
     private void OnDestroy()
     {
-        DestroyEyeHud(leftHud);
-        DestroyEyeHud(rightHud);
-        leftHud = null;
-        rightHud = null;
+        DestroyHud(hud);
+        hud = null;
+        targetCamera = null;
     }
 
-    private static void DestroyEyeHud(EyeHud hud)
+    private static void DestroyHud(HeadsetHud hud)
     {
         if (hud != null && hud.Root != null)
         {

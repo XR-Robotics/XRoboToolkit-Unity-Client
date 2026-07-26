@@ -44,6 +44,7 @@ public partial class UICameraCtrl : MonoBehaviour
     private PicoMicrophoneStreamer microphoneStreamer;
     private RemoteVideoProjectionRenderer videoProjectionRenderer;
     private RemoteRecordStatusOverlay recordStatusOverlay;
+    private string lastRecordStatusBreadcrumbState = string.Empty;
     private OperatorControlClient operatorControlClient;
     private Coroutine cameraRequestCoroutine;
     private Coroutine microphoneStartCoroutine;
@@ -650,10 +651,7 @@ public partial class UICameraCtrl : MonoBehaviour
                     RemoteCameraWindowObj.AddComponent<RemoteRecordStatusOverlay>();
             }
         }
-        if (setLere != null)
-        {
-            recordStatusOverlay.Configure(setLere.CanvLE, setLere.CanvRE);
-        }
+        recordStatusOverlay.Configure();
     }
 
     private void ApplyRecordStatus(byte[] payload)
@@ -668,7 +666,23 @@ public partial class UICameraCtrl : MonoBehaviour
                 LogType.Warning);
             return;
         }
-        recordStatusOverlay.Apply(status);
+        if (!string.Equals(
+                lastRecordStatusBreadcrumbState,
+                status.State,
+                StringComparison.Ordinal))
+        {
+            lastRecordStatusBreadcrumbState = status.State;
+            CrashProbe.Breadcrumb(
+                "record_status.received",
+                $"state={status.State} ep={status.Episode} frames={status.FrameCount}");
+        }
+        if (!recordStatusOverlay.Apply(status))
+        {
+            CrashProbe.Breadcrumb(
+                "record_status.overlay_unavailable",
+                $"state={status.State}",
+                LogType.Warning);
+        }
     }
 
     private void ApplyVideoProjection(string projection, string stereoLayout)
