@@ -132,6 +132,7 @@ public class UIOperate : MonoBehaviour
     private void OnBindEnterpriseService(bool bind)
     {
         Debug.Log("OnBindEnterpriseService " + bind);
+        EnterpriseCollectionRecorder.NotifyEnterpriseServiceBound(bind);
         if (bind)
         {
             //The shared network function is only available on B-end devices.
@@ -297,11 +298,13 @@ public class UIOperate : MonoBehaviour
     private void OnHeadTog(bool on)
     {
         TrackingData.SetHeadOn(on);
+        LogWindow.Info($"Tracking Head toggled: {on}");
     }
 
     private void OnControllerTog(bool on)
     {
         TrackingData.SetControllerOn(on);
+        LogWindow.Info($"Tracking Controller toggled: {on}");
     }
 
     private void OnHandTrackingTog(bool on)

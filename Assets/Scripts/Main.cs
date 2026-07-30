@@ -3,11 +3,13 @@ using Unity.XR.PXR;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
+using Robot;
 
 public class Main : MonoBehaviour
 {
     private void Awake()
     {
+        EnterpriseCollectionRecorder.EnsureCreated();
         DebugManager.instance.enableRuntimeUI = false;
         Application.logMessageReceived += OnLogMessageReceived;
         XRSettings.eyeTextureResolutionScale = 1.5f;

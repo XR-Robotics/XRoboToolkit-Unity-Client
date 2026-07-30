@@ -102,8 +102,13 @@ public class InteractionModeManager : MonoBehaviour
 #endif
         if (activeInputDevice != _currentActiveInputDevice)
         {
+            ActiveInputDevice previousInputDevice = _currentActiveInputDevice;
             _currentActiveInputDevice = activeInputDevice;
             Debug.Log(this + "InputDeviceChange:" + _currentActiveInputDevice);
+            LogWindow.Warn("Input device changed: " + previousInputDevice + " -> " + _currentActiveInputDevice +
+                           " focus=" + _isFocusStateAcquired +
+                           " leftConnected=" + ControllerIsConnect(PXR_Input.Controller.LeftController) +
+                           " rightConnected=" + ControllerIsConnect(PXR_Input.Controller.RightController));
             Dirty = true;
         }
 

@@ -66,15 +66,26 @@ namespace Robot
             _stateData["focus"] = Application.isFocused;
             if (HeadOn)
             {
-                //  if (jsonData == null) jsonData = new JsonData();
-                //Right-handed coordinate system: X right, Y up, Z in
-                PxrSensorState2 sensor = new PxrSensorState2();
-                int sensorFrameIndex = 0;
-                PXR_System.GetPredictedMainSensorStateNew(ref sensor, ref sensorFrameIndex);
-                JsonData sensorJson = GetSensorJson(sensor);
-                //     sensorJson["handMode"] = (int)HandModeValue;
-                totalData["Head"] = sensorJson;
-                // SendToServerMessage("GetHeadTracking", sensorJson.ToJson());
+                if (TrackingDataSourceCtrl.UseEnterpriseSDK &&
+                    EnterpriseCollectionRecorder.TryGetLatestEnterpriseHeadForTcp(out string enterprisePose, out int enterpriseStatus))
+                {
+                    JsonData enterpriseHeadJson = new JsonData();
+                    enterpriseHeadJson["pose"] = enterprisePose;
+                    enterpriseHeadJson["status"] = enterpriseStatus;
+                    totalData["Head"] = enterpriseHeadJson;
+                }
+                else
+                {
+                    //  if (jsonData == null) jsonData = new JsonData();
+                    //Right-handed coordinate system: X right, Y up, Z in
+                    PxrSensorState2 sensor = new PxrSensorState2();
+                    int sensorFrameIndex = 0;
+                    PXR_System.GetPredictedMainSensorStateNew(ref sensor, ref sensorFrameIndex);
+                    JsonData sensorJson = GetSensorJson(sensor);
+                    //     sensorJson["handMode"] = (int)HandModeValue;
+                    totalData["Head"] = sensorJson;
+                    // SendToServerMessage("GetHeadTracking", sensorJson.ToJson());
+                }
             }
             else
             {
@@ -84,7 +95,7 @@ namespace Robot
 
             if (ControllerOn)
             {
-                JsonData controller = GetLeftRightControllerJsonData(predictTime);
+                JsonData controller = GetControllerJsonDataBySource(predictTime);
                 totalData["Controller"] = controller;
             }
             else
@@ -320,6 +331,7 @@ namespace Robot
 
 
             InputDevice left = InputDevices.GetDeviceAtXRNode(XRNode.LeftHand);
+            RemoveEnterpriseControllerFields(_leftControllerJson);
             GetControllerJsonData(left, ref _leftControllerJson);
             _controllerDataJson["left"] = _leftControllerJson;
             _controllerDataJson["left"]["pose"] = GetPoseStr(leftPosition, leftRotation);
@@ -330,11 +342,96 @@ namespace Robot
                 PXR_Input.GetControllerPredictRotation(PXR_Input.Controller.RightController, predictTime);
 
             InputDevice right = InputDevices.GetDeviceAtXRNode(XRNode.RightHand);
+            RemoveEnterpriseControllerFields(_rightControllerJson);
             GetControllerJsonData(right, ref _rightControllerJson);
             _controllerDataJson["right"] = _rightControllerJson;
             _controllerDataJson["right"]["pose"] = GetPoseStr(rightPosition, rightRotation);
 
             return _controllerDataJson;
+        }
+
+        private JsonData GetControllerJsonDataBySource(double predictTime)
+        {
+            if (TrackingDataSourceCtrl.UseEnterpriseSDK)
+            {
+                EnterpriseCollectionRecorder.TryGetLatestEnterpriseControllerForTcp(
+                    out EnterpriseCollectionRecorder.EnterpriseControllerTcpPose leftController,
+                    out EnterpriseCollectionRecorder.EnterpriseControllerTcpPose rightController,
+                    out _);
+                if (PXR_HandTracking.GetActiveInputDevice() != ActiveInputDevice.ControllerActive)
+                {
+                    leftController = EnterpriseCollectionRecorder.CreateInvalidEnterpriseControllerTcpPose();
+                    rightController = EnterpriseCollectionRecorder.CreateInvalidEnterpriseControllerTcpPose();
+                }
+
+                _controllerDataJson["left"] = GetEnterpriseControllerJsonData(leftController, ref _leftControllerJson);
+                _controllerDataJson["right"] = GetEnterpriseControllerJsonData(rightController, ref _rightControllerJson);
+                return _controllerDataJson;
+            }
+
+            return GetLeftRightControllerJsonData(predictTime);
+        }
+
+        private static JsonData GetEnterpriseControllerJsonData(
+            EnterpriseCollectionRecorder.EnterpriseControllerTcpPose pose,
+            ref JsonData json)
+        {
+            json["axisX"] = 0.0;
+            json["axisY"] = 0.0;
+            json["axisClick"] = false;
+            json["grip"] = 0.0;
+            json["trigger"] = 0.0;
+            json["primaryButton"] = false;
+            json["secondaryButton"] = false;
+            json["menuButton"] = false;
+            json["hasPose"] = pose.HasPose;
+            json["pose"] = string.IsNullOrEmpty(pose.Pose)
+                ? EnterpriseCollectionRecorder.InvalidControllerPose
+                : pose.Pose;
+            json["status"] = (double)pose.Status;
+            json["timeStampNs"] = (double)pose.TimeStampNs;
+            json["type"] = (double)pose.Type;
+            json["poseError"] = (double)pose.PoseError;
+
+            return json;
+        }
+
+        private static void RemoveEnterpriseControllerFields(JsonData json)
+        {
+            if (json.ContainsKey("hasPose"))
+            {
+                json.Remove("hasPose");
+            }
+
+            RemoveEnterprisePoseFields(json);
+        }
+
+        private static void RemoveEnterprisePoseFields(JsonData json)
+        {
+            if (json.ContainsKey("pose"))
+            {
+                json.Remove("pose");
+            }
+
+            if (json.ContainsKey("status"))
+            {
+                json.Remove("status");
+            }
+
+            if (json.ContainsKey("timeStampNs"))
+            {
+                json.Remove("timeStampNs");
+            }
+
+            if (json.ContainsKey("type"))
+            {
+                json.Remove("type");
+            }
+
+            if (json.ContainsKey("poseError"))
+            {
+                json.Remove("poseError");
+            }
         }
 
         private static void GetControllerJsonData(InputDevice controllerDevice, ref JsonData json)

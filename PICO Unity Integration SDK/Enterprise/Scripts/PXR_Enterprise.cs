@@ -1982,6 +1982,21 @@ namespace Unity.XR.PICO.TOBSupport
             return PXR_EnterprisePlugin.UPxr_GetPredictedMainSensorState(predictTime,isGlobal);
         }
 
+        public static PoseInfo GetHeadPose()
+        {
+            return PXR_EnterprisePlugin.GetHeadPose();
+        }
+
+        public static PoseInfo[] GetControllerPose()
+        {
+            return GetControllerPose(0);
+        }
+
+        public static PoseInfo[] GetControllerPose(double predictTime)
+        {
+            return PXR_EnterprisePlugin.GetControllerPose(predictTime);
+        }
+
         /// <summary>
         /// Directs the user to the floor-height-adjustment app to adjust the floor's height.
         /// @note Supported by PICO Neo3 Pro, general PICO Neo3 devices activated as enterprise devices, and PICO 4 Enterprise.
