@@ -10,6 +10,10 @@ namespace Robot
 {
     public sealed class EnterpriseCollectionFileWriter : IDisposable
     {
+        // The collection runs at roughly 290 lines/s by default.  A bounded
+        // queue prevents a stalled flash writer from turning a transient I/O
+        // problem into an unbounded managed-memory allocation.
+        private const int MaxPendingLines = 4096;
         private readonly bool _enabled;
         private readonly string _persistentDataPath;
         private readonly ConcurrentQueue<FileLine> _pendingLines = new ConcurrentQueue<FileLine>();
@@ -17,6 +21,8 @@ namespace Robot
 
         private Thread _writerThread;
         private volatile bool _acceptingLines;
+        private int _pendingCount;
+        private long _droppedLineCount;
 
         public EnterpriseCollectionFileWriter(bool enabled, string persistentDataPath)
         {
@@ -27,7 +33,9 @@ namespace Robot
 
         public string RecordDir { get; private set; }
 
-        public int PendingCount => _pendingLines.Count;
+        public int PendingCount => Volatile.Read(ref _pendingCount);
+
+        public long DroppedLineCount => Interlocked.Read(ref _droppedLineCount);
 
         public bool IsWriterThreadAlive => _writerThread != null && _writerThread.IsAlive;
 
@@ -57,6 +65,13 @@ namespace Robot
         {
             if (!_enabled || !_acceptingLines || string.IsNullOrEmpty(line))
             {
+                return;
+            }
+
+            if (Interlocked.Increment(ref _pendingCount) > MaxPendingLines)
+            {
+                Interlocked.Decrement(ref _pendingCount);
+                Interlocked.Increment(ref _droppedLineCount);
                 return;
             }
 
@@ -94,6 +109,7 @@ namespace Robot
             {
                 if (_pendingLines.TryDequeue(out FileLine fileLine))
                 {
+                    Interlocked.Decrement(ref _pendingCount);
                     StreamWriter writer = GetWriter(fileLine.FileName);
                     writer.WriteLine(fileLine.Line);
                 }
@@ -112,7 +128,13 @@ namespace Robot
             }
 
             string path = Path.Combine(RecordDir, fileName);
-            writer = new StreamWriter(path, true);
+            writer = new StreamWriter(path, true)
+            {
+                // Keep completed JSONL records durable even if the process is
+                // killed by LMK.  A killed process can still lose the current
+                // record, but it cannot leave a large buffered tail pending.
+                AutoFlush = true
+            };
             _writers[fileName] = writer;
             return writer;
         }

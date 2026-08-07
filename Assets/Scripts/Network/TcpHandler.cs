@@ -45,7 +45,7 @@ namespace Robot
         [SerializeField] private int trackingThreadQueueBackpressureSleepMs = 1;
         [SerializeField] private bool outputTrackingRateToLogWindow = false;
         [SerializeField] private float trackingRateLogIntervalSeconds = 1f;
-        [SerializeField] private bool outputEnterpriseControllerPayloadToLog = true;
+        [SerializeField] private bool outputEnterpriseControllerPayloadToLog = false;
         [SerializeField] private float enterpriseControllerPayloadLogIntervalSeconds = 1f;
         private Thread _sendThread;
         private Thread _trackingThread;
@@ -69,6 +69,13 @@ namespace Robot
         private string _lastTrackingSendMode = "idle";
         private string _lastDirectTrackingGateStatus;
         private long _lastEnterpriseControllerPayloadLogTicks;
+
+        // Direct tracking instrumentation counters (reset each reporting window)
+        private long _directLoopCount;
+        private long _directStaleReadCount;
+        private long _directNewSampleCount;
+        private long _directEnqueueCount;
+        private long _lastDirectStatsLogTicks;
 
         private void Awake()
         {
@@ -398,35 +405,40 @@ namespace Robot
                     continue;
                 }
 
-                JsonData trackingValue = new JsonData();
-                bool hasNewTrackingSample = false;
+                Interlocked.Increment(ref _directLoopCount);
+
+                // Read the latest cache and its sequence numbers first. Do not build any
+                // JsonData objects until we know that at least one source has advanced.
+                string headPose = null;
+                int headStatus = 0;
+                EnterpriseCollectionRecorder.EnterpriseControllerTcpPose leftController =
+                    default(EnterpriseCollectionRecorder.EnterpriseControllerTcpPose);
+                EnterpriseCollectionRecorder.EnterpriseControllerTcpPose rightController =
+                    default(EnterpriseCollectionRecorder.EnterpriseControllerTcpPose);
                 long headSampleSeq = _lastDirectTrackingHeadSampleSeq;
                 long controllerSampleSeq = _lastDirectTrackingControllerSampleSeq;
+                bool hasNewTrackingSample = false;
 
                 LogEnterpriseDirectTrackingGateIfChanged();
                 if (TrackingData.HeadOn)
                 {
                     if (!EnterpriseCollectionRecorder.TryGetLatestEnterpriseHeadForTcp(
-                            out string pose,
-                            out int status,
+                            out headPose,
+                            out headStatus,
                             out headSampleSeq))
                     {
                         Thread.Sleep(GetClampedSleepMs(trackingThreadWaitForHeadSleepMs));
                         continue;
                     }
 
-                    JsonData head = new JsonData();
-                    head["pose"] = pose;
-                    head["status"] = status;
-                    trackingValue["Head"] = head;
                     hasNewTrackingSample |= headSampleSeq != _lastDirectTrackingHeadSampleSeq;
                 }
 
                 if (TrackingData.ControllerOn)
                 {
                     EnterpriseCollectionRecorder.TryGetLatestEnterpriseControllerForTcp(
-                        out EnterpriseCollectionRecorder.EnterpriseControllerTcpPose leftController,
-                        out EnterpriseCollectionRecorder.EnterpriseControllerTcpPose rightController,
+                        out leftController,
+                        out rightController,
                         out controllerSampleSeq);
                     if (!IsControllerActiveInput())
                     {
@@ -434,16 +446,33 @@ namespace Robot
                         rightController = EnterpriseCollectionRecorder.CreateInvalidEnterpriseControllerTcpPose();
                     }
 
-                    JsonData controller = BuildEnterpriseControllerJson(leftController, rightController);
-                    trackingValue["Controller"] = controller;
-                    LogEnterpriseControllerPayloadIfNeeded(controller, controllerSampleSeq);
                     hasNewTrackingSample |= controllerSampleSeq != _lastDirectTrackingControllerSampleSeq;
                 }
 
                 if (!hasNewTrackingSample)
                 {
-                    Thread.Yield();
+                    Interlocked.Increment(ref _directStaleReadCount);
+                    // Avoid a tight busy loop even though no managed payload is created.
+                    Thread.Sleep(Mathf.Max(1, GetClampedSleepMs(trackingThreadQueueBackpressureSleepMs)));
                     continue;
+                }
+
+                Interlocked.Increment(ref _directNewSampleCount);
+
+                JsonData trackingValue = new JsonData();
+                if (TrackingData.HeadOn)
+                {
+                    JsonData head = new JsonData();
+                    head["pose"] = headPose;
+                    head["status"] = headStatus;
+                    trackingValue["Head"] = head;
+                }
+
+                if (TrackingData.ControllerOn)
+                {
+                    JsonData controller = BuildEnterpriseControllerJson(leftController, rightController);
+                    trackingValue["Controller"] = controller;
+                    LogEnterpriseControllerPayloadIfNeeded(controller, controllerSampleSeq);
                 }
 
                 JsonData appState = new JsonData();
@@ -460,9 +489,12 @@ namespace Robot
                     NetCMD.PACKET_CCMD_TO_CONTROLLER_FUNCTION,
                     Encoding.UTF8.GetBytes(sendJson.ToJson()),
                     true));
+                Interlocked.Increment(ref _directEnqueueCount);
                 Interlocked.Increment(ref _pendingDirectTrackingPackets);
                 _lastDirectTrackingHeadSampleSeq = headSampleSeq;
                 _lastDirectTrackingControllerSampleSeq = controllerSampleSeq;
+
+                LogDirectTrackingStatsIfNeeded(headSampleSeq, controllerSampleSeq);
             }
         }
 
@@ -603,6 +635,39 @@ namespace Robot
             Debug.Log($"{Tag}{rateMessage}");
             _trackingPacketsSentInWindow = 0;
             _trackingRateStopwatch.Restart();
+        }
+
+        private void LogDirectTrackingStatsIfNeeded(long headSeq, long controllerSeq)
+        {
+            long nowTicks = System.Diagnostics.Stopwatch.GetTimestamp();
+            if (_lastDirectStatsLogTicks == 0)
+            {
+                _lastDirectStatsLogTicks = nowTicks;
+                return;
+            }
+
+            double elapsedSeconds = (nowTicks - _lastDirectStatsLogTicks) /
+                                    (double)System.Diagnostics.Stopwatch.Frequency;
+            if (elapsedSeconds < 1.0)
+            {
+                return;
+            }
+
+            long loops = Interlocked.Exchange(ref _directLoopCount, 0);
+            long stale = Interlocked.Exchange(ref _directStaleReadCount, 0);
+            long fresh = Interlocked.Exchange(ref _directNewSampleCount, 0);
+            long enqueued = Interlocked.Exchange(ref _directEnqueueCount, 0);
+            _lastDirectStatsLogTicks = nowTicks;
+
+            double loopHz = loops / elapsedSeconds;
+            double staleHz = stale / elapsedSeconds;
+            double freshHz = fresh / elapsedSeconds;
+            double enqueueHz = enqueued / elapsedSeconds;
+
+            Debug.Log($"{Tag}direct stats: loopHz={loopHz:F0} staleReadHz={staleHz:F0} " +
+                      $"newSampleHz={freshHz:F0} enqueueHz={enqueueHz:F0} " +
+                      $"headSeq={headSeq} controllerSeq={controllerSeq} " +
+                      $"seqDelta={headSeq - controllerSeq} pending={_pendingDirectTrackingPackets}");
         }
 
         private void OnSendThread()
