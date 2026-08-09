@@ -248,6 +248,142 @@ namespace Unity.XR.PICO.TOBSupport
 #endif
         }
 
+        public static int UPxr_SetUsbTetheringStaticIP(string localAddr, string clientAddr)
+        {
+            int resultCode = 1;
+#if PICO_PLATFORM
+            if (IToBService == null)
+            {
+                Debug.LogWarning("TOB service binder is not ready; cannot set USB tethering static IP.");
+                return resultCode;
+            }
+
+            try
+            {
+                resultCode = IToBService.Call<int>(
+                    "setUsbTetheringStaticIP", localAddr, clientAddr);
+                Debug.Log($"USB tethering static IP set path=direct result={resultCode}");
+                return resultCode;
+            }
+            catch (Exception directException)
+            {
+                Debug.LogWarning(
+                    $"USB tethering static IP direct set unavailable; using fallback: {directException.Message}");
+            }
+
+            try
+            {
+                using (AndroidJavaObject parameters = new AndroidJavaObject("android.os.Bundle"))
+                {
+                    parameters.Call("putString", "local_addr", localAddr);
+                    parameters.Call("putString", "client_addr", clientAddr);
+                    using (AndroidJavaObject result = IToBService.Call<AndroidJavaObject>(
+                               "pbsCommonMessageLocked", "set_usb_tethering_static_ip", parameters))
+                    {
+                        if (result != null)
+                        {
+                            resultCode = result.Call<int>("getInt", "key_result_code", 1);
+                        }
+                    }
+                }
+                Debug.Log($"USB tethering static IP set path=pbsCommonMessageLocked result={resultCode}");
+            }
+            catch (Exception fallbackException)
+            {
+                Debug.LogError($"SetUsbTetheringStaticIP fallback failed: {fallbackException}");
+            }
+#endif
+            return resultCode;
+        }
+
+        public static string UPxr_GetUsbTetheringStaticIPLocal()
+        {
+            return UPxr_GetUsbTetheringStaticIPAddress(
+                "getUsbTetheringStaticIPLocal", "get_usb_tethering_static_ip_local", "local_addr");
+        }
+
+        public static string UPxr_GetUsbTetheringStaticIPClient()
+        {
+            return UPxr_GetUsbTetheringStaticIPAddress(
+                "getUsbTetheringStaticIPClient", "get_usb_tethering_static_ip_client", "client_addr");
+        }
+
+        public static void UPxr_EnableUsbTetheringStaticIP()
+        {
+#if PICO_PLATFORM
+            if (IToBService == null)
+            {
+                Debug.LogWarning("TOB service binder is not ready; cannot enable USB tethering static IP.");
+                return;
+            }
+
+            try
+            {
+                using (AndroidJavaObject parameters = new AndroidJavaObject("android.os.Bundle"))
+                {
+                    // PICO 4 Ultra ToBService 4.3.32 identifies this switch as enum index 104.
+                    parameters.Call("putInt", "system_function", 104);
+                    parameters.Call("putInt", "switch", 0);
+                    parameters.Call("putInt", "extension_bit", 0);
+                    using (AndroidJavaObject ignored = IToBService.Call<AndroidJavaObject>(
+                               "pbsCommonMessageLocked", "switch_system_function", parameters))
+                    {
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Debug.LogError($"EnableUsbTetheringStaticIP failed: {exception}");
+            }
+#endif
+        }
+
+        private static string UPxr_GetUsbTetheringStaticIPAddress(
+            string directMethod, string fallbackMethod, string resultKey)
+        {
+            string value = "";
+#if PICO_PLATFORM
+            if (IToBService == null)
+            {
+                Debug.LogWarning("TOB service binder is not ready; cannot get USB tethering static IP.");
+                return value;
+            }
+
+            try
+            {
+                value = IToBService.Call<string>(directMethod) ?? "";
+                Debug.Log(
+                    $"USB tethering static IP get path=direct method={directMethod} value={value}");
+                return value;
+            }
+            catch (Exception directException)
+            {
+                Debug.LogWarning(
+                    $"USB tethering static IP direct get unavailable; using fallback: {directException.Message}");
+            }
+
+            try
+            {
+                using (AndroidJavaObject parameters = new AndroidJavaObject("android.os.Bundle"))
+                using (AndroidJavaObject result = IToBService.Call<AndroidJavaObject>(
+                           "pbsCommonMessageLocked", fallbackMethod, parameters))
+                {
+                    if (result != null)
+                    {
+                        value = result.Call<string>("getString", resultKey) ?? "";
+                    }
+                }
+                Debug.Log(
+                    $"USB tethering static IP get path=pbsCommonMessageLocked method={fallbackMethod} value={value}");
+            }
+            catch (Exception fallbackException)
+            {
+                Debug.LogError($"GetUsbTetheringStaticIP fallback failed: {fallbackException}");
+            }
+#endif
+            return value;
+        }
+
         public static void UPxr_SetControllerPairTime(ControllerPairTimeEnum timeEnum, Action<int> callback,int ext)
         {
 #if PICO_PLATFORM
@@ -955,8 +1091,16 @@ namespace Unity.XR.PICO.TOBSupport
         public static void UPxr_GetSwitchSystemFunctionStatus(SystemFunctionSwitchEnum systemFunction, Action<int> callback,int ext)
         {
 #if PICO_PLATFORM
-            tobHelper.Call("pbsGetSwitchSystemFunctionStatus", GetEnumType(systemFunction), new IntCallback(callback),
-                ext);
+            // pbs* methods belong to IToBService, not ToBServiceHelper.
+            // The current tobservicelib AAR also requires the pvr IIntCallback ABI.
+            if (IToBService == null)
+            {
+                Debug.LogWarning("TOB service binder is not ready; cannot query system function status.");
+                return;
+            }
+
+            IToBService.Call("pbsGetSwitchSystemFunctionStatus", GetEnumType(systemFunction),
+                new IntCallback(callback), ext);
 #endif
         }
 

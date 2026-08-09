@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.NetworkInformation;
 using Robot;
 using Robot.Conf;
 using Unity.XR.PICO.TOBSupport;
@@ -12,6 +14,11 @@ using UnityEngine.UI;
 
 public class UIOperate : MonoBehaviour
 {
+    private const string UsbTetheringLocalAddress = "192.168.10.30";
+    private const string UsbTetheringClientAddress = "192.168.10.40";
+    private const float AutoConnectRetrySeconds = 2.0f;
+    private const float UsbTetheringStatusIntervalSeconds = 3.0f;
+
     public Text SN;
     public Text LocalIP;
     public Text TargetIP;
@@ -40,6 +47,13 @@ public class UIOperate : MonoBehaviour
 
     public Dropdown videoSourceDropdown;
 
+    private bool _enterpriseServiceBound;
+    private bool _usbNetworkingConfigured;
+    private bool _usbNetworkingConfigurationInProgress;
+    private bool _usbTetheringRecoveryInProgress;
+    private float _nextAutoConnectTime;
+    private float _nextUsbTetheringStatusTime;
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -62,6 +76,7 @@ public class UIOperate : MonoBehaviour
         NetshareTog.onValueChanged.AddListener(OnNetShareTog);
         HighAccuracy.onValueChanged.AddListener(OnHighAccuracy);
         ReconnectBtn.onClick.AddListener(OnReconnectBtn);
+        EnableCollectionStreams();
         //The shared network function is only available on B-end devices.
         NetshareTog.gameObject.SetActive(false);
         // Bypass getting sn via enterprise service to enable data transport
@@ -120,7 +135,14 @@ public class UIOperate : MonoBehaviour
     {
         TargetIP.text = "PC Service: " + ip;
         ReconnectBtn.gameObject.SetActive(true);
-        TcpHandler.Connect(ip);
+        if (ip == UsbTetheringClientAddress)
+        {
+            TcpHandler.Connect(ip, UsbTetheringLocalAddress);
+        }
+        else
+        {
+            TcpHandler.Connect(ip);
+        }
         ConnectSuccess();
     }
 
@@ -132,17 +154,156 @@ public class UIOperate : MonoBehaviour
     private void OnBindEnterpriseService(bool bind)
     {
         Debug.Log("OnBindEnterpriseService " + bind);
+        _enterpriseServiceBound = bind;
         EnterpriseCollectionRecorder.NotifyEnterpriseServiceBound(bind);
-        if (bind)
+        if (bind && !_usbNetworkingConfigured)
         {
+            _usbNetworkingConfigured = true;
             //The shared network function is only available on B-end devices.
             NetshareTog.gameObject.SetActive(true);
-            PXR_Enterprise.GetSwitchSystemFunctionStatus(SystemFunctionSwitchEnum.SFS_USB_TETHERING,
-                (value) => { NetshareTog.SetIsOnWithoutNotify(value == 1); });
+            _nextUsbTetheringStatusTime =
+                Time.realtimeSinceStartup + UsbTetheringStatusIntervalSeconds;
+            StartCoroutine(ConfigureUsbNetworking());
 
             string sn = PXR_Enterprise.StateGetDeviceInfo(SystemInfoEnum.EQUIPMENT_SN);
             SetDeviceSN(sn);
         }
+    }
+
+    private IEnumerator ConfigureUsbNetworking()
+    {
+        _usbNetworkingConfigurationInProgress = true;
+        string currentLocal = PXR_Enterprise.GetUsbTetheringStaticIPLocal();
+        string currentClient = PXR_Enterprise.GetUsbTetheringStaticIPClient();
+        bool addressesChanged = currentLocal != UsbTetheringLocalAddress ||
+                                currentClient != UsbTetheringClientAddress;
+
+        Debug.Log($"USB tethering static IP before: local={currentLocal}, client={currentClient}");
+        int result = PXR_Enterprise.SetUsbTetheringStaticIP(
+            UsbTetheringLocalAddress, UsbTetheringClientAddress);
+        Debug.Log($"SetUsbTetheringStaticIP result={result}, addressesChanged={addressesChanged}");
+        if (result != 0 && addressesChanged)
+        {
+            LogWindow.Error($"USB static IP configuration failed: result={result}");
+            _usbNetworkingConfigurationInProgress = false;
+            yield break;
+        }
+        if (result != 0)
+        {
+            Debug.LogWarning(
+                $"USB static IP setter returned {result}, but the configured addresses already match.");
+        }
+
+        PXR_Enterprise.EnableUsbTetheringStaticIP();
+        PXR_Enterprise.SwitchSystemFunction(
+            SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_OFF);
+        yield return new WaitForSecondsRealtime(1.0f);
+        PXR_Enterprise.SwitchSystemFunction(
+            SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_ON);
+        NetshareTog.SetIsOnWithoutNotify(true);
+        _nextAutoConnectTime = 0.0f;
+        _nextUsbTetheringStatusTime =
+            Time.realtimeSinceStartup + UsbTetheringStatusIntervalSeconds;
+        _usbNetworkingConfigurationInProgress = false;
+        Debug.Log($"USB tethering configured: local={UsbTetheringLocalAddress}, client={UsbTetheringClientAddress}");
+    }
+
+    private void EnsureUsbTetheringEnabled()
+    {
+        if (!_enterpriseServiceBound || _usbTetheringRecoveryInProgress ||
+            Time.realtimeSinceStartup < _nextUsbTetheringStatusTime)
+        {
+            return;
+        }
+
+        _nextUsbTetheringStatusTime =
+            Time.realtimeSinceStartup + UsbTetheringStatusIntervalSeconds;
+        if (HasLocalIPv4Address(UsbTetheringLocalAddress))
+        {
+            return;
+        }
+
+        StartCoroutine(RestartUsbTetheringForRecovery());
+    }
+
+    private IEnumerator RestartUsbTetheringForRecovery()
+    {
+        _usbTetheringRecoveryInProgress = true;
+        Debug.LogWarning($"USB address {UsbTetheringLocalAddress} is missing; restarting USB tethering.");
+        PXR_Enterprise.EnableUsbTetheringStaticIP();
+        PXR_Enterprise.SwitchSystemFunction(
+            SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_OFF);
+        yield return new WaitForSecondsRealtime(0.5f);
+        PXR_Enterprise.SwitchSystemFunction(
+            SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_ON);
+        yield return new WaitForSecondsRealtime(1.0f);
+        _usbTetheringRecoveryInProgress = false;
+    }
+
+    private static bool HasLocalIPv4Address(string expectedAddress)
+    {
+        foreach (NetworkInterface networkInterface in NetworkInterface.GetAllNetworkInterfaces())
+        {
+            foreach (UnicastIPAddressInformation addressInfo in
+                     networkInterface.GetIPProperties().UnicastAddresses)
+            {
+                IPAddress address = addressInfo.Address;
+                if (address.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork &&
+                    address.ToString() == expectedAddress)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private void EnableCollectionStreams()
+    {
+        TrackingData.SetHeadOn(true);
+        TrackingData.SetControllerOn(true);
+        TcpHandler.SendTrackingData = true;
+        HeadTog.SetIsOnWithoutNotify(true);
+        ControllerTog.SetIsOnWithoutNotify(true);
+        SendTog.SetIsOnWithoutNotify(true);
+    }
+
+    private void EnsureUsbTcpConnected()
+    {
+        if (!_enterpriseServiceBound || _usbNetworkingConfigurationInProgress ||
+            _usbTetheringRecoveryInProgress || TcpHandler == null)
+        {
+            return;
+        }
+
+        if (!HasLocalIPv4Address(UsbTetheringLocalAddress))
+        {
+            return;
+        }
+
+        bool configuredForUsb = TcpHandler.GetTargetIP == UsbTetheringClientAddress &&
+                                TcpHandler.GetSourceIP == UsbTetheringLocalAddress;
+        if (configuredForUsb &&
+            (TcpHandler.State == SocketState.WORKING ||
+             TcpHandler.State == SocketState.CONNECTING))
+        {
+            return;
+        }
+        if (Time.realtimeSinceStartup < _nextAutoConnectTime)
+        {
+            return;
+        }
+
+        _nextAutoConnectTime = Time.realtimeSinceStartup + AutoConnectRetrySeconds;
+        if (TcpHandler.State == SocketState.WORKING || TcpHandler.State == SocketState.CONNECTING)
+        {
+            Debug.LogWarning(
+                $"Replacing non-USB TCP route: source={TcpHandler.GetSourceIP}, " +
+                $"target={TcpHandler.GetTargetIP}");
+        }
+        Debug.Log($"USB auto-connect: {UsbTetheringClientAddress}:{Robot.TcpHandler.TCP_PORT}");
+        TcpConnect(UsbTetheringClientAddress);
     }
 
     private void SetDeviceSN(string sn)
@@ -374,6 +535,10 @@ public class UIOperate : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        EnableCollectionStreams();
+        EnsureUsbTetheringEnabled();
+        EnsureUsbTcpConnected();
+
         if (TcpHandler.State != SocketState.WORKING)
         {
             if (Time.time - _lastTime > 2)

@@ -203,8 +203,9 @@ namespace Unity.XR.PXR
 
             //log level
             int logLevel = PXR_Plugin.System.UPxr_GetConfigInt(ConfigType.UnityLogLevel);
-            Debug.Log("PXRLog XR Platform----SDK logLevel:" + logLevel);
-            PLog.logLevel = (PLog.LogLevel)logLevel;
+            PLog.LogLevel appliedLogLevel = PLog.NormalizeLogLevel(logLevel);
+            Debug.Log("PXRLog XR Platform----SDK logLevel requested:" + logLevel + ", applied:" + (int)appliedLogLevel);
+            PLog.logLevel = appliedLogLevel;
             eyeCamera = new Camera[3];
             Camera[] cam = gameObject.GetComponentsInChildren<Camera>();
             for (int i = 0; i < cam.Length; i++)

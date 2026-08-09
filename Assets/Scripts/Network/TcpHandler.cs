@@ -10,6 +10,9 @@ using LitJson;
 using Network;
 using Unity.XR.PXR;
 using UnityEngine;
+using UnityEngine.XR;
+using CommonUsages = UnityEngine.XR.CommonUsages;
+using InputDevice = UnityEngine.XR.InputDevice;
 
 namespace Robot
 {
@@ -38,6 +41,7 @@ namespace Robot
 
         private bool _connectInited = false;
         private static string _address = "127.0.0.1"; // PC IP Address
+        private static string _localAddress = ""; // Optional source address for deterministic routing
         private int _port = 8888; //PC Port
         private int _sendTimeout = 15000; // timeout
         [SerializeField] private int trackingThreadIdleSleepMs = 5;
@@ -59,6 +63,9 @@ namespace Robot
         private int _pendingDirectTrackingPackets = 0;
         private bool _cachedAppFocus = true;
         private int _cachedActiveInputDevice = (int)ActiveInputDevice.ControllerActive;
+        private readonly object _controllerInputLock = new object();
+        private ControllerInputState _cachedLeftControllerInput;
+        private ControllerInputState _cachedRightControllerInput;
         private long _lastDirectTrackingHeadSampleSeq;
         private long _lastDirectTrackingControllerSampleSeq;
         private float _lastHeardSend = 0;
@@ -98,10 +105,24 @@ namespace Robot
             get { return _address; }
         }
 
+        public static string GetSourceIP
+        {
+            get { return _localAddress; }
+        }
+
         public void Connect(string address)
         {
-            LogWindow.Info($"Attempting to connect to {address}");
+            Connect(address, null);
+        }
+
+        public void Connect(string address, string localAddress)
+        {
+            LogWindow.Info(
+                string.IsNullOrEmpty(localAddress)
+                    ? $"Attempting to connect to {address}"
+                    : $"Attempting to connect from {localAddress} to {address}");
             _address = address;
+            _localAddress = localAddress ?? "";
             _reconnectEnable = false;
             Connect();
         }
@@ -111,7 +132,10 @@ namespace Robot
             _port = TCP_PORT;
             _state = SocketState.CREATE;
             ConnectErrorInfo = "";
-            Debug.Log(string.Format(Tag + "connect to server: ip {0}port: {1}", _address, _port.ToString()));
+            Debug.Log(
+                $"{Tag}connect to server: source " +
+                $"{(string.IsNullOrEmpty(_localAddress) ? "auto" : _localAddress)} " +
+                $"target {_address} port {_port}");
             IPAddress ia = IPAddress.Parse(_address);
             try
             {
@@ -127,6 +151,11 @@ namespace Robot
                     _socket.SendTimeout = _sendTimeout;
                     _socket.NoDelay = true;
                     _socket.ReceiveTimeout = RECEIVE_TIME_OUT_DEFAULT;
+                    if (!string.IsNullOrEmpty(_localAddress))
+                    {
+                        IPAddress localIp = IPAddress.Parse(_localAddress);
+                        _socket.Bind(new IPEndPoint(localIp, 0));
+                    }
 
 
                     _state = SocketState.CONNECTING;
@@ -291,6 +320,13 @@ namespace Robot
         {
             _cachedAppFocus = Application.isFocused;
             _cachedActiveInputDevice = (int)PXR_HandTracking.GetActiveInputDevice();
+            ControllerInputState leftInput = ReadControllerInput(XRNode.LeftHand);
+            ControllerInputState rightInput = ReadControllerInput(XRNode.RightHand);
+            lock (_controllerInputLock)
+            {
+                _cachedLeftControllerInput = leftInput;
+                _cachedRightControllerInput = rightInput;
+            }
 
             if (SendTrackingData && !ShouldSendEnterpriseTrackingDirectly())
             {
@@ -470,7 +506,17 @@ namespace Robot
 
                 if (TrackingData.ControllerOn)
                 {
-                    JsonData controller = BuildEnterpriseControllerJson(leftController, rightController);
+                    GetControllerInputSnapshot(out ControllerInputState leftInput, out ControllerInputState rightInput);
+                    if (!IsControllerActiveInput())
+                    {
+                        leftInput = default(ControllerInputState);
+                        rightInput = default(ControllerInputState);
+                    }
+                    JsonData controller = BuildEnterpriseControllerJson(
+                        leftController,
+                        rightController,
+                        leftInput,
+                        rightInput);
                     trackingValue["Controller"] = controller;
                     LogEnterpriseControllerPayloadIfNeeded(controller, controllerSampleSeq);
                 }
@@ -508,26 +554,37 @@ namespace Robot
 
         private static JsonData BuildEnterpriseControllerJson(
             EnterpriseCollectionRecorder.EnterpriseControllerTcpPose left,
-            EnterpriseCollectionRecorder.EnterpriseControllerTcpPose right)
+            EnterpriseCollectionRecorder.EnterpriseControllerTcpPose right,
+            ControllerInputState leftInput,
+            ControllerInputState rightInput)
         {
             JsonData controller = new JsonData();
-            controller["left"] = BuildEnterpriseControllerSideJson(left);
-            controller["right"] = BuildEnterpriseControllerSideJson(right);
+            controller["left"] = BuildEnterpriseControllerSideJson(left, leftInput);
+            controller["right"] = BuildEnterpriseControllerSideJson(right, rightInput);
             return controller;
         }
 
         private static JsonData BuildEnterpriseControllerSideJson(
-            EnterpriseCollectionRecorder.EnterpriseControllerTcpPose pose)
+            EnterpriseCollectionRecorder.EnterpriseControllerTcpPose pose,
+            ControllerInputState input)
         {
             JsonData json = new JsonData();
-            json["axisX"] = 0.0;
-            json["axisY"] = 0.0;
-            json["axisClick"] = false;
-            json["grip"] = 0.0;
-            json["trigger"] = 0.0;
-            json["primaryButton"] = false;
-            json["secondaryButton"] = false;
-            json["menuButton"] = false;
+            json["axisX"] = input.AxisX;
+            json["axisY"] = input.AxisY;
+            json["axisClick"] = input.AxisClick;
+            json["grip"] = input.Grip;
+            json["trigger"] = input.Trigger;
+            json["primaryButton"] = input.PrimaryButton;
+            json["secondaryButton"] = input.SecondaryButton;
+            json["menuButton"] = input.MenuButton;
+            json["inputDeviceValid"] = input.DeviceValid;
+            json["axisValid"] = input.AxisValid;
+            json["axisClickValid"] = input.AxisClickValid;
+            json["gripValid"] = input.GripValid;
+            json["triggerValid"] = input.TriggerValid;
+            json["primaryButtonValid"] = input.PrimaryButtonValid;
+            json["secondaryButtonValid"] = input.SecondaryButtonValid;
+            json["menuButtonValid"] = input.MenuButtonValid;
             json["hasPose"] = pose.HasPose;
             json["pose"] = string.IsNullOrEmpty(pose.Pose)
                 ? EnterpriseCollectionRecorder.InvalidControllerPose
@@ -540,9 +597,71 @@ namespace Robot
             return json;
         }
 
+        private static ControllerInputState ReadControllerInput(XRNode node)
+        {
+            InputDevice device = InputDevices.GetDeviceAtXRNode(node);
+            bool axisValid = device.TryGetFeatureValue(CommonUsages.primary2DAxis, out Vector2 axis);
+            bool axisClickValid = device.TryGetFeatureValue(CommonUsages.primary2DAxisClick, out bool axisClick);
+            bool gripValid = device.TryGetFeatureValue(CommonUsages.grip, out float grip);
+            bool triggerValid = device.TryGetFeatureValue(CommonUsages.trigger, out float trigger);
+            bool primaryButtonValid = device.TryGetFeatureValue(CommonUsages.primaryButton, out bool primaryButton);
+            bool secondaryButtonValid = device.TryGetFeatureValue(CommonUsages.secondaryButton, out bool secondaryButton);
+            bool menuButtonValid = device.TryGetFeatureValue(CommonUsages.menuButton, out bool menuButton);
+            return new ControllerInputState
+            {
+                DeviceValid = device.isValid,
+                AxisX = axis.x,
+                AxisY = axis.y,
+                AxisClick = axisClick,
+                Grip = grip,
+                Trigger = trigger,
+                PrimaryButton = primaryButton,
+                SecondaryButton = secondaryButton,
+                MenuButton = menuButton,
+                AxisValid = device.isValid && axisValid,
+                AxisClickValid = device.isValid && axisClickValid,
+                GripValid = device.isValid && gripValid,
+                TriggerValid = device.isValid && triggerValid,
+                PrimaryButtonValid = device.isValid && primaryButtonValid,
+                SecondaryButtonValid = device.isValid && secondaryButtonValid,
+                MenuButtonValid = device.isValid && menuButtonValid
+            };
+        }
+
+        private void GetControllerInputSnapshot(
+            out ControllerInputState left,
+            out ControllerInputState right)
+        {
+            lock (_controllerInputLock)
+            {
+                left = _cachedLeftControllerInput;
+                right = _cachedRightControllerInput;
+            }
+        }
+
         private bool IsControllerActiveInput()
         {
             return _cachedActiveInputDevice == (int)ActiveInputDevice.ControllerActive;
+        }
+
+        private struct ControllerInputState
+        {
+            public bool DeviceValid;
+            public float AxisX;
+            public float AxisY;
+            public bool AxisClick;
+            public float Grip;
+            public float Trigger;
+            public bool PrimaryButton;
+            public bool SecondaryButton;
+            public bool MenuButton;
+            public bool AxisValid;
+            public bool AxisClickValid;
+            public bool GripValid;
+            public bool TriggerValid;
+            public bool PrimaryButtonValid;
+            public bool SecondaryButtonValid;
+            public bool MenuButtonValid;
         }
 
         private void LogEnterpriseControllerPayloadIfNeeded(JsonData controller, long sampleSeq)
@@ -566,7 +685,8 @@ namespace Robot
                 "TCP enterprise controller schema: " +
                 "axisX=double axisY=double axisClick=bool grip=double trigger=double " +
                 "primaryButton=bool secondaryButton=bool menuButton=bool hasPose=bool pose=string " +
-                "status=double timeStampNs=double type=double poseError=double";
+                "inputDeviceValid=bool *Valid=bool status=double timeStampNs=double " +
+                "type=double poseError=double";
             string payloadMessage =
                 $"TCP enterprise controller payload: sampleSeq={sampleSeq} json={controller.ToJson()}";
             Debug.Log($"{Tag}{schemaMessage}");
