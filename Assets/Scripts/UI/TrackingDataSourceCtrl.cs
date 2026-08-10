@@ -10,7 +10,7 @@ public class TrackingDataSourceCtrl : MonoBehaviour
         EnterpriseSDK
     }
 
-    public static TrackingDataSource CurrentSource { get; private set; } = TrackingDataSource.UnityXR;
+    public static TrackingDataSource CurrentSource { get; private set; } = TrackingDataSource.EnterpriseSDK;
     public static bool UseEnterpriseSDK => CurrentSource == TrackingDataSource.EnterpriseSDK;
 
     public Toggle UnityXRToggle;
@@ -38,10 +38,7 @@ public class TrackingDataSourceCtrl : MonoBehaviour
 
     private void Start()
     {
-        TrackingDataSource initialSource = EnterpriseSDKToggle != null && EnterpriseSDKToggle.isOn
-            ? TrackingDataSource.EnterpriseSDK
-            : TrackingDataSource.UnityXR;
-        ApplySource(initialSource);
+        ApplySource(TrackingDataSource.EnterpriseSDK);
     }
 
     private void OnDestroy()

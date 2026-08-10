@@ -538,8 +538,16 @@ namespace Unity.XR.PXR
                     break;
                 case PxrStructureType.SDKLoglevelChanged:
                     status = BitConverter.ToInt32(eventDB.data, 0);
-                    PLog.logLevel = (PLog.LogLevel)status;
-                    PLog.i(TAG, $"SDKLoglevelChanged logLevel ={status}");
+                    PLog.LogLevel appliedLogLevel = PLog.NormalizeLogLevel(status);
+                    PLog.logLevel = appliedLogLevel;
+                    if (status != (int)appliedLogLevel)
+                    {
+                        PLog.w(TAG, $"SDKLoglevelChanged requested unsupported level={status}; applied level={(int)appliedLogLevel}");
+                    }
+                    else
+                    {
+                        PLog.i(TAG, $"SDKLoglevelChanged logLevel ={status}");
+                    }
                     break;
                 case PxrStructureType.MotionTrackerKeyEvent:
                     if (PXR_MotionTracking.MotionTrackerKeyAction != null)

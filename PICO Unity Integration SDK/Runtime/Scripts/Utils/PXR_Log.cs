@@ -19,9 +19,30 @@ namespace Unity.XR.PXR
 {
     public class PLog
     {
-        //   7--all print, 4--info to fatal, 3--warning to fatal,
-        //   2--error to fatal, 1--only fatal print
+        //   4--info to fatal, 3--warning to fatal,
+        //   2--error to fatal, 1--only fatal print.
+        //
+        // PICO system diagnostics may temporarily request level 8 while
+        // collecting a BLACKSCREEN report. Level 8 is not a valid PLog level;
+        // accepting it makes every comparison below true and turns the SDK into
+        // a per-frame verbose logger.
         public static LogLevel logLevel = LogLevel.LogWarn;
+
+        public static LogLevel NormalizeLogLevel(int requestedLevel)
+        {
+            if (requestedLevel >= (int)LogLevel.LogFatal &&
+                requestedLevel <= (int)LogLevel.LogVerbose)
+            {
+                return (LogLevel)requestedLevel;
+            }
+
+            // Never map an unknown high value to LogVerbose. Keep the normal
+            // production level instead, which prevents a runtime-side value
+            // change from creating an unbounded Unity log stream.
+            return requestedLevel < (int)LogLevel.LogFatal
+                ? LogLevel.LogFatal
+                : LogLevel.LogInfo;
+        }
 
         public enum LogLevel
         {

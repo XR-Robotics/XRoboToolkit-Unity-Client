@@ -394,6 +394,39 @@ namespace Unity.XR.PICO.TOBSupport
         }
 
         /// <summary>
+        /// Sets the static IPv4 addresses used by PICO USB tethering.
+        /// </summary>
+        /// <returns>0 on success, 1 on failure, 101 for equal addresses, or 102 for different /24 subnets.</returns>
+        public static int SetUsbTetheringStaticIP(string localAddr, string clientAddr)
+        {
+            return PXR_EnterprisePlugin.UPxr_SetUsbTetheringStaticIP(localAddr, clientAddr);
+        }
+
+        /// <summary>
+        /// Gets the PICO-side static IPv4 address used by USB tethering.
+        /// </summary>
+        public static string GetUsbTetheringStaticIPLocal()
+        {
+            return PXR_EnterprisePlugin.UPxr_GetUsbTetheringStaticIPLocal();
+        }
+
+        /// <summary>
+        /// Gets the PC-side static IPv4 address used by USB tethering.
+        /// </summary>
+        public static string GetUsbTetheringStaticIPClient()
+        {
+            return PXR_EnterprisePlugin.UPxr_GetUsbTetheringStaticIPClient();
+        }
+
+        /// <summary>
+        /// Enables use of the configured USB tethering static addresses.
+        /// </summary>
+        public static void EnableUsbTetheringStaticIP()
+        {
+            PXR_EnterprisePlugin.UPxr_EnableUsbTetheringStaticIP();
+        }
+
+        /// <summary>
         /// Sets the duration after which the controllers enter the pairing mode.
         /// @note Supported by PICO Neo3 Pro (system version 5.4.0 or later) and PICO 4 Enterprise (system version 5.2.8 or later)
         /// </summary>
