@@ -12,6 +12,11 @@ using UnityEngine.UI;
 
 public class UIOperate : MonoBehaviour
 {
+    private const string HeadTogglePreferenceKey = "UIOperate.HeadTracking";
+    private const string ControllerTogglePreferenceKey = "UIOperate.ControllerTracking";
+    private const string HandTrackingTogglePreferenceKey = "UIOperate.HandTracking";
+    private const string SendTogglePreferenceKey = "UIOperate.SendTrackingData";
+
     public Text SN;
     public Text LocalIP;
     public Text TargetIP;
@@ -50,6 +55,8 @@ public class UIOperate : MonoBehaviour
         }
 #endif
         // ReconnectBtn.gameObject.SetActive(false);
+
+        RestoreTrackingTogglePreferences();
 
         bodyModeDrop.onValueChanged.AddListener(OnBodyModeDrop);
         HeadTog.onValueChanged.AddListener(OnHeadTog);
@@ -91,6 +98,16 @@ public class UIOperate : MonoBehaviour
         print("OnSourceConfigOnOnInitialized");
         videoSourceDropdown.ClearOptions();
         videoSourceDropdown.AddOptions(sourceConfig.GetVideoSourceNames());
+
+        string lastVideoSource = RemoteVisionAddressStore.LoadLastVideoSource();
+        for (int i = 0; i < videoSourceDropdown.options.Count; i++)
+        {
+            if (videoSourceDropdown.options[i].text == lastVideoSource)
+            {
+                videoSourceDropdown.SetValueWithoutNotify(i);
+                break;
+            }
+        }
     }
 
     private void OnAndroidCallBack(string key, string value)
@@ -118,6 +135,13 @@ public class UIOperate : MonoBehaviour
 
     public void TcpConnect(string ip)
     {
+        if (!PcServiceAddressStore.TrySave(ip, out string normalizedIp))
+        {
+            LogWindow.Warn("Ignoring a PC service announcement with an invalid IPv4 address.");
+            return;
+        }
+
+        ip = normalizedIp;
         TargetIP.text = "PC Service: " + ip;
         ReconnectBtn.gameObject.SetActive(true);
         TcpHandler.Connect(ip);
@@ -231,8 +255,7 @@ public class UIOperate : MonoBehaviour
     {
         if (CameraObj != null)
         {
-            if (Permission.HasUserAuthorizedPermission(Permission.Camera) &&
-                Permission.HasUserAuthorizedPermission(Permission.Microphone))
+            if (Permission.HasUserAuthorizedPermission(Permission.Camera))
             {
                 CameraObj.SetActive(!CameraObj.activeSelf);
             }
@@ -242,7 +265,9 @@ public class UIOperate : MonoBehaviour
                 permissionCallbacks.PermissionGranted += PermissionGranted;
                 permissionCallbacks.PermissionDenied += PermissionDenied;
 
-                string[] permissions = { Permission.Camera, Permission.Microphone };
+                // Microphone permission is requested only after the operator
+                // negotiates an authenticated audio session in UICameraCtrl.
+                string[] permissions = { Permission.Camera };
                 Permission.RequestUserPermissions(permissions, permissionCallbacks);
             }
 
@@ -260,12 +285,22 @@ public class UIOperate : MonoBehaviour
 
     private void PermissionDenied(string obj)
     {
-        Toast.Show("Permission denied!");
+        if (obj == Permission.Microphone)
+        {
+            Toast.Show("Microphone permission denied; voice upload is disabled.");
+            if (CameraObj != null && Permission.HasUserAuthorizedPermission(Permission.Camera))
+            {
+                CameraObj.SetActive(true);
+            }
+            return;
+        }
+
+        Toast.Show("Camera permission denied!");
     }
 
     private void PermissionGranted(string obj)
     {
-        if (CameraObj != null)
+        if (CameraObj != null && Permission.HasUserAuthorizedPermission(Permission.Camera))
         {
             CameraObj.SetActive(true);
         }
@@ -297,26 +332,59 @@ public class UIOperate : MonoBehaviour
     private void OnHeadTog(bool on)
     {
         TrackingData.SetHeadOn(on);
+        SaveTogglePreference(HeadTogglePreferenceKey, on);
     }
 
     private void OnControllerTog(bool on)
     {
         TrackingData.SetControllerOn(on);
+        SaveTogglePreference(ControllerTogglePreferenceKey, on);
     }
 
     private void OnHandTrackingTog(bool on)
     {
         TrackingData.SetHandTrackingOn(on);
+        SaveTogglePreference(HandTrackingTogglePreferenceKey, on);
     }
 
     private void OnSendTog(bool on)
     {
         TcpHandler.SendTrackingData = on;
+        SaveTogglePreference(SendTogglePreferenceKey, on);
         // Reset FPS
         if (!on)
         {
             FPSDisplay.Reset();
         }
+    }
+
+    private void RestoreTrackingTogglePreferences()
+    {
+        bool headOn = LoadTogglePreference(HeadTogglePreferenceKey, HeadTog.isOn);
+        bool controllerOn = LoadTogglePreference(ControllerTogglePreferenceKey, ControllerTog.isOn);
+        bool handTrackingOn = LoadTogglePreference(HandTrackingTogglePreferenceKey, HandTrackingTog.isOn);
+        bool sendTrackingData = LoadTogglePreference(SendTogglePreferenceKey, SendTog.isOn);
+
+        HeadTog.SetIsOnWithoutNotify(headOn);
+        ControllerTog.SetIsOnWithoutNotify(controllerOn);
+        HandTrackingTog.SetIsOnWithoutNotify(handTrackingOn);
+        SendTog.SetIsOnWithoutNotify(sendTrackingData);
+
+        TrackingData.SetHeadOn(headOn);
+        TrackingData.SetControllerOn(controllerOn);
+        TrackingData.SetHandTrackingOn(handTrackingOn);
+        TcpHandler.SendTrackingData = sendTrackingData;
+    }
+
+    private static bool LoadTogglePreference(string key, bool fallback)
+    {
+        return PlayerPrefs.HasKey(key) ? PlayerPrefs.GetInt(key) != 0 : fallback;
+    }
+
+    private static void SaveTogglePreference(string key, bool on)
+    {
+        PlayerPrefs.SetInt(key, on ? 1 : 0);
+        PlayerPrefs.Save();
     }
 
     private void OnHighAccuracy(bool on)

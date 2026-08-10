@@ -6,6 +6,112 @@
 - **训练数据录制**可以将VST图像与位姿数据同步录制为mp4文件保存到本机的Download目录。
 - **机器人遥控**：将本机位姿数据传输到PC机器人端，用来遥控机器人。
 - **图像的编解码**：可以将本机的VST图像进行编码发送，也可以将PC端的图像进行解码显示。
+- **机器人麦克风播放**：远端视觉开启后，会用同一个PC/operator IP连接原始PCM音频端口，在头显内播放机器人侧麦克风声音。
+- **Pico 麦克风上行**：将头显麦克风转为 `s16le`、`16 kHz`、单声道、20 ms PCM 帧发送到 operator bridge。
+
+## G1-Wuji operator 音频
+当 G1-Wuji operator 栈使用 `--with-audio` 启动时，operator 侧头显桥会把
+G1 自带麦克风转成原始 `s16le`、`16 kHz`、单声道 PCM，并默认暴露在 TCP
+`13580` 端口。Pico App 在 Remote Vision 点击 Listen 并输入 operator IP 后，
+会自动连接同一个 IP 的音频端口；关闭远端相机窗口会同时停止视频和音频。
+Pico 麦克风在同一 Listen 生命周期内默认全双工上行。运行时会明确请求
+`RECORD_AUDIO`；若用户拒绝，只停用麦克风上行，不阻塞相机或原有遥操。
+上行不是匿名裸 PCM 端口：当前控制连接必须先发送 `AUDIO_SESSION`，并拿到
+与本次请求匹配的一次性令牌，Pico 才会连接和发送。
+
+下行 fallback 可在 `Assets/StreamingAssets/video_source.yml` 里通过
+`AudioStreamPort` 调整。麦克风端口不再采用静态 fallback，必须由 schema 为
+`g1_wuji_audio_ports_v2` 的安全 `AUDIO_CONFIG` 下发。当前 Inspire profile
+协商为 `13680/13681`。
+
+协议 payload 示例：
+
+```json
+{
+  "schema": "g1_wuji_audio_ports_v2",
+  "audio_request_id": "<本次32字符请求ID>",
+  "audio_stream_port": 13680,
+  "microphone_upload_port": 13681,
+  "microphone_upload_protocol": "g1_wuji_audio_uplink_v1",
+  "microphone_upload_token": "<一次性会话令牌>",
+  "sample_rate": 16000,
+  "channels": 1,
+  "sample_format": "s16le",
+  "video_projection": "flat",
+  "video_stereo_layout": "mono"
+}
+```
+
+上行 TCP 首帧是带长度的 `G1AT` 鉴权记录；语音用 `G1AF` 记录携带序号、
+采集时间和固定 640 字节 PCM；静音/空闲时用 `G1AH` 心跳保活。operator 会在
+进入云链路前丢弃错误来源、错误令牌、乱序、畸形和陈旧帧，状态文件不会写入令牌。
+Remote Vision 控制连接使用 App 内的 `OperatorControlClient`，通过 read-exact
+和每次连接独立 socket 避开 vendor AAR 的长度头短读与快速重连串线问题。
+
+麦克风上行默认全双工。调用 `UICameraCtrl.SetMicrophoneMuted(true)` 后，本地
+仍持续消费采集环，但不会发送静音 PCM 帧，避免 G1 侧播放/duck 状态被永久激活。
+
+## 连接地址记忆
+
+- 主界面 Data & Control 的 PC Service 输入会保存最后一次确认的有效 IPv4。
+- Remote Vision 会按视频源分别保存 operator IP，并恢复最后一次成功确认的
+  视频源；读取顺序是“当前源专属地址 → 最近一次全局地址 → 旧版地址”。
+- 地址会先去除首尾空白并严格校验，只有点击 Connect/Confirm 后才显式调用
+  `PlayerPrefs.Save()`；格式错误时对话框保持打开且不会覆盖已有值。
+- App 只保存地址和视频源名称，不保存端口、音频会话令牌，也不会在启动时自动连接。
+
+同包名、同签名的 `adb install -r` 会保留这些设置；卸载 App 或执行 `pm clear`
+会清空。正式版 `com.xrobotoolkit.client` 与 Beta
+`com.xrobotoolkit.client.voicebeta` 使用独立存储，因此两者不会自动迁移地址。
+
+## 平面与全景远端视频
+
+operator bridge 会在同一份协商配置里声明
+`video_projection=flat|equirectangular` 和
+`video_stereo_layout=mono|side_by_side|top_bottom`。字段缺失或值未知时会
+安全回退到 `flat/mono`，保留原有悬浮屏显示。`equirectangular` 会把收到的
+纹理交给 Unity `Skybox/Panoramic`，暂停旧的左右眼平面画布并隐藏平面
+`RawImage`；停止 Listen 后恢复进入全景前的 skybox、相机和 UI 状态。
+
+App 不负责把普通画面拼成全景。只有真实全景源才能声明
+`equirectangular`：单目通常为 2:1；左右双目为两个 2:1 画面，整体通常
+4:1；上下双目整体通常 1:1。当前 G1 普通相机必须保持 `flat`。这套显式协议
+同时为后续仿真直接输出全景纹理预留了统一入口。
+operator/G1 生产端还必须配置匹配的尺寸（例如单目 `1280x640`）；全景源或
+输出比例不匹配时会在 resize 前拒绝，不能把普通画面强拉伸后冒充全景。
+点击 Listen 前还需要选择匹配的内置 Remote Vision 源：
+`PANORAMA_MONO_1280x640`、`PANORAMA_SBS_2560x640` 或
+`PANORAMA_TOP_BOTTOM_1280x1280`。
+
+在 `g1_wuji_teleoperation` operator 仓库中启动：
+
+```bash
+scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
+```
+
+## Pico 闪退诊断
+
+App 启动时会在 `Application.persistentDataPath/g1_wuji_crash_probe/`
+写入本地诊断文件：
+
+- `breadcrumbs.jsonl`：关键阶段 JSONL，包含启动、生命周期、Listen、
+  `AUDIO_CONFIG`、音频上下行、全景渲染、warning/error/exception。
+- `active_session.json`：当前 session sentinel。正常 `OnApplicationQuit`
+  会标记 `clean_exit=true`；如果下次启动发现上一轮没有 clean exit，会写
+  `last_exit.json` 并在日志里提示。
+- `last_exit.json`：上一轮异常退出或系统杀进程的检测结果。
+
+从电脑导出 Pico 现场：
+
+```bash
+scripts/pico/export_crash_probe.sh /tmp/pico-crash-$(date +%Y%m%d-%H%M%S)
+```
+
+脚本会导出 App probe 文件、`adb logcat -d`、设备信息，以及可访问的
+tombstone/ANR/Dropbox 线索。非 root Pico 固件通常不能直接读取
+`/data/tombstones` 或 `/data/anr`，这种情况下以 `breadcrumbs.jsonl`、
+`last_exit.json` 和 `logcat_threadtime.txt` 作为第一调试面。脚本会优先自动
+识别已安装的 beta 包；也可以用 `PICO_APP_PACKAGE=...` 显式指定包名。
 
 ## 目录结构
 
@@ -15,6 +121,7 @@ Unity 项目的核心资源文件夹，包含了项目中使用的所有资源�
 - **Plugins**：包含了提供Android接口的robotassistant_lib.aar和其他android平台配置。
 - **Resources**：本项目相关的资源。
 - **Scripts**：存放项目的脚本文件。
+  - **Audio**：机器人麦克风播放和 Pico 麦克风 PCM 上行逻辑。
   - **Camera**：与Camera相关的逻辑代码。
   - **ExtraDev**：用来读取PICO追踪器外设的相关逻辑。
   - **Network**：网络相关逻辑。
@@ -82,6 +189,61 @@ PICO Unity官方SDK，官方下载地址：https://developer.picoxr.com/zh/resou
 - Windows：自动打开资源管理器并选中输出文件
 - macOS：在 Finder 中显示构建文件
 - 显示构建结果弹窗
+
+### 双向语音 Beta 测试包
+
+为了在不覆盖头显现有正式版 App 的情况下测试双向语音，可以构建并行安装的
+Beta 包。它使用包名 `com.xrobotoolkit.client.voicebeta`、ARM64 + IL2CPP、
+Android API 30/31 和 Unity 开发调试签名，不读取或修改正式版 keystore。
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -buildTarget Android \
+  -executeMethod VoiceDuplexBetaBuilder.BuildBatch \
+  -logFile /tmp/xrobotoolkit-voice-beta-unity.log
+```
+
+可选环境变量为 `XRBT_BETA_VERSION_NAME`、`XRBT_BETA_VERSION_CODE`、
+`XRBT_BETA_APK_PATH` 和 `XRBT_BETA_DEVELOPMENT_BUILD`。Beta 默认使用
+Release 构建；仅在需要 Unity 开发诊断时显式设置
+`XRBT_BETA_DEVELOPMENT_BUILD=1`。默认输出为
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.10.apk`，默认
+versionCode 为 `11`。
+
+构建前可先执行地址存储自检：
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod RemoteVisionAddressStoreSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-address-store-test.log
+```
+
+同时执行低延迟视频档位和麦克风分块自检：
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod PicoStreamPerformanceSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-stream-performance-test.log
+```
+
+从 beta.7 使用 `adb install -r` 升级时，beta.8 只会一次性迁移完全匹配的旧
+PICO4U 档位（`2160x810@60`、20 MiB/s）；手工修改的视频档位、已保存的操作端
+地址和勾选偏好均会保留。
+
+Pico 开启开发者模式和 USB 调试后安装：
+
+```bash
+adb devices -l
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.10.apk
+adb shell monkey -p com.xrobotoolkit.client.voicebeta \
+  -c android.intent.category.LAUNCHER 1
+```
 
 ### 核心接口
 - 硬件交互层

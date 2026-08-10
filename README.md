@@ -25,7 +25,7 @@
 | Tracking - Status                              | Panel to show tracking related information                                                      |
 | Remote Vision - State                          | Show the state of camera                                                                        |
 | Remote Vision - Dropdown (Video Source)        | Select a supported video source                                                                 |
-| Remote Vision - Listen                         | Open a connection to receive the video stream to the selected video source                      |
+| Remote Vision - Listen                         | Open video plus full-duplex raw PCM audio when the PC/operator bridge exposes it          |
 | Data Collection - Tracking                     | Whether to record pose tracking data                                                            |
 | Data Collection - Vision                       | Whether to record vision data                                                                   |
 | Data Collection - Record                       | Start/Stop recording                                                                            |
@@ -40,6 +40,10 @@
   Transmits stereo vision from the robot-side headset to operator-side for 3D display.
 - **Remote stereo vision sync between PC camera and XR headset**
   Transmits stereo vision from the robot-side PC camera to operator-side headset for 3D display.
+- **Remote robot microphone audio playback**
+  Connects to the PC/operator bridge raw PCM audio port and plays robot-side microphone audio in the headset while remote vision is open.
+- **Pico microphone audio uplink**
+  Captures the headset microphone and sends bounded-latency 20 ms PCM frames to the operator bridge.
 ## Feature instructions
 
 ### Pose sync between XR device and robot PC
@@ -96,6 +100,135 @@ On the main panel, select preferred pose data to be collected, click Record. You
 8. If you close the live camera window, you can simply repeat Step 6.
 9. If you want to stop the camera streaming, quit **XRRoboToolkit** on the XR headset and stop the OrinVideoSender on Orin.
 
+### Full-duplex audio with the operator bridge
+
+When the G1-Wuji operator stack is started with audio enabled, the operator-side
+headset bridge exposes the relayed G1 built-in microphone as raw `s16le`
+`16 kHz` mono PCM on TCP port `13580` by default. The headset uses the same IP
+entered for Remote Vision and automatically starts audio playback after Listen
+is confirmed. Closing the remote camera window stops both the video stream and
+the audio client.
+
+At the same time, `PicoMicrophoneStreamer` captures the headset microphone,
+downmixes/resamples it to `s16le` `16 kHz` mono, and sends timestamped 20 ms
+frames to the operator bridge. The uplink is not an anonymous raw PCM socket:
+it is enabled only after the current Remote Vision control connection sends an
+`AUDIO_SESSION` request and receives a matching, one-session token. Android
+`RECORD_AUDIO` permission is requested at runtime; denying it disables only the
+microphone uplink and does not block the camera or robot teleoperation UI.
+
+The downlink fallback can be changed per video source through `AudioStreamPort`.
+The microphone port is intentionally not taken from static configuration: it
+must arrive in an authenticated `AUDIO_CONFIG` message using schema
+`g1_wuji_audio_ports_v2`. The current Inspire profile negotiates `13680/13681`.
+
+The payload of the framed `AUDIO_CONFIG` command is:
+
+```json
+{
+  "schema": "g1_wuji_audio_ports_v2",
+  "audio_request_id": "<matching-32-char-request-id>",
+  "audio_stream_port": 13680,
+  "microphone_upload_port": 13681,
+  "microphone_upload_protocol": "g1_wuji_audio_uplink_v1",
+  "microphone_upload_token": "<ephemeral-session-token>",
+  "sample_rate": 16000,
+  "channels": 1,
+  "sample_format": "s16le",
+  "video_projection": "flat",
+  "video_stereo_layout": "mono"
+}
+```
+
+The upload TCP stream begins with a length-framed `G1AT` authentication record.
+Audio uses `G1AF` records containing a sequence number, capture timestamp, and
+exactly 640 bytes of PCM; an idle/muted client sends `G1AH` heartbeats. The
+operator drops wrong-peer, wrong-token, malformed, out-of-order, and stale
+records before cloud relay. The token is never written to the status file.
+Remote Vision control itself uses the managed `OperatorControlClient`, whose
+read-exact framing and per-run socket ownership avoid the vendor AAR client's
+partial-length-read and rapid-reconnect races.
+
+The microphone uplink is full-duplex by default. Calling
+`UICameraCtrl.SetMicrophoneMuted(true)` keeps local capture running but sends no
+PCM frames, so robot-side playback/ducking does not remain falsely active.
+
+### Connection address persistence
+
+- Data & Control remembers the last valid IPv4 confirmed for PC Service.
+- Remote Vision stores a separate operator IP for each video source and restores
+  the last successfully confirmed source. Lookup order is current-source address,
+  global last address, then the valid legacy address.
+- Input is trimmed and strictly validated. Only an explicit Connect/Confirm flushes
+  the value with `PlayerPrefs.Save()`; invalid input keeps the dialog open and does
+  not overwrite a saved address.
+- The app stores only addresses and the video-source name. It never persists ports,
+  audio session tokens, or an automatic-connect instruction.
+
+`adb install -r` preserves these preferences only when package id and signing key
+remain unchanged. Uninstalling the app or running `pm clear` removes them. The
+release package `com.xrobotoolkit.client` and beta package
+`com.xrobotoolkit.client.voicebeta` have separate storage and do not migrate values
+between each other.
+
+### Flat and panoramic remote video
+
+The operator bridge can advertise `video_projection=flat|equirectangular` and
+`video_stereo_layout=mono|side_by_side|top_bottom` in the same negotiated
+configuration. Missing or unknown values fall back to `flat/mono`, preserving
+the existing floating-screen behavior. `equirectangular` binds the received
+texture to Unity's `Skybox/Panoramic`, suspends both legacy eye canvases, hides
+the flat `RawImage`, and restores the previous skybox/camera/UI state when
+Listen stops.
+
+The app does not stitch a panorama. Use `equirectangular` only when the source
+is a real panorama: 2:1 for mono, normally 4:1 overall for two side-by-side 2:1
+eyes, or normally 1:1 overall for two top-bottom 2:1 eyes. Current ordinary G1
+camera streams must stay `flat`; the explicit contract is also intended for a
+future simulation panorama producer. The operator/G1 producer configuration
+must use matching dimensions (for example `1280x640` for mono); panoramic
+source/output ratios are rejected before resize rather than stretched.
+Select the matching built-in Remote Vision source (`PANORAMA_MONO_1280x640`,
+`PANORAMA_SBS_2560x640`, or `PANORAMA_TOP_BOTTOM_1280x1280`) before Listen.
+
+Recorder state is a separate control-plane update. The operator sends a bounded
+`RECORD_STATUS` / `g1_wuji_record_status_v1` JSON message after camera setup and
+at the control heartbeat rate; the app renders it with the operator date/time in
+a per-eye HUD. G1 H.264 packets stay compressed and untouched through the relay
+and operator bridge, so this overlay does not require workstation decode and
+re-encode or add image payloads to the control connection.
+
+Run this from the `g1_wuji_teleoperation` operator repository:
+
+```bash
+scripts/run_operator_cloud_stack.sh --cleanup-first --with-camera --with-audio --auto-start
+```
+
+### Pico Crash Diagnostics
+
+The app writes local crash breadcrumbs under
+`Application.persistentDataPath/g1_wuji_crash_probe/`:
+
+- `breadcrumbs.jsonl`: startup, lifecycle, Listen, `AUDIO_CONFIG`, duplex audio,
+  panorama, warnings, errors, and exceptions.
+- `active_session.json`: the current session sentinel. A clean
+  `OnApplicationQuit` marks `clean_exit=true`; the next launch detects a missing
+  clean exit and writes `last_exit.json`.
+- `last_exit.json`: previous unclean exit marker.
+
+Export a Pico debugging bundle from the workstation:
+
+```bash
+scripts/pico/export_crash_probe.sh /tmp/pico-crash-$(date +%Y%m%d-%H%M%S)
+```
+
+The script captures the app probe files, `adb logcat -d`, device metadata, and
+any accessible tombstone/ANR/Dropbox clues. Non-root Pico firmware usually
+blocks direct `/data/tombstones` and `/data/anr` reads, so use
+`breadcrumbs.jsonl`, `last_exit.json`, and `logcat_threadtime.txt` as the first
+debugging surface. The script auto-detects an installed beta package first; set
+`PICO_APP_PACKAGE=...` to override the package id explicitly.
+
 
 ## Directory Structure
 
@@ -115,6 +248,8 @@ Core resource folder containing all project assets:
     PICO tracker peripheral integration.
   - **Network**
     Network communication implementation.
+  - **Audio**
+    Remote robot-microphone playback and Pico microphone PCM upload clients.
   - **UI**
     User interface components.
 
@@ -198,6 +333,62 @@ ProjectRoot/
   Reveals build output in Finder
 - **Universal**:
   Displays build result dialog
+
+### Voice Duplex Beta Build
+
+For headset testing without replacing the currently installed release app, build the
+side-by-side beta package. It uses application id
+`com.xrobotoolkit.client.voicebeta`, ARM64 + IL2CPP, Android API 30/31, and Unity's
+development signing key. It does not use or modify the production keystore.
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -buildTarget Android \
+  -executeMethod VoiceDuplexBetaBuilder.BuildBatch \
+  -logFile /tmp/xrobotoolkit-voice-beta-unity.log
+```
+
+Optional environment variables are `XRBT_BETA_VERSION_NAME`,
+`XRBT_BETA_VERSION_CODE`, `XRBT_BETA_APK_PATH`, and
+`XRBT_BETA_DEVELOPMENT_BUILD`. The beta is a release build by default; set
+`XRBT_BETA_DEVELOPMENT_BUILD=1` only when Unity development diagnostics are
+required. The default output is
+`Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.11.apk`, with versionCode `12`.
+
+Run the address-store self-test before building:
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod RemoteVisionAddressStoreSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-address-store-test.log
+```
+
+Run the low-latency stream-profile and microphone chunking self-test as well:
+
+```bash
+/path/to/Unity \
+  -batchmode -nographics -quit \
+  -projectPath /path/to/XRoboToolkit-Unity-Client \
+  -executeMethod PicoStreamPerformanceSelfTest.Run \
+  -logFile /tmp/xrobotoolkit-stream-performance-test.log
+```
+
+When upgrading from beta.7 with `adb install -r`, beta.8 migrates only the exact
+legacy PICO4U profile (`2160x810@60`, 20 MiB/s) once. Manually customized video
+profiles and the saved operator address/preferences are preserved.
+
+Install it after enabling PICO developer mode and USB debugging:
+
+```bash
+adb devices -l
+adb install -r -g Builds/Android/XRoboToolkit_VoiceBeta_1.1.2-beta.11.apk
+adb shell monkey -p com.xrobotoolkit.client.voicebeta \
+  -c android.intent.category.LAUNCHER 1
+```
 
 ### Core Interfaces
 - **Hardware Interaction Layer**

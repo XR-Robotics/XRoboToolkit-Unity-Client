@@ -8,6 +8,8 @@ using UnityEngine.Networking;
 
 public class VideoSourceConfigManager : MonoBehaviour
 {
+    private const string CloudProfileMigrationMarker = ".video_source_cloud_profile_v2";
+
     [Header("Configuration")] [SerializeField]
     private string yamlFileName = "video_source.yml";
 
@@ -91,6 +93,7 @@ public class VideoSourceConfigManager : MonoBehaviour
 
             if (File.Exists(yamlPath))
             {
+                MigrateLegacyCloudProfileOnce(yamlPath);
                 LoadConfiguration(yamlPath);
                 Debug.Log($"Load video_source.yml from {yamlPath}");
             } else {
@@ -103,6 +106,36 @@ public class VideoSourceConfigManager : MonoBehaviour
         {
             Debug.Log($"Failed to initialize VideoSourceConfigManager: {e.Message}");
             isInitialized = false;
+        }
+    }
+
+    private void MigrateLegacyCloudProfileOnce(string yamlPath)
+    {
+        string markerPath = Path.Combine(Application.persistentDataPath, CloudProfileMigrationMarker);
+        if (File.Exists(markerPath))
+        {
+            return;
+        }
+
+        try
+        {
+            string yaml = File.ReadAllText(yamlPath);
+            bool migrated = LegacyPicoVideoProfileMigration.TryMigrate(yaml, out string migratedYaml);
+            if (migrated)
+            {
+                File.WriteAllText(yamlPath, migratedYaml);
+                Debug.Log("Migrated legacy PICO4U video profile to 1280x480@15, 1000000 bps.");
+            }
+            else
+            {
+                Debug.Log("Preserved customized PICO4U video profile during cloud-profile migration.");
+            }
+
+            File.WriteAllText(markerPath, "1280x480@15/1000000\n");
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"Failed to migrate legacy PICO4U video profile: {e.Message}");
         }
     }
 
@@ -394,6 +427,7 @@ public class VideoSourceConfigManager : MonoBehaviour
     /// Get camera bitrate from the current video source
     /// </summary>
     public int CamBitrate => CurrentVideoSource?.GetIntProperty("CamBitrate") ?? 5000000;
+    public int AudioStreamPort => CurrentVideoSource?.GetIntProperty("AudioStreamPort") ?? 13580;
 
     public float RectWidth
     {
