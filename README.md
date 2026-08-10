@@ -1,5 +1,8 @@
 # XRoboToolkit-Unity-Client Project Documentation
 
+##Attention
+As of August 10, 2026, the EnterpriseSDK branch is only supported on Swan devices, and we are continuing development on this branch.
+
 ## Project Overview
 `XRoboToolkit-Unity-Client` is a Unity-based software developed for PICO devices to facilitate robot training and remote teleoperation. It works in conjunction with PC-side software to achieve robot training and teleoperation functionalities.
 
@@ -40,6 +43,8 @@
   Transmits stereo vision from the robot-side headset to operator-side for 3D display.
 - **Remote stereo vision sync between PC camera and XR headset**
   Transmits stereo vision from the robot-side PC camera to operator-side headset for 3D display.
+- **Remote stereo vision sync between PC camera and XR headset**
+  Swan devices support high-frequency hardware data acquisition via the EnterpriseSDK.
 ## Feature instructions
 
 ### Pose sync between XR device and robot PC
