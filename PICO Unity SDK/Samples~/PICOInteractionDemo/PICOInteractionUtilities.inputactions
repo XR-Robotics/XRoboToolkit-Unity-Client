@@ -1,0 +1,201 @@
+{
+    "name": "PICOInteractionUtilities",
+    "maps": [
+        {
+            "name": "PICO Interaction Utilities",
+            "id": "0c2b1a07-4a3b-4cc7-91c3-0ffb08103cf7",
+            "actions": [
+                {
+                    "name": "Left Tracking State",
+                    "type": "Value",
+                    "id": "e8a74bd6-0f6f-4a6b-b7a6-6e2b64a5367b",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Left Is Tracked",
+                    "type": "Button",
+                    "id": "8ddc1fae-5bdc-4e49-b77c-17d8f8c6b1a8",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Left Aim Position",
+                    "type": "Value",
+                    "id": "0eb4bf13-1c21-4f7a-9b7f-dfdbb2c486a0",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Left Aim Rotation",
+                    "type": "Value",
+                    "id": "2d0c6760-baa0-4d3c-bf45-2f48d8156cc8",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Right Tracking State",
+                    "type": "Value",
+                    "id": "8f152c95-35d8-4547-961b-e2942f2b664c",
+                    "expectedControlType": "Integer",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Right Is Tracked",
+                    "type": "Button",
+                    "id": "a0820b31-7b09-4e2c-b07b-4cdb3b2d7ac7",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Right Aim Position",
+                    "type": "Value",
+                    "id": "fc0d6963-4a1a-4d25-b3fb-10e3fbd8b3d3",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Right Aim Rotation",
+                    "type": "Value",
+                    "id": "0c5dbb3c-2c02-4d10-9c5f-1ccf47fd2d23",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a5669bff-20a6-4cf6-9c38-5cf4f386f7a8",
+                    "path": "<PXR_InteractionLayout>{LeftHand}/trackingState",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Left Tracking State",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7b1df63b-3b65-4a26-9fe0-0ecfd0d4bce6",
+                    "path": "<PXR_InteractionLayout>{LeftHand}/isTracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Left Is Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8f9e74c2-7e3a-4c7f-8b3a-7b5519d92f09",
+                    "path": "<PXR_InteractionLayout>{LeftHand}/aimPosePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Left Aim Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "0c8b30a6-8b8f-4c29-ae2c-9c07d2bf2d0d",
+                    "path": "<PXR_InteractionLayout>{LeftHand}/aimPoseRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Left Aim Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "e5cd7d1f-90b9-4a1a-8c5c-5dd04366c0a1",
+                    "path": "<PXR_InteractionLayout>{RightHand}/trackingState",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right Tracking State",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "6e2d7087-b43b-41fe-94cb-9f1cf5d2ec49",
+                    "path": "<PXR_InteractionLayout>{RightHand}/isTracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right Is Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7a8ea1a8-40e1-4a76-8d2f-219e92b5a832",
+                    "path": "<PXR_InteractionLayout>{RightHand}/aimPosePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right Aim Position",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "bd3a0f1e-88ab-4b7a-9b19-1a07fc30b3d2",
+                    "path": "<PXR_InteractionLayout>{RightHand}/aimPoseRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Right Aim Rotation",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Generic XR Controller",
+            "bindingGroup": "Generic XR Controller",
+            "devices": [
+                {
+                    "devicePath": "<XRController>{LeftHand}",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>{RightHand}",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<WMRHMD>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

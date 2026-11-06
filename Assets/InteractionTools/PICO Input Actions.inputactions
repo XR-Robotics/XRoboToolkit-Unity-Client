@@ -411,10 +411,10 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Aim Flags",
+                    "name": "Aim Ready",
                     "type": "Value",
                     "id": "f98e71db-49b4-4882-8991-a0e386733e87",
-                    "expectedControlType": "Integer",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -587,8 +587,19 @@
                 },
                 {
                     "name": "",
+                    "id": "15ba35a7-2a6e-419c-b252-0732a3f9b0f7",
+                    "path": "<XRSimulatedController>{LeftHand}/trackingState",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Tracking State",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "34454fec-7610-497a-b1a5-d3d5f01b312c",
-                    "path": "<PicoAimHand>{LeftHand}/trackingState",
+                    "path": "<PicoHandInteraction>{LeftHand}/trackingState",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -599,7 +610,7 @@
                 {
                     "name": "",
                     "id": "28df8d2f-b563-4377-bd11-6c8932ee591c",
-                    "path": "<PicoAimHand>{LeftHand}/devicePosition",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointer/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -610,7 +621,7 @@
                 {
                     "name": "",
                     "id": "2623b909-75bd-40da-97bd-ae1ecfb0a89b",
-                    "path": "<PicoAimHand>{LeftHand}/deviceRotation",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointer/rotation",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -664,8 +675,19 @@
                 },
                 {
                     "name": "",
+                    "id": "3f0399af-8c69-4910-bb7f-72c3f3a278e9",
+                    "path": "<XRSimulatedController>{LeftHand}/isTracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Is Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "d9f33fe3-b3bf-48c1-a8bc-dd6a4ddfba94",
-                    "path": "<PicoAimHand>{LeftHand}/isTracked",
+                    "path": "<PicoHandInteraction>{LeftHand}/isTracked",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -676,11 +698,11 @@
                 {
                     "name": "",
                     "id": "286f44f6-74a5-4f92-8468-42445c7a3cb8",
-                    "path": "<PicoAimHand>{LeftHand}/aimFlags",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivateReady",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
-                    "action": "Aim Flags",
+                    "action": "Aim Ready",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -837,8 +859,19 @@
                 },
                 {
                     "name": "",
+                    "id": "fab1b7fa-5605-4456-8374-ce8e3c6eb622",
+                    "path": "<XRSimulatedController>{LeftHand}/gripButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Select",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "a4158a0f-d2c5-4b52-9f79-52b7331add4b",
-                    "path": "<PicoAimHand>{LeftHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -859,8 +892,19 @@
                 },
                 {
                     "name": "",
+                    "id": "65cce6a0-76a2-42eb-a4ee-d8f35277d755",
+                    "path": "<XRSimulatedController>{LeftHand}/grip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Select Value",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "304be843-4b23-45d9-89fa-005ac163d9b9",
-                    "path": "<PicoAimHand>{LeftHand}/pinchStrengthIndex",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivateValue",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -903,8 +947,19 @@
                 },
                 {
                     "name": "",
+                    "id": "f47b12ab-67d3-422f-bcb6-f522f5499c16",
+                    "path": "<XRSimulatedController>{LeftHand}/triggerButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "UI Press",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "5e9e459c-b313-46a5-b033-6be9b5e46ecd",
-                    "path": "<PicoAimHand>{LeftHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -925,8 +980,19 @@
                 },
                 {
                     "name": "",
+                    "id": "23f06d5c-f6f3-4d75-9c07-d0d545387cf6",
+                    "path": "<XRSimulatedController>{LeftHand}/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "UI Press Value",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "2783a170-9ac4-4437-b39f-3113048577f0",
-                    "path": "<PicoAimHand>{LeftHand}/pinchStrengthIndex",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivateValue",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -1059,10 +1125,10 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Aim Flags",
+                    "name": "Aim Ready",
                     "type": "Value",
                     "id": "93a75a21-033e-440c-9954-ff264afb2db9",
-                    "expectedControlType": "Integer",
+                    "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -1244,8 +1310,19 @@
                 },
                 {
                     "name": "",
+                    "id": "ef448bdf-2484-48e6-9290-df1d2cc75caf",
+                    "path": "<XRSimulatedController>{RightHand}/trackingState",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Tracking State",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "714d1173-f908-4bca-951c-4adb4eb7b4c5",
-                    "path": "<PicoAimHand>{RightHand}/trackingState",
+                    "path": "<PicoHandInteraction>{RightHand}/trackingState",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1256,7 +1333,7 @@
                 {
                     "name": "",
                     "id": "dd822fc8-c655-4a4d-87d0-9575760b6dca",
-                    "path": "<PicoAimHand>{RightHand}/devicePosition",
+                    "path": "<PicoHandInteraction>{RightHand}/pointer/position",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1267,7 +1344,7 @@
                 {
                     "name": "",
                     "id": "2bb1158a-2d78-446b-9351-6f9b3f1364cb",
-                    "path": "<PicoAimHand>{RightHand}/deviceRotation",
+                    "path": "<PicoHandInteraction>{RightHand}/pointer/rotation",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1321,8 +1398,19 @@
                 },
                 {
                     "name": "",
+                    "id": "08d5e116-c43d-42eb-bb8b-0bcd8b91f279",
+                    "path": "<XRSimulatedController>{RightHand}/isTracked",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Is Tracked",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "5a0c4fe0-639a-44e0-beeb-4e11e0dea7ef",
-                    "path": "<PicoAimHand>{RightHand}/isTracked",
+                    "path": "<PicoHandInteraction>{RightHand}/isTracked",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1333,11 +1421,11 @@
                 {
                     "name": "",
                     "id": "5469d4d1-9645-4397-a596-d74f876eafc2",
-                    "path": "<PicoAimHand>/aimFlags",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivateReady",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
-                    "action": "Aim Flags",
+                    "action": "Aim Ready",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -1517,7 +1605,7 @@
                 {
                     "name": "",
                     "id": "1d5b47ea-64e3-4b99-b620-de6c360908be",
-                    "path": "<PicoAimHand>{RightHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1538,8 +1626,19 @@
                 },
                 {
                     "name": "",
+                    "id": "a5caad83-8c98-41f5-a2f9-3b343cc94a1f",
+                    "path": "<XRSimulatedController>{RightHand}/grip",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "Select Value",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "770a07b5-a199-4342-b4a5-b3baafbe2bcb",
-                    "path": "<PicoAimHand>{RightHand}/pinchStrengthIndex",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivateValue",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1583,7 +1682,7 @@
                 {
                     "name": "",
                     "id": "1652c26e-d835-461f-b46b-55b146fd9bba",
-                    "path": "<PicoAimHand>{RightHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -1615,8 +1714,19 @@
                 },
                 {
                     "name": "",
+                    "id": "70b0fce6-1c65-462d-810b-69e1a46106c3",
+                    "path": "<XRSimulatedController>{RightHand}/trigger",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Generic XR Controller",
+                    "action": "UI Press Value",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
                     "id": "620cd3c3-a8c2-4a24-825a-ef6eb1cb41ef",
-                    "path": "<PicoAimHand>{RightHand}/pinchStrengthIndex",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivateValue",
                     "interactions": "",
                     "processors": "",
                     "groups": "Generic XR Controller",
@@ -2471,7 +2581,7 @@
                 {
                     "name": "",
                     "id": "23d832ec-ca8c-4daf-83bc-5554540040c9",
-                    "path": "<PicoAimHand>{LeftHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{LeftHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
@@ -2482,7 +2592,7 @@
                 {
                     "name": "",
                     "id": "2171e3b5-dbd0-4fb8-8c8a-c4a3d48339b0",
-                    "path": "<PicoAimHand>{RightHand}/indexPressed",
+                    "path": "<PicoHandInteraction>{RightHand}/pointerActivated",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

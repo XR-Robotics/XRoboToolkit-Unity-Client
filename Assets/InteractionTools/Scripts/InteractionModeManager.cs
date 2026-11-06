@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using com.picoxr.tobframwork;
 using Unity.XR.CoreUtils;
-using Unity.XR.PXR;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;

@@ -1,0 +1,22 @@
+{
+    "name": "XRoboToolkit.EnterpriseEyeFrames",
+    "rootNamespace": "Robot",
+    "references": [
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.bytedance.pico.xr",
+            "expression": "6.1.1",
+            "define": "PICO_XR"
+        }
+    ],
+    "noEngineReferences": false
+}

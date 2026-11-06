@@ -1,0 +1,21 @@
+{
+    "name": "ByteDance.PICO.XR.Spatializer",
+    "rootNamespace": "",
+    "references": [
+        "ByteDance.PICO.XR"
+    ],
+    "includePlatforms": [
+        "Android",
+        "Editor",
+        "macOSStandalone",
+        "WindowsStandalone64"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

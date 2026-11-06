@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>代码评审报告 — XRoboToolkit-Unity-Client</title>
+  <style>
+    :root {
+      --color-p0: #dc2626;
+      --color-p0-bg: #fef2f2;
+      --color-p0-border: #fca5a5;
+      --color-p1: #d97706;
+      --color-p1-bg: #fffbeb;
+      --color-p1-border: #fcd34d;
+      --color-p2: #2563eb;
+      --color-p2-bg: #eff6ff;
+      --color-p2-border: #93c5fd;
+      --color-bg: #f8fafc;
+      --color-card: #ffffff;
+      --color-border: #e2e8f0;
+      --color-text: #1e293b;
+      --color-text-secondary: #64748b;
+      --color-code-bg: #f1f5f9;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans SC", sans-serif;
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    /* --- Header --- */
+    .report-header {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+
+    .report-header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .meta-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    .meta-item .label { font-weight: 600; color: var(--color-text); }
+
+    /* --- P0 Alert Banner --- */
+    .p0-alert {
+      background: var(--color-p0-bg);
+      border: 1px solid var(--color-p0-border);
+      border-left: 4px solid var(--color-p0);
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .p0-alert-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-p0);
+      margin-bottom: 8px;
+    }
+
+    .p0-alert-list {
+      list-style: none;
+      font-size: 14px;
+    }
+
+    .p0-alert-list li {
+      padding: 2px 0;
+      color: var(--color-text);
+    }
+
+    /* --- Summary Bar --- */
+    .summary-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .summary-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+    }
+
+    .summary-chip .count {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .summary-chip.p0 { border-color: var(--color-p0); color: var(--color-p0); }
+    .summary-chip.p1 { border-color: var(--color-p1); color: var(--color-p1); }
+    .summary-chip.p2 { border-color: var(--color-p2); color: var(--color-p2); }
+    .summary-chip.total { border-color: var(--color-text); color: var(--color-text); }
+
+    /* --- Defect Cards --- */
+    .defect-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .defect-card {
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .defect-card.severity-P0 { border-left: 4px solid var(--color-p0); }
+    .defect-card.severity-P1 { border-left: 4px solid var(--color-p1); }
+    .defect-card.severity-P2 { border-left: 4px solid var(--color-p2); }
+
+    .defect-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--color-border);
+      flex-wrap: wrap;
+    }
+
+    .severity-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .severity-badge.P0 { background: var(--color-p0); }
+    .severity-badge.P1 { background: var(--color-p1); }
+    .severity-badge.P2 { background: var(--color-p2); }
+
+    .category-badge {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      background: var(--color-code-bg);
+      color: var(--color-text-secondary);
+    }
+
+    .defect-title {
+      font-size: 15px;
+      font-weight: 600;
+      flex: 1;
+    }
+
+    .confidence-tag {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+    }
+
+    .defect-body { padding: 20px; }
+
+    .defect-location {
+      font-size: 13px;
+      color: var(--color-text-secondary);
+      margin-bottom: 12px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+    }
+
+    .defect-section { margin-bottom: 16px; }
+    .defect-section:last-child { margin-bottom: 0; }
+
+    .defect-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--color-text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .defect-section p {
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .code-block {
+      background: var(--color-code-bg);
+      border: 1px solid var(--color-border);
+      border-radius: 6px;
+      padding: 12px 16px;
+      font-family: "SF Mono", "Fira Code", "Cascadia Code", monospace;
+      font-size: 13px;
+      line-height: 1.6;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    /* --- Empty State --- */
+    .empty-state {
+      text-align: center;
+      padding: 64px 32px;
+      background: var(--color-card);
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+    }
+
+    .empty-state h2 {
+      font-size: 18px;
+      color: #16a34a;
+      margin-bottom: 8px;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      color: var(--color-text-secondary);
+    }
+
+    /* --- Footer --- */
+    .report-footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
+    /* --- Responsive --- */
+    @media (max-width: 640px) {
+      body { padding: 12px; }
+      .report-header { padding: 20px; }
+      .defect-header { padding: 12px 16px; }
+      .defect-body { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- ====== Header ====== -->
+    <div class="report-header">
+      <h1>代码评审报告</h1>
+      <div class="meta-grid">
+        <div class="meta-item">
+          <span class="label">仓库：</span>
+          <span>XRoboToolkit-Unity-Client</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">检测模式：</span>
+          <span>通用检测</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">检测范围：</span>
+          <span>origin/EnterpriseSDK (93c6072) -&gt; HEAD 063d334 + working tree; UI 改造、眼动功能及 SDK 迁移</span>
+        </div>
+        <div class="meta-item">
+          <span class="label">生成时间：</span>
+          <span>2026-11-06 11:35</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== P0 Alert (hidden when no P0) ====== -->
+    <div class="p0-alert">
+      <div class="p0-alert-title">高优先级告警 — 发现 P0 级别缺陷，建议立即处理</div>
+      <ul class="p0-alert-list">
+        
+      </ul>
+    </div>
+
+    <!-- ====== Summary ====== -->
+    <div class="summary-bar">
+      <div class="summary-chip p0"><span class="count">0</span> P0</div>
+      <div class="summary-chip p1"><span class="count">3</span> P1</div>
+      <div class="summary-chip p2"><span class="count">0</span> P2</div>
+      <div class="summary-chip total"><span class="count">3</span> 合计</div>
+    </div>
+
+    <!-- ====== Defect List ====== -->
+    <div class="defect-list">
+      
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">业务语义问题</span>
+        <span class="defect-title">场景把 VST 默认关闭改为启动时自动开启</span>
+        <span class="confidence-tag">置信度 10/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">Assets/Main.unity:26106-26106</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>本地场景新增 enableVstCamera: 1；远端场景没有该字段，使用 Main.cs 中 false 的缺省值。Main.Awake、OnEnable 和恢复路径消费该字段，改变 Android 启动和恢复的 VST 行为。这是场景默认策略变化，不只是 SDK API 适配；本次没有证明新的内存泄漏。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>如需保持远端业务行为，将场景值恢复为 false；如确实需要默认开启，应作为独立业务变化明确记录。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">健壮性问题</span>
+        <span class="defect-title">PC 相机参数请求仍依赖已禁用的原生相机插件</span>
+        <span class="confidence-tag">置信度 9/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">PICO Unity SDK/Enterprise/android/CameraRenderingPlugin.aar.meta:18-19</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>Android importer 将 CameraRenderingPlugin.aar 禁用，但 PC GetCameraParam 请求仍从 UICameraCtrlPC.cs:80-86 调用 Utils 的相机内外参方法。新 SDK PXR_EnterprisePlugin 的对应方法直接 DllImport CameraRenderingPlugin。该请求路径没有适配到保留的应用相机库，也没有失败回复，因而可能在原生加载失败时中断回包。现有预览/录制使用另一条应用相机路径，不能据此证明参数接口正常。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>将相机内外参读取适配到保留的应用相机实现，并为不支持或读取失败提供明确回复。保持 capturelib-0.0.7 相机路径；不要直接重新启用存在 JNI ABI 冲突的 SDK 相机库。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">逻辑错误</span>
+        <span class="defect-title">追踪器完成回调用被截断的 ID 覆盖正确设备缓存</span>
+        <span class="confidence-tag">置信度 9/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">Assets/Scripts/PicoMotionTrackerDevices.cs:40-43</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>OnRequestComplete 清空缓存并采用 SDK 完成事件的 trackerIds。SDK PXR_Loader.cs:808 却用 ToInt16 解析以 8 字节间隔存放的 ID，而连接事件使用 ToInt64。对 40000 的合成验证得到 -25536，随后会污染查询/标识缓存。真实设备是否分配超出 16 位有符号范围的 ID 尚未验证，问题在此类 ID 条件下触发。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>在 SDK 事件适配中按完整 Int64 读取设备 ID，并确认本地事件布局和返回码偏移；覆盖缓存前验证 ID 一致性，保留现有协议中的字符串字段。</p>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- ====== Empty State (shown when no defects) ====== -->
+    <!-- __EMPTY_STATE_START__
+    <div class="empty-state">
+      <h2>未发现缺陷</h2>
+      <p>本次评审未发现 P0-P2 级别的缺陷。共检查 52 个文件，约 14528 行变更。</p>
+    </div>
+    __EMPTY_STATE_END__ -->
+
+    <div class="report-footer">
+      bits-code-guard &middot; 由 AI 辅助生成 &middot; 2026-11-06 11:35
+    </div>
+
+  </div>
+</body>
+</html>
+
+<!--
+╔══════════════════════════════════════════════════════════════╗
+║                        占位符说明                           ║
+╠══════════════════════════════════════════════════════════════╣
+║                                                              ║
+║  --- 报告元信息 ---                                          ║
+║  XRoboToolkit-Unity-Client           仓库名称                            ║
+║  通用检测         检测模式                            ║
+║  origin/EnterpriseSDK (93c6072) -&gt; HEAD 063d334 + working tree; UI 改造、眼动功能及 SDK 迁移          检测范围描述                         ║
+║  2026-11-06 11:35        报告生成时间 (YYYY-MM-DD HH:mm)     ║
+║                                                              ║
+║  --- 统计数据 ---                                            ║
+║  0            P0 缺陷数量                         ║
+║  3            P1 缺陷数量                         ║
+║  0            P2 缺陷数量                         ║
+║  3         缺陷总数                            ║
+║                                                              ║
+║  --- P0 告警 ---                                             ║
+║  none    有 P0 时为 "block"，无 P0 时为      ║
+║                          "none"                              ║
+║        P0 缺陷摘要列表，每项格式：         ║
+║    <li>[P0][类型] file:line | {title}</li>                   ║
+║                                                              ║
+║  --- 缺陷卡片 ---                                            ║
+║  
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">业务语义问题</span>
+        <span class="defect-title">场景把 VST 默认关闭改为启动时自动开启</span>
+        <span class="confidence-tag">置信度 10/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">Assets/Main.unity:26106-26106</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>本地场景新增 enableVstCamera: 1；远端场景没有该字段，使用 Main.cs 中 false 的缺省值。Main.Awake、OnEnable 和恢复路径消费该字段，改变 Android 启动和恢复的 VST 行为。这是场景默认策略变化，不只是 SDK API 适配；本次没有证明新的内存泄漏。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>如需保持远端业务行为，将场景值恢复为 false；如确实需要默认开启，应作为独立业务变化明确记录。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">健壮性问题</span>
+        <span class="defect-title">PC 相机参数请求仍依赖已禁用的原生相机插件</span>
+        <span class="confidence-tag">置信度 9/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">PICO Unity SDK/Enterprise/android/CameraRenderingPlugin.aar.meta:18-19</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>Android importer 将 CameraRenderingPlugin.aar 禁用，但 PC GetCameraParam 请求仍从 UICameraCtrlPC.cs:80-86 调用 Utils 的相机内外参方法。新 SDK PXR_EnterprisePlugin 的对应方法直接 DllImport CameraRenderingPlugin。该请求路径没有适配到保留的应用相机库，也没有失败回复，因而可能在原生加载失败时中断回包。现有预览/录制使用另一条应用相机路径，不能据此证明参数接口正常。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>将相机内外参读取适配到保留的应用相机实现，并为不支持或读取失败提供明确回复。保持 capturelib-0.0.7 相机路径；不要直接重新启用存在 JNI ABI 冲突的 SDK 相机库。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="defect-card severity-P1">
+      <div class="defect-header">
+        <span class="severity-badge P1">P1</span>
+        <span class="category-badge">逻辑错误</span>
+        <span class="defect-title">追踪器完成回调用被截断的 ID 覆盖正确设备缓存</span>
+        <span class="confidence-tag">置信度 9/10</span>
+      </div>
+      <div class="defect-body">
+        <div class="defect-location">Assets/Scripts/PicoMotionTrackerDevices.cs:40-43</div>
+        <div class="defect-section">
+          <div class="defect-section-title">问题描述</div>
+          <p>OnRequestComplete 清空缓存并采用 SDK 完成事件的 trackerIds。SDK PXR_Loader.cs:808 却用 ToInt16 解析以 8 字节间隔存放的 ID，而连接事件使用 ToInt64。对 40000 的合成验证得到 -25536，随后会污染查询/标识缓存。真实设备是否分配超出 16 位有符号范围的 ID 尚未验证，问题在此类 ID 条件下触发。</p>
+        </div>
+        <div class="defect-section">
+          <div class="defect-section-title">修复建议</div>
+          <p>在 SDK 事件适配中按完整 Int64 读取设备 ID，并确认本地事件布局和返回码偏移；覆盖缓存前验证 ID 一致性，保留现有协议中的字符串字段。</p>
+        </div>
+      </div>
+    </div>        所有缺陷卡片的 HTML，单张卡片格式：  ║
+║                                                              ║
+║    <div class="defect-card severity-{severity}">             ║
+║      <div class="defect-header">                             ║
+║        <span class="severity-badge {severity}">              ║
+║          {severity}</span>                                   ║
+║        <span class="category-badge">                         ║
+║          {category_zh}</span>                                ║
+║        <span class="defect-title">                           ║
+║          {title}</span>                                       ║
+║        <span class="confidence-tag">                         ║
+║          置信度 {confidence}/10</span>                       ║
+║      </div>                                                  ║
+║      <div class="defect-body">                               ║
+║        <div class="defect-location">                         ║
+║          {file}:{start_line}-{end_line}</div>                ║
+║        <div class="defect-section">                          ║
+║          <div class="defect-section-title">                  ║
+║            问题描述</div>                                    ║
+║          <p>{rationale}</p>                                  ║
+║        </div>                                                ║
+║        <div class="defect-section">                          ║
+║          <div class="defect-section-title">                  ║
+║            问题代码</div>                                    ║
+║          <div class="code-block">                            ║
+║            {代码片段}</div>                                  ║
+║        </div>                                                ║
+║        <div class="defect-section">                          ║
+║          <div class="defect-section-title">                  ║
+║            修复建议</div>                                    ║
+║          <p>{suggestion}</p>                                 ║
+║        </div>                                                ║
+║      </div>                                                  ║
+║    </div>                                                    ║
+║                                                              ║
+║  --- 空状态 ---                                              ║
+║  无缺陷时：取消注释 __EMPTY_STATE_START__ 到                 ║
+║  __EMPTY_STATE_END__ 之间的内容，并删除 defect-list 区块      ║
+║  52          检查的文件数                         ║
+║  14528          变更行数                            ║
+║                                                              ║
+║  --- category 中英文映射 ---                                  ║
+║  LOGIC       → 逻辑错误                                     ║
+║  BUSINESS_SEMANTICS → 业务语义问题                           ║
+║  SECURITY    → 安全漏洞                                      ║
+║  CONCURRENCY → 并发问题                                      ║
+║  ROBUSTNESS  → 健壮性问题                                    ║
+║  PERFORMANCE → 性能问题                                      ║
+║  QUALITY     → 代码质量问题                                  ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+-->

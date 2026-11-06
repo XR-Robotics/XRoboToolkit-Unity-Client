@@ -19,9 +19,10 @@ MonoBehaviour:
   openMRC: 0
   faceTracking: 1
   lipsyncTracking: 0
-  eyeTracking: 0
+  eyeTracking: 1
   eyetrackingCalibration: 0
   enableETFR: 0
+  foveationLevel: 0
   latelatching: 0
   latelatchingDebug: 0
   enableSubsampled: 0
@@ -33,6 +34,8 @@ MonoBehaviour:
   sceneCapture: 0
   sharedAnchor: 0
   spatialMesh: 0
+  planeDetection: 0
+  secureMR: 0
   meshLod: 0
   superResolution: 0
   normalSharpening: 0
@@ -40,6 +43,11 @@ MonoBehaviour:
   fixedFoveatedSharpening: 0
   selfAdaptiveSharpening: 0
   handTrackingSupportType: 0
+  environmentDepth: 0
+  lightEstimation: 0
+  lightEstimationTextureResolution: 0
+  objectTracking: 0
+  keyboardPassthrough: 0
   arFoundation: 0
   mrSafeguard: 1
   enableRecommendMSAA: 1
@@ -47,3 +55,7 @@ MonoBehaviour:
   recommendMSAA: 1
   validationFFREnabled: 0
   validationETFREnabled: 0
+  portalInited: 1
+  isDataCollectionDisabled: 0
+  portalFirstSelected: 1
+  isSpatialAdapter: 0

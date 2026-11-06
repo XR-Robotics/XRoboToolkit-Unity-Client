@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.bytedance.ide.trae": "https://github.com/Pico-Developer/TRAE-Editor-Unity.git#1b1b02717ee1c8427a3d25c7ceb8d3882d856f4b",
     "com.unity.ai.navigation": "1.1.6",
     "com.unity.collab-proxy": "2.7.1",
     "com.unity.device-simulator.devices": "1.0.0",
@@ -17,7 +18,7 @@
     "com.unity.xr.hands": "1.4.1",
     "com.unity.xr.interaction.toolkit": "3.0.3",
     "com.unity.xr.openxr": "1.14.3",
-    "com.unity.xr.picoxr": "file:../PICO Unity Integration SDK",
+    "com.bytedance.pico.xr": "file:../PICO Unity SDK",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",

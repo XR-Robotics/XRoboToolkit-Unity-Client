@@ -1,0 +1,4 @@
+{
+  "displayName": "PICO Interaction Demo",
+  "description": "Based on the Unity XR Interaction Toolkit, primarily focused on addressing the combined interaction requirements of complex hand‑gesture interaction (Hand Tracking) and eye‑tracking interaction (Eye Tracking) in VR/MR development.\n<i>Dependencies:</i>\n • <a href=\"com.unity3d.kharma:upmpackage/com.unity.xr.interaction.toolkit\">XR Interaction Toolkit</a>\n • <a href=\"com.unity3d.kharma:upmpackage/com.unity.shadergraph\">Shader Graph</a>\n • Starter Assets sample"
+}

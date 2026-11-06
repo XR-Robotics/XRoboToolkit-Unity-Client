@@ -63,7 +63,7 @@ class ProjectBuild : Editor
                 }
             }
 
-            return "1.0.0";
+            return PlayerSettings.bundleVersion;
         }
     }
 
@@ -83,7 +83,7 @@ class ProjectBuild : Editor
                 }
             }
 
-            return "1";
+            return PlayerSettings.Android.bundleVersionCode.ToString();
         }
     }
 
@@ -103,7 +103,7 @@ class ProjectBuild : Editor
                 }
             }
 
-            return "PicoVRUnity";
+            return PlayerSettings.productName;
         }
     }
 

@@ -1,0 +1,36 @@
+{
+    "name": "ByteDance.PICO.Interaction",
+    "rootNamespace": "",
+    "references": [
+        "ByteDance.PICO.XR.Editor",
+        "Unity.XR.Interaction.Toolkit",
+        "ByteDance.PICO.XR",
+        "Unity.XR.OpenXR",
+        "Unity.InputSystem"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "[2.4.0,3.0.0]",
+            "define": "XRI_240"
+        },
+        {
+            "name": "com.unity.xr.interaction.toolkit",
+            "expression": "3.0.0",
+            "define": "XRI_300"
+        },
+        {
+            "name": "com.unity.xr.compositionlayers",
+            "expression": "",
+            "define": "UNITY_XR_COMPOSITIONLAYERS"
+        }
+    ],
+    "noEngineReferences": false
+}

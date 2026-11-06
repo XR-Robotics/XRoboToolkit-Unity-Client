@@ -2,8 +2,8 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 using LitJson;
-using Unity.XR.PICO.TOBSupport;
-using Unity.XR.PXR;
+using ByteDance.PICO.XR;
+using PoseInfo = ByteDance.PICO.Enterprise.Pose;
 using UnityEngine;
 using UnityEngine.XR;
 using CommonUsages = UnityEngine.XR.CommonUsages;
@@ -371,10 +371,14 @@ namespace Robot
                 double predictTimeMs = GetEnterpriseHeadPredictTimeMs();
                 PxrSensorState2 sensorState = new PxrSensorState2();
                 int sensorFrameIndex = 0;
-                int result = PXR_EnterprisePlugin.Pxr_GetPredictedMainSensorState2(
+#if PICO_XR && UNITY_ANDROID && !UNITY_EDITOR
+                int result = PXR_Plugin.Pxr_GetPredictedMainSensorState2(
                     predictTimeMs,
                     ref sensorState,
                     ref sensorFrameIndex);
+#else
+                int result = -1;
+#endif
 
                 JsonData data = BuildUnityHeadJson(sensorState);
                 data["sensorFrameIndex"] = sensorFrameIndex;
@@ -402,7 +406,7 @@ namespace Robot
         {
             if (useDynamicPredictedDisplayTimeForEnterpriseHead)
             {
-                return PXR_Enterprise.GetPredictedDisplayTime();
+                return PXR_System.GetPredictedDisplayTime();
             }
 
             long nowTicks = Stopwatch.GetTimestamp();
@@ -421,7 +425,7 @@ namespace Robot
             try
             {
                 double predictTimeMs = GetEnterpriseControllerPredictTimeMs();
-                PoseInfo[] poses = PXR_Enterprise.GetControllerPose(predictTimeMs);
+                PoseInfo[] poses = EnterpriseControllerPoseSource.GetControllerPose(predictTimeMs);
                 if (poses != null)
                 {
                     Interlocked.Increment(ref _enterpriseControllerSamplesInWindow);
@@ -469,7 +473,7 @@ namespace Robot
         {
             try
             {
-                double predictTime = PXR_Enterprise.GetPredictedDisplayTime() * 1000;
+                double predictTime = PXR_System.GetPredictedDisplayTime() * 1000;
                 JsonData data = new JsonData();
                 data["predictTime"] = predictTime;
                 data["left"] = BuildUnityControllerSide(PXR_Input.Controller.LeftController, XRNode.LeftHand, predictTime,

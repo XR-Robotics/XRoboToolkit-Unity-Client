@@ -1,0 +1,36 @@
+{
+  "date": "2026-11-03",
+  "scene": "Assets/Main.unity",
+  "unity_version": "2022.3.16f1",
+  "sdk_version": "3.1.2",
+  "checks": {
+    "scene_yaml_documents": 2109,
+    "sprite_importer_yaml_documents": 1,
+    "existing_scene_objects_preserved": 1840,
+    "authored_scene_objects": 269,
+    "introduced_dangling_references": 0,
+    "business_component_references": "preserved",
+    "existing_button_and_toggle_persistent_events": "preserved",
+    "preview_camera_references": 4,
+    "preview_inactive_by_default": true,
+    "source_and_sampling_rate_remain_siblings": true,
+    "editor_preview_assembly_compile": "passed",
+    "editor_assembly_csharp_compile": "passed",
+    "android_preview_assembly_compile": "passed",
+    "android_assembly_csharp_compile": "passed",
+    "git_diff_check": "passed"
+  },
+  "layout_dimensions": {
+    "canvas": [599.8, 723.3],
+    "data_controls": [276.61, 397.47],
+    "data_controls_required_height": 364.0,
+    "eye_camera_grid": [575.8, 535.3],
+    "activity_viewport": [515.8, 77.83],
+    "camera_viewports": "positive dimensions and contained in their cards"
+  },
+  "not_verified": [
+    "Unity Editor import and visual rendering",
+    "Unity pointer interactions",
+    "PICO device image capture and shader rendering"
+  ]
+}

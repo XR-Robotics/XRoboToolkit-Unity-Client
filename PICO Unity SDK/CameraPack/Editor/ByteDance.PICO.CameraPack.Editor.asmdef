@@ -1,0 +1,38 @@
+{
+    "name": "ByteDance.PICO.CameraPack.Editor",
+    "rootNamespace": "",
+    "references": [
+        "Unity.XR.Management",
+        "Unity.XR.Management.Editor",
+        "Unity.XR.CoreUtils",
+        "Unity.XR.CoreUtils.Editor",
+        "ByteDance.PICO.CameraPack"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.bytedance.pico.xr",
+            "expression": "",
+            "define": "PICO_XR_NEW"
+        },
+        {
+            "name": "com.unity.xr.picoxr",
+            "expression": "",
+            "define": "PICO_XR_3"
+        },
+        {
+            "name": "com.unity.ai.inference",
+            "expression": "",
+            "define": "UNITY_AI_INFERENCE"
+        }
+    ],
+    "noEngineReferences": false
+}

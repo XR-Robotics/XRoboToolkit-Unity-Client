@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using Unity.XR.PXR;
+using ByteDance.PICO.XR;
 using UnityEngine;
 
 public class EyeRotationSetter : MonoBehaviour

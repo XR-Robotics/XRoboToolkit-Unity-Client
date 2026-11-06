@@ -1,0 +1,121 @@
+#if ENABLE_PICO_XR_SDK || ENABLE_PICO_OPENXR_SDK
+using System;
+using System.Linq;
+using Unity.XR.CoreUtils.Editor;
+using UnityEditor;
+using UnityEditor.Build;
+using UnityEditor.Rendering;
+using UnityEditor.XR.Management;
+using UnityEngine;
+
+#if ENABLE_PICO_OPENXR_SDK
+using ByteDance.PICO.OpenXR;
+#endif
+
+namespace ByteDance.PICO.XR.Editor
+{
+    static class PXR_ProjectValidationOptional
+    {
+        const string k_Catergory = "PICO Optional";
+
+        [InitializeOnLoadMethod]
+        static void AddOptionalRules()
+        {
+            var androidGlobalRules = new[]
+            {
+                #region Cross-Platform Validation (PXR & OpenXR)
+
+                new BuildValidationRule
+                {
+                    Category = k_Catergory,
+                    Message = "Disable Realtime GI.",
+                    IsRuleEnabled = () => { return PXR_Utils.IsPXRValidationEnabled() || PXR_Utils.IsOpenXRValidationEnabled(); },
+                    CheckPredicate = () => { return !Lightmapping.realtimeGI; },
+                    FixItMessage = "Open Window > Rendering > Lighting > Realtime Lighting > Realtime Global lllumination: disabled.",
+                    FixIt = () =>
+                    {
+                        Lightmapping.realtimeGI = false;
+                        PXR_AppLog.PXR_OnEvent(PXR_AppLog.strProjectValidation, PXR_AppLog.strProjectValidation_DisableRealtimeGI);
+                    },
+                    Error = false
+                },
+                new BuildValidationRule
+                {
+                    Category = k_Catergory,
+                    Message = "Enable GPU Skinning.",
+                    IsRuleEnabled = () => { return PXR_Utils.IsPXRValidationEnabled() || PXR_Utils.IsOpenXRValidationEnabled(); },
+                    CheckPredicate = () => { return PlayerSettings.gpuSkinning; },
+                    FixItMessage = "Open Project Settings > Player Settings > Player> Other Settings > GPU Skinning :enabled",
+                    FixIt = () =>
+                    {
+                        PlayerSettings.gpuSkinning = true;
+                        PXR_AppLog.PXR_OnEvent(PXR_AppLog.strProjectValidation, PXR_AppLog.strProjectValidation_GPUSkinning);
+                    },
+                    Error = false
+                },
+
+                #endregion
+
+                #region PXR Platform Validation
+
+                new BuildValidationRule
+                {
+                    Category = k_Catergory,
+                    Message = "When enabling ET or ETFR, option 'Eye Tracking Calibration' can be used.",
+                    IsRuleEnabled = PXR_Utils.IsPXRValidationEnabled,
+                    CheckPredicate = () =>
+                    {
+                        if (PXR_ProjectSetting.GetProjectConfig().eyeTracking || PXR_ProjectSetting.GetProjectConfig().enableETFR)
+                        {
+                            return PXR_ProjectSetting.GetProjectConfig().eyetrackingCalibration;
+                        }
+
+                        return true;
+                    },
+                    FixItMessage = "PXR_Manager > 'Eye Tracking Calibration' set to enable.",
+                    FixIt = () =>
+                    {
+                        PXR_ProjectSetting.GetProjectConfig().eyetrackingCalibration = true;
+                        PXR_AppLog.PXR_OnEvent(PXR_AppLog.strProjectValidation, PXR_AppLog.strProjectValidation_EyeTrackingCalibration);
+                    },
+                    Error = false
+                },
+
+                #endregion
+
+                #region PICO OpenXR Validation
+
+#if ENABLE_PICO_OPENXR_SDK
+                new BuildValidationRule
+                {
+                    Category = k_Catergory,
+                    Message = "When enabling ET or ETFR, option 'Eye Tracking Calibration' can be used.",
+                    IsRuleEnabled = PXR_Utils.IsOpenXRValidationEnabled,
+                    CheckPredicate = () =>
+                    {
+                        if (PXR_OpenXRProjectSetting.GetProjectConfig().isEyeTracking || 
+                        (PXR_OpenXRProjectSetting.GetProjectConfig().foveatedRenderingMode == FoveationFeature.FoveatedRenderingMode.EyeTrackedFoveatedRendering && 
+                        PXR_OpenXRProjectSetting.GetProjectConfig().foveatedRenderingLevel != FoveationFeature.FoveatedRenderingLevel.Off))
+                        {
+                            return PXR_OpenXRProjectSetting.GetProjectConfig().isEyeTrackingCalibration;
+                        }
+                        return true;
+                    },
+                    FixItMessage = "PXR_Manager > 'Eye Tracking Calibration' set to enable.",
+                    FixIt = () =>
+                    {
+                        PXR_OpenXRProjectSetting.GetProjectConfig().isEyeTrackingCalibration = true;
+                        PXR_AppLog.PXR_OnEvent(PXR_AppLog.strProjectValidation, PXR_AppLog.strProjectValidation_EyeTrackingCalibration);
+                    },
+                    Error = false
+                },
+#endif
+
+                #endregion
+            };
+            BuildValidator.AddRules(BuildTargetGroup.Android, androidGlobalRules);
+        }
+    }
+}
+
+#endif

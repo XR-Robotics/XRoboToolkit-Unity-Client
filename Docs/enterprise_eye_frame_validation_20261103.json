@@ -1,0 +1,26 @@
+{
+  "timestamp": "2026-11-03T14:46:20.987790",
+  "unity": "2022.3.16f1",
+  "integration_sdk": "3.1.2",
+  "tob_client": "0.6.0-alpha.0",
+  "checks": {
+    "java8_bridge_and_lifecycle": "passed; byte[] and ByteBuffer fixtures, 30Hz config, invalid payloads, stale callbacks, cleanup, concurrency",
+    "actual_alpha_api_signatures": "passed; actual AAR plus local Android API jar, manager not initialized",
+    "actual_sdk_frame_type_with_synthetic_payloads": "passed; camera IDs 15..18, 640x480, 307200 bytes, long timestamps, direct-buffer copies; NOT sensor data",
+    "unity2022_editor_android_and_ui_integration": "passed; standalone compilation, not APK or Editor runtime",
+    "tob_import_selection": "passed; release Android disabled, alpha Android enabled"
+  },
+  "device": {
+    "serial": "PB321XJGL3090095G",
+    "model": "B3110",
+    "product": "swan",
+    "firmware": "6.2.0",
+    "tob_service_version": "5.9.0",
+    "native_eye_service_present": true,
+    "project_app_installed": false
+  },
+  "sensor_capture_verified": false,
+  "device_note": "Read-only enumeration only. No APK build, app installation, app launch, or sensor capture performed.",
+  "aar_sha256": "53d1cee59fb116c98eefa4cdd05d68656f525858b423013c87f48da2f35e2882",
+  "local_validation": "passed"
+}

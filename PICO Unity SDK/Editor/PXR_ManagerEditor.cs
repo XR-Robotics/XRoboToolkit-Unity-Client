@@ -1,0 +1,451 @@
+﻿#if ENABLE_PICO_XR_SDK || ENABLE_PICO_OPENXR_SDK
+/*******************************************************************************
+Copyright © 2015-2022 PICO Technology Co., Ltd.All rights reserved.  
+
+NOTICE：All information contained herein is, and remains the property of 
+PICO Technology Co., Ltd. The intellectual and technical concepts 
+contained herein are proprietary to PICO Technology Co., Ltd. and may be 
+covered by patents, patents in process, and are protected by trade secret or 
+copyright law. Dissemination of this information or reproduction of this 
+material is strictly forbidden unless prior written permission is obtained from
+PICO Technology Co., Ltd. 
+*******************************************************************************/
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Xml;
+using Unity.XR.CoreUtils;
+using ByteDance.PICO.XR;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Rendering;
+
+namespace ByteDance.PICO.XR.Editor
+{
+    [CustomEditor(typeof(PXR_Manager))]
+    public class PXR_ManagerEditor : UnityEditor.Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            GUI.changed = false;
+            DrawDefaultInspector();
+
+            PXR_Manager manager = (PXR_Manager)target;
+            PXR_ProjectSetting projectConfig = PXR_ProjectSetting.GetProjectConfig();
+
+            //Screen Fade
+            manager.screenFade = EditorGUILayout.Toggle("Open Screen Fade", manager.screenFade);
+            if (Camera.main != null)
+            {
+                var head = Camera.main.transform;
+                if (head)
+                {
+                    var fade = head.GetComponent<PXR_ScreenFade>();
+                    if (manager.screenFade)
+                    {
+                        if (!fade)
+                        {
+                            head.gameObject.AddComponent<PXR_ScreenFade>();
+                            Selection.activeObject = head;
+                        }
+                    }
+                    else
+                    {
+                        if (fade) DestroyImmediate(fade);
+                    }
+                }
+            }
+
+            //ffr
+            manager.foveatedRenderingMode = (FoveatedRenderingMode)EditorGUILayout.EnumPopup("Foveated Rendering Mode", manager.foveatedRenderingMode);
+            if (FoveatedRenderingMode.FixedFoveatedRendering == manager.foveatedRenderingMode)
+            {
+                projectConfig.enableETFR = false;
+                projectConfig.recommendSubsamping = false;
+                projectConfig.validationFFREnabled = false;
+                projectConfig.validationETFREnabled = false;
+                projectConfig.foveationLevel= manager.foveationLevel = (FoveationLevel)EditorGUILayout.EnumPopup("Foveated Rendering Level", manager.foveationLevel);
+                manager.eyeFoveationLevel = FoveationLevel.None;
+                if (FoveationLevel.None != manager.foveationLevel)
+                {
+                    projectConfig.validationFFREnabled = true;
+                    if (GraphicsDeviceType.OpenGLES3 == PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget)[0] && PlayerSettings.colorSpace == ColorSpace.Gamma)
+                    {
+                        projectConfig.enableSubsampled = false;
+                        projectConfig.recommendSubsamping = false;
+                    }
+                    else
+                    {
+                        projectConfig.enableSubsampled = EditorGUILayout.Toggle("  Subsampling", projectConfig.enableSubsampled);
+                        projectConfig.recommendSubsamping = true;
+                    }
+                }
+            }
+            else if (FoveatedRenderingMode.EyeTrackedFoveatedRendering == manager.foveatedRenderingMode) //etfr
+            {
+                projectConfig.enableETFR = true;
+                projectConfig.recommendSubsamping = false;
+                projectConfig.validationFFREnabled = false;
+                projectConfig.validationETFREnabled = false;
+                projectConfig.foveationLevel=manager.eyeFoveationLevel = (FoveationLevel)EditorGUILayout.EnumPopup("Foveated Rendering Level", manager.eyeFoveationLevel);
+                manager.foveationLevel = FoveationLevel.None;
+                if (FoveationLevel.None != manager.eyeFoveationLevel)
+                {
+                    projectConfig.validationETFREnabled = true;
+                    if (GraphicsDeviceType.OpenGLES3 == PlayerSettings.GetGraphicsAPIs(EditorUserBuildSettings.activeBuildTarget)[0] && PlayerSettings.colorSpace == ColorSpace.Gamma)
+                    {
+                        projectConfig.enableSubsampled = false;
+                        projectConfig.recommendSubsamping = false;
+                    }
+                    else
+                    {
+                        projectConfig.enableSubsampled = EditorGUILayout.Toggle("  Subsampling", projectConfig.enableSubsampled);
+                        projectConfig.recommendSubsamping = true;
+                    }
+                }
+            }
+
+            //eye tracking
+            GUIStyle firstLevelStyle = new GUIStyle(GUI.skin.label);
+            firstLevelStyle.alignment = TextAnchor.UpperLeft;
+            firstLevelStyle.fontStyle = FontStyle.Bold;
+            firstLevelStyle.fontSize = 12;
+            firstLevelStyle.wordWrap = true;
+            var guiContent = new GUIContent();
+            guiContent.text = "Eye Tracking";
+            guiContent.tooltip = "Before calling EyeTracking API, enable this option first, only for Neo3 Pro Eye , PICO 4 Pro device.";
+            projectConfig.eyeTracking = EditorGUILayout.Toggle(guiContent, projectConfig.eyeTracking);
+            manager.eyeTracking = projectConfig.eyeTracking;
+            if (manager.eyeTracking || FoveatedRenderingMode.EyeTrackedFoveatedRendering == manager.foveatedRenderingMode)
+            {
+                projectConfig.eyetrackingCalibration = EditorGUILayout.Toggle(new GUIContent("Eye Tracking Calibration"), projectConfig.eyetrackingCalibration);
+                EditorGUILayout.BeginVertical("box");
+                EditorGUILayout.LabelField("Note:", firstLevelStyle);
+                EditorGUILayout.LabelField("Eye Tracking is supported only on Neo 3 Pro Eye , PICO 4 Pro");
+                EditorGUILayout.EndVertical();
+            }
+
+            //face tracking
+            var FaceContent = new GUIContent();
+            FaceContent.text = "Face Tracking Mode";
+            manager.trackingMode = (XrFacialSimulationModeBD)EditorGUILayout.EnumPopup(FaceContent, manager.trackingMode);
+            if (manager.trackingMode == XrFacialSimulationModeBD.NONE)
+            {
+                projectConfig.faceTracking = false;
+                projectConfig.lipsyncTracking = false;
+            }
+            else if (manager.trackingMode == XrFacialSimulationModeBD.XR_FACIAL_SIMULATION_MODE_COMBINED_AUDIO_BD || manager.trackingMode == XrFacialSimulationModeBD.XR_FACIAL_SIMULATION_MODE_COMBINED_AUDIO_WITH_LIP_BD)
+            {
+                projectConfig.faceTracking = true;
+                projectConfig.lipsyncTracking = true;
+            }
+            else if (manager.trackingMode == XrFacialSimulationModeBD.XR_FACIAL_SIMULATION_MODE_DEFAULT_BD)
+            {
+                projectConfig.faceTracking = true;
+                projectConfig.lipsyncTracking = false;
+            }
+            else if (manager.trackingMode == XrFacialSimulationModeBD.XR_FACIAL_SIMULATION_MODE_ONLY_AUDIO_WITH_LIP_BD)
+            {
+                projectConfig.faceTracking = false;
+                projectConfig.lipsyncTracking = true;
+            }
+            manager.faceTracking = projectConfig.faceTracking;
+            manager.lipsyncTracking = projectConfig.lipsyncTracking;
+
+            //hand tracking
+            var handContent = new GUIContent();
+            handContent.text = "Hand Tracking";
+            projectConfig.handTracking = EditorGUILayout.Toggle(handContent, projectConfig.handTracking);
+            if (projectConfig.handTracking)
+            {
+                //hand tracking Support
+                var handSupport = new GUIContent();
+                handSupport.text = "Hand Tracking Support";
+                projectConfig.handTrackingSupportType =(HandTrackingSupport)EditorGUILayout.EnumPopup(handSupport, projectConfig.handTrackingSupportType); 
+            }
+          
+            //Adaptive Hand Model
+            var adaptiveContent = new GUIContent();
+            adaptiveContent.text = "Adaptive Hand Model(PICO)";
+            adaptiveContent.tooltip = "If this function is selected, the hand model will change according to the actual size of the user's palm. Note that the hand model only works on PICO.";
+            projectConfig.adaptiveHand = EditorGUILayout.Toggle(adaptiveContent, projectConfig.adaptiveHand);
+            //body tracking
+            var bodyContent = new GUIContent();
+            bodyContent.text = "Body Tracking";
+            projectConfig.bodyTracking = EditorGUILayout.Toggle(bodyContent, projectConfig.bodyTracking);
+            manager.bodyTracking = projectConfig.bodyTracking;
+
+            // content protect
+            projectConfig.useContentProtect = EditorGUILayout.Toggle("Use Content Protect", projectConfig.useContentProtect);
+
+            //MRC
+            var mrcContent = new GUIContent();
+            mrcContent.text = "MRC";
+            projectConfig.openMRC = EditorGUILayout.Toggle(mrcContent, projectConfig.openMRC);
+            manager.openMRC = projectConfig.openMRC;
+            if (manager.openMRC == true)
+            {
+                EditorGUILayout.BeginVertical("frameBox");
+                string[] layerNames = new string[32];
+                for (int i = 0; i < 32; i++)
+                {
+                    layerNames[i] = LayerMask.LayerToName(i);
+                    if (layerNames[i].Length == 0)
+                    {
+                        layerNames[i] = "LayerName " + i.ToString();
+                    }
+                }
+                manager.foregroundLayerMask = EditorGUILayout.MaskField("Foreground Layer Masks", manager.foregroundLayerMask, layerNames);
+                manager.backgroundLayerMask = EditorGUILayout.MaskField("Background Layer Masks", manager.backgroundLayerMask, layerNames);
+                EditorGUILayout.EndVertical();
+            }
+            //Late Latching
+            projectConfig.latelatching = EditorGUILayout.Toggle("Use Late Latching", projectConfig.latelatching);
+            manager.lateLatching = projectConfig.latelatching;
+            if (manager.lateLatching)
+            {
+                projectConfig.latelatchingDebug = EditorGUILayout.Toggle("  Late Latching Debug", projectConfig.latelatchingDebug);
+                manager.latelatchingDebug = projectConfig.latelatchingDebug;
+            }
+#if ENABLE_PICO_XR_SDK
+            if (Camera.main != null)
+            {
+                var head = Camera.main.transform;
+                if (head)
+                {
+                    var fade = head.GetComponent<PXR_LateLatching>();
+                    if (manager.lateLatching)
+                    {
+                        if (!fade)
+                        {
+                            head.gameObject.AddComponent<PXR_LateLatching>();
+                            Selection.activeObject = head;
+                        }
+                    }
+                    else
+                    {
+                        if (fade) DestroyImmediate(fade);
+                    }
+                }
+            }
+#endif
+
+            // msaa
+            if (QualitySettings.renderPipeline != null)
+            {
+                EditorGUI.BeginDisabledGroup(true);
+                projectConfig.enableRecommendMSAA = EditorGUILayout.Toggle("Use Recommended MSAA", projectConfig.enableRecommendMSAA);
+                manager.useRecommendedAntiAliasingLevel = projectConfig.enableRecommendMSAA;
+                EditorGUI.EndDisabledGroup();
+                EditorGUILayout.HelpBox("A Scriptable Render Pipeline is in use,the 'Use Recommended MSAA' will not be used. ", MessageType.Info, true);
+                projectConfig.recommendMSAA = false;
+            }
+            else
+            {
+                projectConfig.enableRecommendMSAA = EditorGUILayout.Toggle("Use Recommended MSAA", projectConfig.enableRecommendMSAA);
+                manager.useRecommendedAntiAliasingLevel = projectConfig.enableRecommendMSAA;
+                if (!projectConfig.enableRecommendMSAA)
+                {
+                    projectConfig.recommendMSAA = true;
+                }
+            }
+
+            //Adaptive Resolution
+            guiContent = new GUIContent();
+            guiContent.text = "Adaptive Resolution";
+            guiContent.tooltip = "Adaptively change resolution based on GPU performance using renderViewportScale. Render buffer will be allocated to max adaptive resolution scale size. Currently, FFR should be disabled with this feature.";
+            projectConfig.adaptiveResolution = EditorGUILayout.Toggle(guiContent, projectConfig.adaptiveResolution);
+            manager.adaptiveResolution = projectConfig.adaptiveResolution;
+            if (manager.adaptiveResolution)
+            {
+                EditorGUILayout.LabelField("Min Adaptive Resolution Scale:");
+                manager.minEyeTextureScale = EditorGUILayout.Slider(manager.minEyeTextureScale, 0.7f, 1.3f);
+                EditorGUILayout.LabelField("Max Adaptive Resolution Scale:");
+                manager.maxEyeTextureScale = EditorGUILayout.Slider(manager.maxEyeTextureScale, 0.7f, 1.3f);
+                manager.adaptiveResolutionPowerSetting = (AdaptiveResolutionPowerSetting)EditorGUILayout.EnumPopup(" Power Setting", manager.adaptiveResolutionPowerSetting);
+
+            }
+
+#if UNITY_2021_3_OR_NEWER
+            XROrigin xrOrigin = FindAnyObjectByType<XROrigin>();
+#else
+            XROrigin xrOrigin = FindObjectOfType<XROrigin>();
+#endif
+            if (xrOrigin.RequestedTrackingOriginMode != XROrigin.TrackingOriginMode.Floor)
+            {
+                GUI.enabled = false;
+                projectConfig.stageMode = EditorGUILayout.Toggle("Stage Mode", false);
+                GUI.enabled = true;
+            }
+            else
+            {
+                projectConfig.stageMode = EditorGUILayout.Toggle("Stage Mode", projectConfig.stageMode);
+            }
+
+            //mr
+            EditorGUILayout.BeginVertical("frameBox");
+            projectConfig.videoSeeThrough = EditorGUILayout.Toggle("Video Seethrough", projectConfig.videoSeeThrough);
+            projectConfig.spatialAnchor = EditorGUILayout.Toggle("Spatial Anchor", projectConfig.spatialAnchor);
+            projectConfig.sceneCapture = EditorGUILayout.Toggle("Scene Capture", projectConfig.sceneCapture);
+            projectConfig.sharedAnchor = EditorGUILayout.Toggle("Shared Spatial Anchor", projectConfig.sharedAnchor);
+            projectConfig.spatialMesh = EditorGUILayout.Toggle("Spatial Mesh", projectConfig.spatialMesh);
+            if (projectConfig.spatialMesh)
+            {
+                projectConfig.meshLod = (PxrMeshLod)EditorGUILayout.EnumPopup(" LOD", projectConfig.meshLod);
+            }
+            projectConfig.planeDetection = EditorGUILayout.Toggle("Plane Detection", projectConfig.planeDetection);
+            projectConfig.environmentDepth = EditorGUILayout.Toggle("Environment Depth", projectConfig.environmentDepth);
+            projectConfig.lightEstimation = EditorGUILayout.Toggle("Light Estimation", projectConfig.lightEstimation);
+            if (projectConfig.lightEstimation)
+            {
+                projectConfig.lightEstimationTextureResolution = (PxrEnvironmentTextureResolution)EditorGUILayout.EnumPopup(" Resolution", projectConfig.lightEstimationTextureResolution);
+            }
+#if ENABLE_PICO_XR_SDK
+            projectConfig.objectTracking = EditorGUILayout.Toggle("Object Tracking", projectConfig.objectTracking);
+#endif
+            EditorGUILayout.EndVertical();
+            //mr safeguard
+
+            var mrSafeguardContent = new GUIContent();
+            mrSafeguardContent.text = "MR Safeguard";
+            mrSafeguardContent.tooltip =
+                "MR safety, if you choose this option, your application will adopt MR safety policies during runtime. If not selected, it will continue to use VR safety policies by default.";
+            projectConfig.mrSafeguard = EditorGUILayout.Toggle(mrSafeguardContent, projectConfig.mrSafeguard);
+
+            var secureMRContent = new GUIContent();
+            secureMRContent.text = "SecureMR";
+            projectConfig.secureMR = EditorGUILayout.Toggle(secureMRContent, projectConfig.secureMR);
+
+            //Super Resolution
+            var superresolutionContent = new GUIContent();
+            superresolutionContent.text = "Super Resolution";
+            superresolutionContent.tooltip = "Single pass spatial aware upscaling technique.\n\nThis can't be used with Sharpening. \nAlso can't be used along with subsample feature due to unsupported texture format. \n\nThis effect won't work properly under low resolutions when Adaptive Resolution is also enabled.";
+            projectConfig.superResolution = EditorGUILayout.Toggle(superresolutionContent, projectConfig.superResolution);
+            manager.enableSuperResolution = projectConfig.superResolution;
+
+            //Sharpening
+
+            var sharpeningContent = new GUIContent();
+            sharpeningContent.text = "Sharpening Mode";
+            sharpeningContent.tooltip = "Normal: Normal Quality \n\nQuality: Higher Quality, higher GPU usage\n\nThis effect won't work properly under low resolutions when Adaptive Resolution is also enabled.\n\nThis can't be used with Super Resolution. It will be automatically disabled when you enable Super Resolution. \nAlso can't be used along with subsample feature due to unsupported texture format";
+            var sharpeningEnhanceContent = new GUIContent();
+            sharpeningEnhanceContent.text = "Sharpening Enhance Mode";
+            sharpeningEnhanceContent.tooltip = "None: Full screen will be sharpened\n\nFixed Foveated: Only the central fixation point will be sharpened\n\nSelf Adaptive: Only when contrast between the current pixel and the surrounding pixels exceeds a certain threshold will be sharpened.\n\nThis menu will be only enabled while Sharpening (either Normal or Quality) is enabled.";
+
+            if (projectConfig.superResolution)
+            {
+                GUI.enabled = false;
+                manager.sharpeningMode = SharpeningMode.None;
+                manager.sharpeningEnhance = SharpeningEnhance.None;
+            }
+            else 
+            {
+                GUI.enabled = true;
+            }
+
+            manager.sharpeningMode = (SharpeningMode)EditorGUILayout.EnumPopup(sharpeningContent, manager.sharpeningMode);
+            if (manager.sharpeningMode == SharpeningMode.None)
+            {
+                manager.sharpeningEnhance = SharpeningEnhance.None;
+            }
+            else
+            {
+                manager.sharpeningEnhance = (SharpeningEnhance)EditorGUILayout.EnumPopup(sharpeningEnhanceContent, manager.sharpeningEnhance);
+            }
+
+            if (manager.sharpeningMode != SharpeningMode.None)
+            {
+                if (manager.sharpeningMode == SharpeningMode.Normal)
+                {
+                    projectConfig.normalSharpening = true;
+                    projectConfig.qualitySharpening = false;
+                }
+                else
+                {
+                    projectConfig.normalSharpening = false;
+                    projectConfig.qualitySharpening = true;
+                }
+
+                if (manager.sharpeningEnhance == SharpeningEnhance.Both)
+                {
+                    projectConfig.fixedFoveatedSharpening = true;
+                    projectConfig.selfAdaptiveSharpening = true;
+                }
+                else if (manager.sharpeningEnhance == SharpeningEnhance.FixedFoveated)
+                {
+                    projectConfig.fixedFoveatedSharpening = true;
+                    projectConfig.selfAdaptiveSharpening = false;
+                }
+                else if (manager.sharpeningEnhance == SharpeningEnhance.SelfAdaptive)
+                {
+                    projectConfig.fixedFoveatedSharpening = false;
+                    projectConfig.selfAdaptiveSharpening = true;
+                }
+                else
+                {
+                    projectConfig.fixedFoveatedSharpening = false;
+                    projectConfig.selfAdaptiveSharpening = false;
+                }
+            }
+            else
+            {
+                projectConfig.normalSharpening = false;
+                projectConfig.qualitySharpening = false;
+                projectConfig.fixedFoveatedSharpening = false;
+                projectConfig.selfAdaptiveSharpening = false;
+            }
+
+            var usePremultipliedAlphaContent = new GUIContent();
+            usePremultipliedAlphaContent.text = "Use Premultiplied Alpha";
+            usePremultipliedAlphaContent.tooltip = @"Enable premultiplied alpha for this content.
+
+When enabled:
+• RGB color channels are multiplied by Alpha (R*A, G*A, B*A)
+• Improves performance for transparent elements (e.g., UI, particles)
+• Fixes edge artifacts in semitransparent objects
+• Matches OpenXR and GPU blending requirements
+
+Recommended for:
+• UI panels with transparency
+• Particle effects
+• Materials using alpha blending
+• Any content requiring frequent transparency mixing
+
+Note: Ensure textures are imported with 'Alpha Is Transparency' 
+or manually pre-multiply colors if needed.";
+            manager.usePremultipliedAlpha = EditorGUILayout.Toggle(usePremultipliedAlphaContent, manager.usePremultipliedAlpha);
+            
+            guiContent.text = "Layer Blend";
+            manager.useLayerBlend = EditorGUILayout.Toggle(guiContent, manager.useLayerBlend);
+            if (manager.useLayerBlend)
+            {
+                EditorGUILayout.BeginVertical("frameBox");
+                guiContent.text = "Src Color";
+                manager.srcColor = (PxrBlendFactor)EditorGUILayout.EnumPopup(guiContent, manager.srcColor);
+                guiContent.text = "Dst Color";
+                manager.dstColor = (PxrBlendFactor)EditorGUILayout.EnumPopup(guiContent, manager.dstColor);
+                guiContent.text = "Src Alpha";
+                manager.srcAlpha = (PxrBlendFactor)EditorGUILayout.EnumPopup(guiContent, manager.srcAlpha);
+                guiContent.text = "Dst Alpha";
+                manager.dstAlpha = (PxrBlendFactor)EditorGUILayout.EnumPopup(guiContent, manager.dstAlpha);
+
+                EditorGUILayout.EndVertical();
+            }
+            if (GUI.changed)
+            {
+                EditorUtility.SetDirty(projectConfig);
+                EditorUtility.SetDirty(manager);
+            }
+            serializedObject.ApplyModifiedProperties();
+        }
+
+        private void OnDisable()
+        {
+            EditorUtility.SetDirty(PXR_ProjectSetting.GetProjectConfig());
+            UnityEditor.AssetDatabase.SaveAssets();
+        }
+    }
+}
+#endif

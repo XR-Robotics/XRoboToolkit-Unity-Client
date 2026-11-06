@@ -1,0 +1,299 @@
+{
+    "name": "PXR_PICODebuggerActions",
+    "maps": [
+        {
+            "name": "PICODebugger_XRI_UI",
+            "id": "edd65a7c-601c-4915-8307-025a081d8790",
+            "actions": [
+                {
+                    "name": "DebuggerStartButton",
+                    "type": "Button",
+                    "id": "18b5674b-8449-40e1-8352-eb0d01586b43",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "TimerControllerButton",
+                    "type": "Button",
+                    "id": "9b4a54f6-8890-4002-bc26-610f22fad18f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RulerReleaseButton",
+                    "type": "Button",
+                    "id": "b7d67e61-7b0d-4453-8dcc-9a5f8dd3badc",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "RulerControllerButton",
+                    "type": "Button",
+                    "id": "b534ff66-ac64-44ca-b5c6-25adddc1eeba",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "LeftControllerPositionAction",
+                    "type": "Value",
+                    "id": "ff546c24-e61e-41a6-944c-7ee28645e5fa",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "LeftControllerRotationAction",
+                    "type": "Value",
+                    "id": "efa60c23-aeb2-42bd-9d92-fc235dd01e57",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightControllerPositionAction",
+                    "type": "Value",
+                    "id": "0032f00e-8302-46b7-8c40-f671b5b052bb",
+                    "expectedControlType": "Vector3",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "RightControllerRotationAction",
+                    "type": "Value",
+                    "id": "8019b9b7-6609-4f2f-a0da-3c1da6f6fe53",
+                    "expectedControlType": "Quaternion",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "9e8e0205-41dc-47a0-9e60-aae1b25516bc",
+                    "path": "<Keyboard>/a",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebuggerStartButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "7f321d7f-4e94-4254-933d-fcc5eb12c87e",
+                    "path": "<PXR_Controller>{RightHand}/primaryButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebuggerStartButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b24c8ead-a32d-4613-8016-401469151706",
+                    "path": "<PXR_Controller>{RightHand}/{PrimaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebuggerStartButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "29c4e53b-b3f1-4b40-94da-660dd139cce6",
+                    "path": "<XRController>/{PrimaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "DebuggerStartButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "b0643ff6-debf-4d19-a4ea-75ebe678eb6c",
+                    "path": "<PXR_Controller>{RightHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TimerControllerButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "88125537-a5e6-412b-abad-328d506b21fa",
+                    "path": "<Keyboard>/t",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "TimerControllerButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "baf401ef-a4d1-4abf-b129-f5ad179f0a04",
+                    "path": "<PXR_Controller>{RightHand}/{SecondaryButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RulerReleaseButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cccdabeb-6ec0-43b2-adab-6f3352626794",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RulerReleaseButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "67d084c6-ce1a-4af6-ac69-90b788d152a9",
+                    "path": "<PXR_Controller>{RightHand}/{GripButton}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RulerControllerButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "917625ec-13f0-4927-887a-c5c6482bab8e",
+                    "path": "<Keyboard>/c",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RulerControllerButton",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "f6010ced-5334-4b65-b94c-497849f90646",
+                    "path": "<XRController>{RightHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftControllerPositionAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "da366ca7-99af-4228-8baf-f0ccb02b99cf",
+                    "path": "<XRController>{LeftHand}/deviceRotation",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "LeftControllerRotationAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "063c55d6-8f80-496c-852a-848ac1e9e719",
+                    "path": "<XRController>{RightHand}/devicePosition",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightControllerPositionAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "cacc2859-adab-4548-a515-ae1c3153ca7f",
+                    "path": "<XRController>{RightHand}/{DeviceRotation}",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "RightControllerRotationAction",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Generic XR Controller",
+            "bindingGroup": "Generic XR Controller",
+            "devices": [
+                {
+                    "devicePath": "<XRController>{LeftHand}",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>{RightHand}",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>",
+                    "isOptional": true,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<WMRHMD>",
+                    "isOptional": true,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Continuous Move",
+            "bindingGroup": "Continuous Move",
+            "devices": [
+                {
+                    "devicePath": "<XRController>{LeftHand}",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>{RightHand}",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        },
+        {
+            "name": "Noncontinuous Move",
+            "bindingGroup": "Noncontinuous Move",
+            "devices": [
+                {
+                    "devicePath": "<XRController>{LeftHand}",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<XRController>{RightHand}",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

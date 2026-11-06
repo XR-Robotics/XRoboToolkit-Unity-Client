@@ -136,7 +136,7 @@ PlayerSettings:
   vulkanEnableLateAcquireNextImage: 0
   vulkanEnableCommandBufferRecycling: 1
   loadStoreDebugModeEnabled: 0
-  bundleVersion: 1.1.2
+  bundleVersion: 1.1.16
   preloadedAssets:
   - {fileID: 11400000, guid: f2ef844c0e47a5d4297d66125bf1d191, type: 2}
   - {fileID: -8221979108565540337, guid: da34a6e7d51410049b366296e6664eda, type: 2}
@@ -169,7 +169,7 @@ PlayerSettings:
     iPhone: 0
     tvOS: 0
   overrideDefaultApplicationIdentifier: 1
-  AndroidBundleVersionCode: 2
+  AndroidBundleVersionCode: 3
   AndroidMinSdkVersion: 30
   AndroidTargetSdkVersion: 31
   AndroidPreferredInstallLocation: 1
@@ -669,8 +669,8 @@ PlayerSettings:
   webGLMemoryGeometricGrowthCap: 96
   webGLPowerPreference: 2
   scriptingDefineSymbols:
-    Android: VUPLEX_XR_INTERACTION_TOOLKIT;AUTOTEST_BUILD
-    Standalone: VUPLEX_XR_INTERACTION_TOOLKIT
+    Android: VUPLEX_XR_INTERACTION_TOOLKIT;PICO_XR;ENABLE_PICO_XR_SDK;PICO_SPATIALIZER
+    Standalone: VUPLEX_XR_INTERACTION_TOOLKIT;PICO_XR;ENABLE_PICO_XR_SDK
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

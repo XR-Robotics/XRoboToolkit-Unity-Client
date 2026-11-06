@@ -1,0 +1,49 @@
+{
+    "name": "ByteDance.PICO.SptatialUI",
+    "rootNamespace": "",
+    "references": [
+        "Unity.XR.Management",
+        "Unity.InputSystem",
+        "Unity.XR.Interaction.Toolkit",
+        "Unity.XR.Hands",
+        "Unity.XR.OpenXR",
+        "Unity.XR.OpenXR.Editor",
+        "Unity.XR.CoreUtils",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": true,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.unity.inputsystem",
+            "expression": "",
+            "define": "UNITY_INPUT_SYSTEM"
+        },
+        {
+            "name": "com.unity.xr.management",
+            "expression": "3.2.0",
+            "define": "XR_MGMT_GTE_320"
+        },
+        {
+            "name": "com.unity.xr.hands",
+            "expression": "1.1.0",
+            "define": "XR_HANDS"
+        },
+        {
+            "name": "com.unity.render-pipelines.universal",
+            "expression": "12.1.12",
+            "define": "URP"
+        },
+        {
+            "name": "com.unity.xr.compositionlayers",
+            "expression": "1.0.0",
+            "define": "XR_COMPOSITION_LAYERS"
+        }
+    ],
+    "noEngineReferences": false
+}

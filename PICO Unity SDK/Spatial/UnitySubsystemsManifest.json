@@ -1,0 +1,15 @@
+{
+        "name": "StagePlatform",
+        "version": "0.1.0",
+        "libraryName": "StagePlatform",
+        "inputs": [
+                {
+                        "id": "PICO Input"
+                }
+        ],
+        "meshings": [
+                {
+                        "id": "PICO Mesh"
+                }
+        ]
+}

@@ -1,0 +1,384 @@
+/* Root container of the whole Icon Configurator window: controls the main axis, overall padding, and global background. */
+.icon-configurator {
+    flex-direction: column;
+    flex-grow: 1; /* Let the window content fill the available height. */
+    padding: 12px; /* Uniform padding around the whole tool window. */
+    background-color: rgb(30, 30, 30); /* Dark background of the whole window. */
+    color: rgb(230, 230, 230); /* Default text color. */
+}
+
+/* Top header area: hosts the title and the mode-switch buttons. */
+.icon-configurator__header {
+    flex-shrink: 0; /* Do not shrink the header first when the window is compressed. */
+    margin-bottom: 12px; /* Spacing from the main body below. */
+}
+
+/* Single header row: distributes the title on the left and mode buttons on the right. */
+.icon-configurator__header-row {
+    flex-direction: row;
+    justify-content: space-between; /* Title left-aligned, mode buttons right-aligned. */
+    align-items: center; /* Vertically align title and buttons. */
+    gap: 16px; /* Minimum gap between the title and the buttons. */
+}
+
+/* Top main title: the "Icon Configurator" text. */
+.icon-configurator__title {
+    font-size: 18px; /* Title font size. */
+    -unity-font-style: bold; /* Bold title. */
+    flex-grow: 1; /* Let the title fill the left side and push the buttons to the right. */
+}
+
+/* Notice under the title: flags the device support limitation of the current project. */
+.icon-configurator__notice {
+    margin-top: 6px; /* Spacing from the title row above. */
+    font-size: 12px; /* Hint font size, slightly smaller than the title. */
+    color: rgba(255, 255, 255, 0.74); /* Muted translucent white, a non-blocking notice. */
+    white-space: normal; /* Allow long notices to wrap. */
+}
+
+/* Mode-switch host row: hosts the Manual / AI Split buttons. */
+.icon-configurator__mode-host {
+    flex-direction: row;
+    align-items: center; /* Vertically center the buttons. */
+    justify-content: flex-end; /* Right-align the mode buttons as a group. */
+    gap: 8px; /* Horizontal gap between mode-switch controls. */
+    min-height: 32px; /* Prevent the buttons from being squashed too short. */
+    overflow: visible; /* Avoid clipping button text or borders. */
+}
+
+/* Mode-switch segment control body: lay the two buttons out horizontally. */
+.icon-configurator__mode-segment {
+    flex-direction: row;
+    align-items: center; /* Vertically center the content inside the segment control. */
+    min-height: 28px; /* Guarantee a minimum height for the segment control itself. */
+    overflow: visible; /* Avoid clipping the selected state or text. */
+}
+
+/* Main scroll area: the content body holding Layers / Preview / Localization. */
+.icon-configurator__body {
+    flex-grow: 1; /* Occupy the remaining space between the header and the bottom bar. */
+    flex-shrink: 1; /* Allow the body to shrink first when the window gets smaller. */
+    min-height: 0; /* Let the ScrollView shrink normally instead of pushing the bottom bar out. */
+    margin-bottom: 12px; /* Spacing from the bottom status bar. */
+}
+
+/* Shared ScrollView content sizing: Manual and AI Split reuse one global stretch model. */
+.icon-configurator__body-content {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Generic section card: the outer shell for Layers / Preview / Localization. */
+.icon-configurator__section {
+    margin-bottom: 12px; /* Vertical spacing between section cards. */
+    padding: 10px; /* Inner padding around the section content. */
+    border-radius: 4px; /* Slight rounded corners on the section shell. */
+    background-color: rgb(40, 40, 40); /* Section shell background color. */
+    flex-shrink: 0;
+}
+
+/* Preview owns the flexible part of the page so window resize applies globally. */
+.icon-configurator__section--preview {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Generic section title: such as Preview / Layers / Localization. */
+.icon-configurator__section-title {
+    margin-bottom: 8px; /* Spacing from the section content. */
+    -unity-font-style: bold; /* Bold title. */
+}
+
+/* Generic section content area: spacing container between controls inside a section. */
+.icon-configurator__section-content {
+    gap: 8px; /* Uniform spacing between rows/blocks within a section. */
+}
+
+/* Preview content must stretch with its section instead of keeping per-mode local height. */
+.icon-configurator__section-content--preview {
+    flex-grow: 1;
+    min-height: 0;
+}
+
+/* Preview two-column grid: the container that places 2D Feedback and 3D Spatial side by side. */
+.icon-configurator__preview-grid {
+    flex-direction: row;
+    flex-grow: 1; /* Let the preview area fill as much height as possible. */
+    align-items: stretch; /* Keep both cards stretched to equal height vertically. */
+    min-width: 0; /* Avoid child elements blowing out the two-column width. */
+    column-gap: 12px; /* Horizontal gap between the 2D and 3D cards. */
+}
+
+/* Single preview card shell: shared by the 2D card and the 3D card. */
+.icon-configurator__preview-card {
+    flex-grow: 1; /* The two cards split the width evenly. */
+    flex-basis: 0; /* Works with flex-grow to keep them as equal-width as possible while scaling. */
+    min-width: 0; /* Avoid content expanding the card width. */
+    padding: 6px; /* Padding between the card shell and the inner canvas. */
+    border-radius: 6px; /* Slight rounded corners on the card shell. */
+    background-color: rgb(52, 52, 56); /* Card shell background color. */
+    justify-content: flex-start; /* Lay out content starting from the top. */
+}
+
+/* Extra style for the 3D card: currently mainly keeps the same top alignment as a normal card. */
+.icon-configurator__preview-card--spatial {
+    justify-content: flex-start; /* The 3D card content also starts laying out from the top. */
+    padding: 6px; /* Keep the same outer padding as the 2D card. */
+}
+
+/* Preview shell: the relatively-positioned container inside each preview card that actually hosts the canvas and overlay elements. */
+.icon-configurator__preview-shell {
+    position: relative; /* Let the title and the 3D bottom floating bar be absolutely positioned relative to the canvas. */
+    flex-grow: 1; /* The shell fills the remaining area inside the whole preview card. */
+}
+
+/* 3D preview shell: reserved extension point on its own, currently just fills the space. */
+.icon-configurator__preview-shell--spatial {
+    flex-grow: 1; /* Let the 3D preview shell fill the 3D card. */
+}
+
+/* Base style of the floating title label: reused by both 2D Feedback and 3D Spatial visuals. */
+.icon-configurator__preview-card-title {
+    margin-bottom: 8px; /* Default bottom margin for the non-floating case, mainly a fallback now. */
+    padding-top: 2px; /* Label top/bottom padding. */
+    padding-bottom: 2px; /* Label top/bottom padding. */
+    padding-left: 6px; /* Label left/right padding. */
+    padding-right: 6px; /* Label left/right padding. */
+    border-radius: 4px; /* Small rounded corners on the label itself. */
+    background-color: rgba(80, 82, 88, 1); /* Label background color. */
+    color: rgb(245, 245, 245); /* Label text color. */
+    -unity-font-style: bold; /* Bold label text. */
+    max-width: 90px; /* Limit the label width to avoid an overly long label hurting the look. */
+}
+
+/* Floating title positioning: pin the 2D / 3D titles to the top-left corner inside their canvases. */
+.icon-configurator__preview-card-title--overlay {
+    position: absolute; /* Switch to floating positioning, no longer occupying normal document flow. */
+    top: 8px; /* Offset from the top of the canvas. */
+    left: 8px; /* Offset from the left of the canvas. */
+    margin-bottom: 0; /* No longer need the bottom margin from normal flow when floating. */
+}
+
+/* Preview canvas container: controls the minimum height of the preview main area. */
+.icon-configurator__preview-canvas {
+    flex-grow: 1; /* Let the canvas fill the card height as much as possible. */
+    min-height: 160px; /* Minimum height of the preview area to avoid over-compression. */
+}
+
+/* Preview display board: the light-gray canvas actually seen in 2D / 3D. */
+.icon-configurator__preview-surface {
+    flex-grow: 1; /* Fill the canvas container. */
+    border-radius: 4px; /* Small rounded corners on the canvas itself. */
+    background-color: rgba(117, 119, 125, 1); /* 2D / 3D preview board color. */
+}
+
+/* Preview viewport: centers the image content within the canvas and clips anything overflowing. */
+.icon-configurator__preview-viewport {
+    flex-grow: 1; /* Let the viewport fill the whole board. */
+    justify-content: center; /* Center the image horizontally. */
+    align-items: center; /* Center the image vertically. */
+    overflow: hidden; /* Hide content that overflows the viewport. */
+}
+
+/* 2D-only checkerboard base: applies only to the 2D Feedback canvas to simulate a transparent-background check pattern. */
+.icon-configurator__preview-surface--checkerboard {
+    background-color: rgb(122, 122, 128); /* Base color of the checkerboard. */
+    background-image:
+        linear-gradient(45deg, rgb(104, 104, 110) 25%, transparent 25%),
+        linear-gradient(-45deg, rgb(104, 104, 110) 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, rgb(104, 104, 110) 75%),
+        linear-gradient(-45deg, transparent 75%, rgb(104, 104, 110) 75%); /* Compose the checkerboard texture. */
+    background-size: 16px 16px; /* Checkerboard cell size. */
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0; /* Stagger and align the four texture layers. */
+}
+
+/* Preview image body: used by both the 2D composite image and the 3D RenderTexture. */
+.icon-configurator__preview-image {
+    max-width: 100%; /* Image width does not exceed the canvas. */
+    max-height: 100%; /* Image height does not exceed the canvas. */
+    unity-background-scale-mode: scale-to-fit; /* Scale proportionally to fit within the visible area. */
+}
+
+/* Inner row of the 3D bottom control bar: horizontal layout of Y, slider, and angle value. */
+.icon-configurator__preview-slider-row {
+    flex-direction: row;
+    justify-content: space-between; /* Spread the three parts to both ends. */
+    align-items: center; /* Center vertically. */
+}
+
+/* Base style of the preview control bar: fallback style for the generic bottom control container. */
+.icon-configurator__preview-controls {
+    min-height: 32px; /* Base minimum height of the control bar. */
+    padding-left: 8px; /* Control bar left/right padding. */
+    padding-right: 8px; /* Control bar left/right padding. */
+    background-color: rgba(48, 64, 153, 0.8); /* Base control bar background color. */
+    justify-content: center; /* Vertically center the inner content. */
+}
+
+/* 3D floating layer positioning: pin the bottom control bar to the inner bottom edge of the 3D canvas. */
+.icon-configurator__preview-overlay {
+    position: absolute; /* Absolutely positioned relative to the 3D shell. */
+    left: 0; /* Stick to the left edge of the canvas. */
+    right: 0; /* Stick to the right edge of the canvas. */
+    bottom: 0; /* Stick to the bottom edge of the canvas. */
+}
+
+/* 3D bottom floating control bar appearance: the light-gray bottom bar currently seen is this. */
+.icon-configurator__preview-controls--overlay {
+    min-height: 24px; /* Actual visible height of the edge-pinned bottom bar. */
+    border-top-left-radius: 4px; /* Slight rounded corner at the top-left. */
+    border-top-right-radius: 4px; /* Slight rounded corner at the top-right. */
+    border-bottom-left-radius: 0; /* Bottom sticks to the canvas, no rounded corner kept. */
+    border-bottom-right-radius: 0; /* Bottom sticks to the canvas, no rounded corner kept. */
+    background-color: rgba(87, 86, 86, 0.9); /* 3D bottom floating bar background color. */
+}
+
+/* Y-axis label on the left of the 3D control bar. */
+.icon-configurator__preview-slider-axis {
+    min-width: 14px; /* Give the Y label a stable width. */
+    flex-shrink: 0; /* Do not shrink, to avoid squeezing the slider and angle value and overflowing the content. */
+    color: rgb(236, 236, 236); /* Y label text color. */
+}
+
+/* 3D slider body: the draggable angle control bar in the middle. */
+.icon-configurator__preview-slider {
+    flex-grow: 1; /* Fill the remaining space between Y and the angle value. */
+    flex-shrink: 1; /* When space is tight, the slider shrinks rather than the side labels. */
+    margin-left: 8px; /* Spacing from the Y label on the left. */
+    margin-right: 8px; /* Spacing from the angle value on the right. */
+}
+
+/* Angle value text on the right of the 3D control bar. */
+.icon-configurator__preview-slider-value {
+    min-width: 36px; /* Reserve width for negative angles (such as -80°) to avoid text overflowing the right edge of the control bar. */
+    flex-shrink: 0; /* Do not shrink, ensuring negative-angle text stays complete and does not overflow. */
+    color: rgb(236, 236, 236); /* Angle value text color. */
+    -unity-text-align: middle-right; /* Right-align the value. */
+}
+
+/* 3D slider track: a semi-transparent white line. */
+.icon-configurator__preview-controls--overlay .unity-base-slider__tracker {
+    background-color: rgba(255, 255, 255, 0.35); /* Slider track color. */
+    border-width: 0; /* Remove the default 1px border to avoid the rounded border narrowing to a point at both ends. */
+    border-radius: 0; /* Cancel the capsule rounding so the line keeps a consistent width from end to end. */
+    height: 3px; /* Slider track thickness. */
+}
+
+.icon-configurator__preview-controls--overlay .unity-base-slider__tracker-dragger {
+    background-color: rgba(255, 255, 255, 0.35); /* Slider track color. */
+    border-width: 0; /* Remove the default 1px border to avoid the rounded border narrowing to a point at both ends. */
+    border-radius: 0; /* Cancel the capsule rounding so the line keeps a consistent width from end to end. */
+    height: 3px; /* Slider track thickness. */
+}
+
+.icon-configurator__preview-controls--overlay .unity-base-slider__tracker-highlight {
+    background-color: rgba(255, 255, 255, 0.35); /* Slider track color. */
+    border-width: 0; /* Remove the default 1px border to avoid the rounded border narrowing to a point at both ends. */
+    border-radius: 0; /* Cancel the capsule rounding so the line keeps a consistent width from end to end. */
+    height: 3px; /* Slider track thickness. */
+}
+
+/* 3D slider dragger: the draggable white knob in the middle. */
+.icon-configurator__preview-controls--overlay .unity-base-slider__dragger {
+    background-color: rgb(248, 248, 248); /* Slider knob color. */
+    border-radius: 999px; /* Make the knob circular. */
+    width: 10px; /* Knob width matched to the track thickness. */
+    height: 10px; /* Knob height matched to the track thickness. */
+}
+
+/* Window bottom bar: the area holding the bottom status text and the Apply button. */
+.icon-configurator__bottom-bar {
+    flex-direction: row;
+    flex-shrink: 0; /* Do not shrink the bottom bar first when the window gets smaller. */
+    justify-content: space-between; /* Distribute the status on the left and the button on the right. */
+    align-items: center; /* Vertically center the bottom bar controls. */
+    padding-top: 8px; /* Top padding of the bottom bar. */
+    border-top-width: 1px; /* Thickness of the bottom bar top divider. */
+    border-top-color: rgb(55, 55, 55); /* Color of the bottom bar top divider. */
+}
+
+/* Status text on the left of the bottom bar. */
+.icon-configurator__bottom-status {
+    color: rgb(180, 180, 180); /* Muted color of the status text. */
+}
+
+/* Apply button: the primary action button at the bottom-right of the bottom bar. */
+.icon-configurator__apply-button {
+    min-width: 120px; /* Minimum button width. */
+    min-height: 24px; /* Minimum button height. */
+    -unity-text-align: middle-center; /* Center the button text. */
+}
+
+/* Mode buttons: the top Manual / AI Split mode buttons. */
+.icon-configurator__mode-button {
+    min-width: 120px; /* Minimum width of the top mode buttons. */
+    min-height: 24px; /* Minimum height of the top mode buttons. */
+    -unity-text-align: middle-center; /* Center the mode button text. */
+    padding-top: 2px; /* Top/bottom padding of the top mode buttons. */
+    padding-bottom: 2px; /* Top/bottom padding of the top mode buttons. */
+}
+
+/* Selected mode button: e.g. the highlight background when Manual is currently selected. */
+.icon-configurator__mode-button--selected {
+    background-color: rgb(55, 110, 190); /* Background of the selected mode button. */
+}
+
+/* Placeholder hint text: weak hint text used when there is no content. */
+.icon-configurator__placeholder {
+    color: rgb(155, 155, 155); /* Placeholder text color. */
+}
+
+/* AI Split agreement area: the checkbox plus the description block below act as a single agreement panel. */
+.icon-configurator__agreement {
+    flex-direction: column;
+    margin-top: 4px; /* Spacing from the progress bar above. */
+}
+
+/* Agreement checkbox: the "I agree" checkbox body. Checkbox on the left, text on the right. */
+.icon-configurator__agreement-toggle {
+    flex-direction: row-reverse; /* Reverse the default order: checkbox to the left, text to the right. */
+    justify-content: flex-end; /* Under row-reverse, flex-end means the group is left-aligned. */
+    align-items: center; /* Vertically center the checkbox and text. */
+    margin-bottom: 6px; /* Spacing from the description block below. */
+}
+
+/* Checkbox container: cancel the default stretch to avoid pulling the checkbox and text to both ends. */
+.icon-configurator__agreement-toggle .unity-toggle__input {
+    flex-grow: 0;
+}
+
+.icon-configurator__agreement-toggle .unity-label {
+    flex-grow: 0; /* The text no longer stretches, staying close to the checkbox. */
+    min-width: auto; /* Cancel the default minimum width to avoid pulling the text away from the checkbox. */
+    margin-left: 6px; /* When the text is on the right, leave a gap from the checkbox on the left. */
+    -unity-font-style: bold; /* Bold the "I agree" text as the agreement heading. */
+    color: rgb(230, 230, 230); /* Keep consistent with the window's main text color. */
+}
+
+/* Checkbox square: change the background to an obvious gray to distinguish it from the dark panel. */
+.icon-configurator__agreement-toggle .unity-toggle__checkmark {
+    background-color: rgb(120, 120, 120); /* Gray checkbox background, brighter than the panel for visibility. */
+    border-color: rgb(160, 160, 160); /* Brighter gray border to reinforce the boundary. */
+    border-width: 1px;
+}
+
+/* Agreement description block: a light rounded block hosting the algorithm-deviation disclaimer. */
+.icon-configurator__agreement-disclaimer {
+    padding: 12px; /* Padding around the text block. */
+    border-radius: 6px; /* Rounded block. */
+    background-color: rgb(46, 46, 48); /* Block color slightly lighter than the section. */
+    color: rgb(196, 196, 196); /* Muted color of the description text. */
+    white-space: normal; /* Allow long text to wrap. */
+}
+
+.icon-configurator__layer-slot {
+    border-width: 1px;
+    border-color: rgba(255, 255, 255, 0.06);
+    border-radius: 4px;
+    padding: 6px;
+}
+
+.icon-configurator__layer-slot--drag-over {
+    border-color: rgb(85, 150, 240);
+    background-color: rgba(85, 150, 240, 0.08);
+}

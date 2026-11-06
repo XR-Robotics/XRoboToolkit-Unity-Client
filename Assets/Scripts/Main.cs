@@ -1,5 +1,5 @@
-using Unity.XR.PICO.TOBSupport;
-using Unity.XR.PXR;
+using ByteDance.PICO.Enterprise;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     [SerializeField] private bool enableVstCamera = false;
     [SerializeField] private float eyeTextureResolutionScale = 1.0f;
 
-    private bool _vstCameraOpen;
+    private bool _vstEnabled;
 
     private void Awake()
     {
@@ -72,26 +72,16 @@ public class Main : MonoBehaviour
             return;
         }
 
-        if (enabled == _vstCameraOpen && PXR_Manager.EnableVideoSeeThrough == enabled)
+        if (enabled == _vstEnabled && PXR_Manager.EnableVideoSeeThrough == enabled)
         {
             Debug.Log($"Main VST unchanged: enabled={enabled}, reason={reason}");
             return;
         }
 
-        if (enabled)
-        {
-            PXR_Manager.EnableVideoSeeThrough = true;
-            bool openResult = PXR_Enterprise.OpenVSTCamera();
-            _vstCameraOpen = openResult;
-            Debug.Log($"Main VST open: result={openResult}, reason={reason}");
-            return;
-        }
-
-        // Disable the compositor background before closing the camera so a
-        // resume/black-screen transition cannot keep a stale VST layer alive.
-        PXR_Manager.EnableVideoSeeThrough = false;
-        bool closeResult = PXR_Enterprise.CloseVSTCamera();
-        _vstCameraOpen = !closeResult;
-        Debug.Log($"Main VST close: result={closeResult}, reason={reason}");
+        // SDK 6.1 controls compositor passthrough through PXR_Manager.
+        // The old Enterprise RGB-camera open/close methods are now no-op stubs.
+        PXR_Manager.EnableVideoSeeThrough = enabled;
+        _vstEnabled = enabled;
+        Debug.Log($"Main VST compositor: enabled={enabled}, reason={reason}");
     }
 }

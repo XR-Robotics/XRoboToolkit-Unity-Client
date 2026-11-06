@@ -4,8 +4,8 @@ using System.Net;
 using System.Net.NetworkInformation;
 using Robot;
 using Robot.Conf;
-using Unity.XR.PICO.TOBSupport;
-using Unity.XR.PXR;
+using ByteDance.PICO.Enterprise;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.Android;
 using UnityEngine.InputSystem;
@@ -26,6 +26,7 @@ public class UIOperate : MonoBehaviour
     public Toggle HeadTog;
     public Toggle ControllerTog;
     public Toggle HandTrackingTog;
+    public Toggle EyeFrameTog;
     public Toggle SendTog;
     public Toggle AcontrolerTog;
     public Dropdown bodyModeDrop;
@@ -53,6 +54,8 @@ public class UIOperate : MonoBehaviour
     private bool _usbTetheringRecoveryInProgress;
     private float _nextAutoConnectTime;
     private float _nextUsbTetheringStatusTime;
+    [SerializeField] private EnterpriseEyeFrameSource _eyeFrameSource;
+    [SerializeField] private EnterpriseEyeFramePreview _eyeFramePreview;
 
     // Start is called before the first frame update
     private void Awake()
@@ -76,6 +79,7 @@ public class UIOperate : MonoBehaviour
         NetshareTog.onValueChanged.AddListener(OnNetShareTog);
         HighAccuracy.onValueChanged.AddListener(OnHighAccuracy);
         ReconnectBtn.onClick.AddListener(OnReconnectBtn);
+        InitializeEyeFrames();
         EnableCollectionStreams();
         //The shared network function is only available on B-end devices.
         NetshareTog.gameObject.SetActive(false);
@@ -98,6 +102,17 @@ public class UIOperate : MonoBehaviour
         sourceConfig.OnInitialized += OnSourceConfigOnOnInitialized;
         // Initialize video source configuration
         sourceConfig.Initialize();
+    }
+
+    private void InitializeEyeFrames()
+    {
+        if (EyeFrameTog == null || _eyeFrameSource == null || _eyeFramePreview == null)
+        {
+            Debug.LogWarning("[EnterpriseEyeFrames] Assign the authored toggle, source and preview in the scene.");
+            return;
+        }
+
+        _eyeFramePreview.Initialize();
     }
 
     private void OnSourceConfigOnOnInitialized()
@@ -155,6 +170,7 @@ public class UIOperate : MonoBehaviour
     {
         Debug.Log("OnBindEnterpriseService " + bind);
         _enterpriseServiceBound = bind;
+        _eyeFrameSource?.NotifyServiceBound(bind);
         EnterpriseCollectionRecorder.NotifyEnterpriseServiceBound(bind);
         if (bind && !_usbNetworkingConfigured)
         {
@@ -173,13 +189,13 @@ public class UIOperate : MonoBehaviour
     private IEnumerator ConfigureUsbNetworking()
     {
         _usbNetworkingConfigurationInProgress = true;
-        string currentLocal = PXR_Enterprise.GetUsbTetheringStaticIPLocal();
-        string currentClient = PXR_Enterprise.GetUsbTetheringStaticIPClient();
+        string currentLocal = EnterpriseUsbNetworking.GetLocalAddress();
+        string currentClient = EnterpriseUsbNetworking.GetClientAddress();
         bool addressesChanged = currentLocal != UsbTetheringLocalAddress ||
                                 currentClient != UsbTetheringClientAddress;
 
         Debug.Log($"USB tethering static IP before: local={currentLocal}, client={currentClient}");
-        int result = PXR_Enterprise.SetUsbTetheringStaticIP(
+        int result = EnterpriseUsbNetworking.SetStaticAddresses(
             UsbTetheringLocalAddress, UsbTetheringClientAddress);
         Debug.Log($"SetUsbTetheringStaticIP result={result}, addressesChanged={addressesChanged}");
         if (result != 0 && addressesChanged)
@@ -194,7 +210,7 @@ public class UIOperate : MonoBehaviour
                 $"USB static IP setter returned {result}, but the configured addresses already match.");
         }
 
-        PXR_Enterprise.EnableUsbTetheringStaticIP();
+        EnterpriseUsbNetworking.EnableStaticAddress();
         PXR_Enterprise.SwitchSystemFunction(
             SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_OFF);
         yield return new WaitForSecondsRealtime(1.0f);
@@ -230,7 +246,7 @@ public class UIOperate : MonoBehaviour
     {
         _usbTetheringRecoveryInProgress = true;
         Debug.LogWarning($"USB address {UsbTetheringLocalAddress} is missing; restarting USB tethering.");
-        PXR_Enterprise.EnableUsbTetheringStaticIP();
+        EnterpriseUsbNetworking.EnableStaticAddress();
         PXR_Enterprise.SwitchSystemFunction(
             SystemFunctionSwitchEnum.SFS_USB_TETHERING, SwitchEnum.S_OFF);
         yield return new WaitForSecondsRealtime(0.5f);
@@ -346,25 +362,14 @@ public class UIOperate : MonoBehaviour
         int res = 0;
         bool support = false;
 
-        MotionTrackerMode trackingMode = PXR_MotionTracking.GetMotionTrackerMode();
         if (tType == TrackingData.TrackingType.Body)
         {
-            if (trackingMode != MotionTrackerMode.BodyTracking)
-            {
-                res = PXR_MotionTracking.CheckMotionTrackerModeAndNumber(MotionTrackerMode.BodyTracking,
-                    MotionTrackerNum.TWO);
-            }
-
+            res = PXR_MotionTracking.CheckMotionTrackerNumber(MotionTrackerNum.TWO);
             PXR_MotionTracking.GetBodyTrackingSupported(ref support);
         }
         else if (tType == TrackingData.TrackingType.Motion)
         {
-            if (trackingMode != MotionTrackerMode.MotionTracking)
-            {
-                res = PXR_MotionTracking.CheckMotionTrackerModeAndNumber(MotionTrackerMode.MotionTracking,
-                    MotionTrackerNum.ONE);
-            }
-
+            res = PXR_MotionTracking.CheckMotionTrackerNumber(MotionTrackerNum.ONE);
             support = true;
         }
 
@@ -503,23 +508,20 @@ public class UIOperate : MonoBehaviour
         }
         else
         {
-            MotionTrackerConnectState state = new MotionTrackerConnectState();
-            PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
-            //  PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref state);
-            TrackNum.text = "Num: " + state.trackerSum;
+            int trackerCount = PicoMotionTrackerDevices.GetConnectedIds().Length;
+            TrackNum.text = "Num: " + trackerCount;
 
             if (tType == TrackingData.TrackingType.Body)
             {
-                BodyTrackingMode mode = BodyTrackingMode.BTM_FULL_BODY_LOW;
                 if (HighAccuracy.isOn)
                 {
-                    mode = BodyTrackingMode.BTM_FULL_BODY_HIGH;
+                    Debug.LogWarning("SDK 6.1.1 exposes full-body joint sets without a separate high-accuracy mode.");
                 }
 
                 // Enable full body motion capture default mode
-                int ret = PXR_MotionTracking.StartBodyTracking(mode, boneLength);
+                int ret = PXR_MotionTracking.StartBodyTracking(BodyJointSet.BODY_JOINT_SET_BODY_FULL_START, boneLength);
                 BodyInfo.text = "Start BodyTracking " + ret;
-                Debug.Log(" UpdateBodyTracking :" + ret + " trackerSum:" + state.trackerSum);
+                Debug.Log(" UpdateBodyTracking :" + ret + " trackerSum:" + trackerCount);
             }
             else if (tType == TrackingData.TrackingType.Motion)
             {

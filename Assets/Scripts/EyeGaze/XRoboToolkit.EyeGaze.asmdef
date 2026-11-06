@@ -1,0 +1,23 @@
+{
+    "name": "XRoboToolkit.EyeGaze",
+    "rootNamespace": "Robot",
+    "references": [
+        "ByteDance.PICO.XR",
+        "UnityEngine.UI"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+        {
+            "name": "com.bytedance.pico.xr",
+            "expression": "6.1.1",
+            "define": "PICO_XR"
+        }
+    ],
+    "noEngineReferences": false
+}

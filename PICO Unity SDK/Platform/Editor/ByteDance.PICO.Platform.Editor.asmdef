@@ -1,0 +1,23 @@
+﻿{
+  "name": "ByteDance.PICO.Platform.Editor",
+  "references": [
+    "ByteDance.PICO.XR.Editor",
+    "ByteDance.PICO.XR",
+    "Unity.XR.Management",
+    "Unity.XR.Management.Editor",
+    "ByteDance.PICO.Platform"
+  ],
+  "optionalUnityReferences": [],
+  "includePlatforms": [
+    "Editor"
+  ],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "versionDefines": [
+    {
+      "name": "com.unity.xr.management",
+      "expression": "",
+      "define": "USING_XR_MANAGEMENT"
+    }
+  ]
+}

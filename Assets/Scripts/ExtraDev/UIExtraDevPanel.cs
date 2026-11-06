@@ -1,6 +1,6 @@
 using System;
 using Robot;
-using Unity.XR.PXR;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -38,8 +38,7 @@ public class UIExtraDevPanel : MonoBehaviour
         Test();
        return;
 #endif
-        ExtDevTrackerConnectState connectState = new ExtDevTrackerConnectState();
-        PXR_MotionTracking.GetExtDevTrackerConnectState(ref connectState);
+        ExtDevTrackerConnectState connectState = PicoMotionTrackerDevices.GetExternalDevices();
         Debug.Log("connectState.extNumber:" + connectState.extNumber);
         RefreshUI(connectState);
     }

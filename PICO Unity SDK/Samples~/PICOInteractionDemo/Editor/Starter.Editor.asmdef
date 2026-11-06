@@ -1,0 +1,19 @@
+{
+    "name": "ByteDance.PICO.XR.Interaction.Samples.Starter.Editor",
+    "rootNamespace": "",
+    "references": [
+        "ByteDance.PICO.XR.Editor"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [
+    ],
+    "noEngineReferences": false
+}

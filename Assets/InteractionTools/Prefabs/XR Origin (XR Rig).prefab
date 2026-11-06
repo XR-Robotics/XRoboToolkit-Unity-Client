@@ -801,8 +801,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2726eb0b6d51cf4dbd860b1365371a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimFlags:
-    m_Name: Aim Flags
+  trackingState:
+    m_Name: Tracking State
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 5fb92b58-dd51-47db-813f-706575414f0a
@@ -811,11 +811,11 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: b7bd16da-eaba-4521-a197-b090156f5368
-      m_Path: <PicoAimHand>{LeftHand}/aimFlags
+      m_Path: <PicoHandInteraction>{LeftHand}/trackingState
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Aim Flags
+      m_Action: Tracking State
       m_Flags: 0
     m_Flags: 0
   pinchStrength:
@@ -828,7 +828,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: f50c1ecf-b915-4432-997d-9f2c812cc82a
-      m_Path: <PicoAimHand>{LeftHand}/pinchStrengthIndex
+      m_Path: <PicoHandInteraction>{LeftHand}/pointerActivateValue
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -1120,7 +1120,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 88568a07-146b-4cf4-a08c-e3af41d1cfb0
-      m_Path: <PicoAimHand>{RightHand}/indexPressed
+      m_Path: <PicoHandInteraction>{RightHand}/pointerActivated
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -1137,7 +1137,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: bec8ab08-b418-4497-883a-92b7055c6441
-      m_Path: <PicoAimHand>{RightHand}/pinchStrengthIndex
+      m_Path: <PicoHandInteraction>{RightHand}/pointerActivateValue
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -2032,7 +2032,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 72d9fdba-fa14-48e2-ad22-ba86df3924c6
-      m_Path: <PicoAimHand>{LeftHand}/indexPressed
+      m_Path: <PicoHandInteraction>{LeftHand}/pinchTouched
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -2049,7 +2049,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 8f91386c-f3a0-4b93-b2d5-dd84c7fb30df
-      m_Path: <PicoAimHand>{LeftHand}/pinchStrengthIndex
+      m_Path: <PicoHandInteraction>{LeftHand}/pinchValue
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -4613,7 +4613,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 12787d23-c15f-499a-8aad-635e032b17d1
-      m_Path: <PicoAimHand>{LeftHand}/indexPressed
+      m_Path: <PicoHandInteraction>{LeftHand}/pointerActivated
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -4630,7 +4630,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 62a84ff9-3449-48ef-9a3c-bc29cf311b2c
-      m_Path: <PicoAimHand>{LeftHand}/pinchStrengthIndex
+      m_Path: <PicoHandInteraction>{LeftHand}/pointerActivateValue
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -5444,8 +5444,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2726eb0b6d51cf4dbd860b1365371a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  aimFlags:
-    m_Name: Aim Flags
+  trackingState:
+    m_Name: Tracking State
     m_Type: 0
     m_ExpectedControlType: 
     m_Id: 74868940-7cf1-479b-8349-7eccff54cb79
@@ -5454,11 +5454,11 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 3bab71d7-98c5-449c-9d6f-1459ac72f435
-      m_Path: <PicoAimHand>{RightHand}/aimFlags
+      m_Path: <PicoHandInteraction>{RightHand}/trackingState
       m_Interactions: 
       m_Processors: 
       m_Groups: 
-      m_Action: Aim Flags
+      m_Action: Tracking State
       m_Flags: 0
     m_Flags: 0
   pinchStrength:
@@ -5471,7 +5471,7 @@ MonoBehaviour:
     m_SingletonActionBindings:
     - m_Name: 
       m_Id: 790b8107-8c9d-423e-bdd6-c5003a9a9044
-      m_Path: <PicoAimHand>{RightHand}/pinchStrengthIndex
+      m_Path: <PicoHandInteraction>{RightHand}/pointerActivateValue
       m_Interactions: 
       m_Processors: 
       m_Groups: 
@@ -5765,6 +5765,9 @@ GameObject:
   - component: {fileID: 7838565616117344549}
   - component: {fileID: 7838565616117344553}
   - component: {fileID: 7299773526670748892}
+  - component: {fileID: 906000000000000101}
+  - component: {fileID: 906000000000000102}
+  - component: {fileID: 906000000000000103}
   m_Layer: 2
   m_Name: XR Origin (XR Rig)
   m_TagString: Untagged
@@ -5836,7 +5839,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   screenFade: 0
-  eyeTracking: 0
+  eyeTracking: 1
   trackingMode: 0
   sharpeningMode: 0
   sharpeningEnhance: 0
@@ -5865,6 +5868,75 @@ MonoBehaviour:
   maxEyeTextureScale: 1.26
   enableSuperResolution: 0
   useRecommendedAntiAliasingLevel: 1
+--- !u!114 &906000000000000101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8860333405150017128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bd8ec420d544cbca76e43d8348f2d6b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  gazeCamera: {fileID: 8860333404803800443}
+  trackingRequested: 0
+  requestCalibrationOnFirstStart: 0
+  serviceRetrySeconds: 2
+  logStatusChanges: 1
+  editorGazeMode: 0
+  simulatedPoseValid: 1
+  simulatedLocalOrigin: {x: 0, y: 0, z: 0}
+  simulatedLocalDirection: {x: 0, y: 0, z: 1}
+  status: 0
+  worldOrigin: {x: 0, y: 0, z: 0}
+  worldDirection: {x: 0, y: 0, z: 0}
+  lastSdkResult: 0
+--- !u!114 &906000000000000102
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8860333405150017128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 466f637c1391482ea1cb870ca63c21e6, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  source: {fileID: 906000000000000101}
+  maxDistance: 10
+  hitLayers:
+    serializedVersion: 2
+    m_Bits: 4294967291
+  ignoredRoot: {fileID: 7838565616117344548}
+  hitWorldSpaceUI: 1
+  hitKind: 0
+  hitPoint: {x: 0, y: 0, z: 0}
+  hitTarget: {fileID: 0}
+  hitDistance: 0
+--- !u!114 &906000000000000103
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8860333405150017128}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ff6c73a6a9b49cd9e862263c4dc2b68, type: 3}
+  m_Name:
+  m_EditorClassIdentifier:
+  gazeRaycaster: {fileID: 906000000000000102}
+  showDirection: 1
+  showHitPoint: 1
+  lineWidth: 0.002
+  pointDiameter: 0.016
+  surfaceOffset: 0.002
+  lineStartDistance: 0.08
+  gazeColor: {r: 0.1, g: 1, b: 0.8, a: 0.9}
+  simulationColor: {r: 1, g: 0.65, b: 0.1, a: 0.9}
 --- !u!1 &8860333405896118226
 GameObject:
   m_ObjectHideFlags: 0

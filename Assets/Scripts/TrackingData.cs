@@ -1,7 +1,7 @@
 using System;
 using LitJson;
-using Unity.XR.PICO.TOBSupport;
-using Unity.XR.PXR;
+using ByteDance.PICO.Enterprise;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.XR;
 using CommonUsages = UnityEngine.XR.CommonUsages;
@@ -59,7 +59,7 @@ namespace Robot
         public void Get(ref JsonData totalData)
         {
             //sensor
-            double predictTime = PXR_Enterprise.GetPredictedDisplayTime(); //毫秒
+            double predictTime = PXR_System.GetPredictedDisplayTime(); // Milliseconds.
             predictTime = predictTime * 1000;
             totalData["predictTime"] = predictTime; //微秒，对应camera录制中帧插入的时间戳
             totalData["appState"] = _stateData;
@@ -120,24 +120,17 @@ namespace Robot
 
             if (TrackingTypeValue == TrackingType.Body)
             {
-                int state = 0;
-                PXR_Input.GetMotionTrackerCalibState(ref state);
-
-                if (state == 1)
+                bool isTracking = false;
+                BodyTrackingStatus state = new BodyTrackingStatus();
+                int stateResult = PXR_MotionTracking.GetBodyTrackingState(ref isTracking, ref state);
+                if (stateResult == 0 && isTracking && state.stateCode != BodyTrackingStatusCode.BT_INVALID)
                 {
-                    // Get the current tracking mode
-                    MotionTrackerMode trackingMode = PXR_MotionTracking.GetMotionTrackerMode();
-                    // Debug.Log("trackingMode::" + trackingMode);
-                    // Update human tracking pose data
-                    if (trackingMode == MotionTrackerMode.BodyTracking)
-                    {
                         BodyTrackingGetDataInfo dataInfo = new BodyTrackingGetDataInfo();
                         BodyTrackingData trackingData = new BodyTrackingData();
                         // Obtain position and orientation data of each body node
                         int ret = PXR_MotionTracking.GetBodyTrackingData(ref dataInfo, ref trackingData);
                         JsonData json = GetBodyTracking(dataInfo, trackingData);
                         totalData["Body"] = json;
-                    }
                 }
             }
             else
@@ -148,13 +141,8 @@ namespace Robot
 
             if (TrackingTypeValue == TrackingType.Motion)
             {
-                MotionTrackerMode trackingMode = PXR_MotionTracking.GetMotionTrackerMode();
-
-                if (trackingMode == MotionTrackerMode.MotionTracking)
-                {
                     JsonData json = GetMotionTracking();
                     totalData["Motion"] = json;
-                }
             }
             else
             {
@@ -172,8 +160,7 @@ namespace Robot
 
         private JsonData GetMotionTracking()
         {
-            MotionTrackerConnectState mtcs = new MotionTrackerConnectState();
-            int ret = PXR_MotionTracking.GetMotionTrackerConnectStateWithSN(ref mtcs);
+            long[] trackerIds = PicoMotionTrackerDevices.GetConnectedIds();
 
             int len = 0;
             JsonData joints;
@@ -189,24 +176,22 @@ namespace Robot
             }
 
 
-            if (ret == 0)
-            {
-                if (mtcs.trackersSN.Length > 0)
+                if (trackerIds.Length > 0)
                 {
-                    for (int i = 0; i < mtcs.trackerSum; i++)
+                    for (int i = 0; i < trackerIds.Length; i++)
                     {
-                        string sn = mtcs.trackersSN[i].value.ToString().Trim();
+                        string sn = PicoMotionTrackerDevices.GetIdentifier(trackerIds[i]);
                         if (!string.IsNullOrEmpty(sn))
                         {
                             //Obtain estimated position and rotation values for each somatosensory tracker
-                            MotionTrackerLocations locations = new MotionTrackerLocations();
-                            MotionTrackerConfidence confidence = new MotionTrackerConfidence();
+                            MotionTrackerLocation localLocation = new MotionTrackerLocation();
+                            bool isValidPose = false;
                             int result =
-                                PXR_MotionTracking.GetMotionTrackerLocations(mtcs.trackersSN[i], ref locations,
-                                    ref confidence);
+                                PXR_MotionTracking.GetMotionTrackerLocation(trackerIds[i], ref localLocation,
+                                    ref isValidPose);
 
                             // If the position and rotation information are successfully obtained
-                            if (result == 0)
+                            if (result == 0 && isValidPose)
                             {
                                 JsonData joint;
                                 if (len < joints.Count)
@@ -220,8 +205,6 @@ namespace Robot
                                 }
 
                                 len++;
-                                MotionTrackerLocation localLocation = locations.localLocation;
-
                                 joint["p"] = GetPoseStr(localLocation.pose.Position, localLocation.pose.Orientation);
                                 unsafe
                                 {
@@ -247,8 +230,6 @@ namespace Robot
                         }
                     }
                 }
-            }
-
             _motionTrackingJson["len"] = len;
             return _motionTrackingJson;
         }

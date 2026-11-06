@@ -1,0 +1,34 @@
+{
+  "name": "com.bytedance.pico.xr",
+  "displayName": "PICO XR",
+  "version": "6.1.1",
+  "unity": "2022.3",
+  "description": "Provides display and input support for PICO devices.",
+  "author": {
+    "name": "PICO"
+  },
+  "keywords": [
+    "picoxr",
+    "xr",
+    "vr",
+    "virtual",
+    "xreditorsubsystem"
+  ],
+  "dependencies": {
+    "com.unity.xr.management": "4.0.0",
+    "com.unity.xr.interaction.toolkit": "2.0.0",
+    "com.unity.xr.core-utils": "2.3.0",
+    "com.unity.ugui": "1.0.0",
+    "com.unity.textmeshpro": "3.0.6"
+  },
+  "samples": [
+    {
+      "displayName": "PICO Interaction Demo",
+      "description": "Based on the Unity XR Interaction Toolkit, this demo focuses on addressing the need for complex combined interactions involving hand tracking and eye tracking in VR/MR development.\n<i>Dependencies:</i>\n • <a href=\"com.unity3d.kharma:upmpackage/com.unity.xr.interaction.toolkit\">XR Interaction Toolkit</a>\n • <a href=\"com.unity3d.kharma:upmpackage/com.unity.xr.hands\">XR Hands</a>\n • <a href=\"com.unity3d.kharma:upmpackage/com.unity.shadergraph\">Shader Graph</a>\n • HandVisualizer\n • Starter Assets sample\n • Hands Interaction Demo",
+      "path": "Samples~/PICOInteractionDemo"
+    }
+  ],
+  "unityRelease": "15f1",
+  "documentationUrl": "https://developer.picoxr.com/document/unity/",
+  "changelogUrl": "https://developer.picoxr.com/document/updates-unity/"
+}

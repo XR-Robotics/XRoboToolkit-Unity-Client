@@ -1,5 +1,26 @@
 {
   "dependencies": {
+    "com.bytedance.ide.trae": {
+      "version": "https://github.com/Pico-Developer/TRAE-Editor-Unity.git#1b1b02717ee1c8427a3d25c7ceb8d3882d856f4b",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.33"
+      },
+      "hash": "1b1b02717ee1c8427a3d25c7ceb8d3882d856f4b"
+    },
+    "com.bytedance.pico.xr": {
+      "version": "file:../PICO Unity SDK",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {
+        "com.unity.xr.management": "4.0.0",
+        "com.unity.xr.interaction.toolkit": "2.0.0",
+        "com.unity.xr.core-utils": "2.3.0",
+        "com.unity.ugui": "1.0.0",
+        "com.unity.textmeshpro": "3.0.6"
+      }
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.6",
       "depth": 0,
@@ -272,16 +293,6 @@
         "com.unity.xr.legacyinputhelpers": "2.1.2"
       },
       "url": "https://packages.unity.com"
-    },
-    "com.unity.xr.picoxr": {
-      "version": "file:../PICO Unity Integration SDK",
-      "depth": 0,
-      "source": "local",
-      "dependencies": {
-        "com.unity.xr.management": "4.0.0",
-        "com.unity.xr.interaction.toolkit": "2.0.0",
-        "com.unity.xr.core-utils": "2.3.0"
-      }
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

@@ -1,0 +1,29 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <ui:VisualElement name="icon-configurator" class="icon-configurator">
+        <ui:VisualElement name="icon-configurator__header" class="icon-configurator__header">
+            <ui:VisualElement name="icon-configurator__header-row" class="icon-configurator__header-row">
+                <ui:Label name="icon-configurator__title" class="icon-configurator__title" text="Icon Configurator" />
+                <ui:VisualElement name="icon-configurator__mode-host" class="icon-configurator__mode-host" />
+            </ui:VisualElement>
+            <ui:Label name="icon-configurator__notice" class="icon-configurator__notice" text="3D icons are only applicable to Project Swan,2D icons will still be displayed on PICO4 and PICO4 Ultra." />
+        </ui:VisualElement>
+        <ui:ScrollView name="icon-configurator__body" class="icon-configurator__body" mode="Vertical" horizontal-scroller-visibility="Hidden">
+            <ui:VisualElement name="icon-configurator__layers" class="icon-configurator__section icon-configurator__section--layers">
+                <ui:Label class="icon-configurator__section-title" text="Layers" />
+                <ui:VisualElement name="layer-content" class="icon-configurator__section-content" />
+            </ui:VisualElement>
+            <ui:VisualElement name="icon-configurator__preview" class="icon-configurator__section icon-configurator__section--preview">
+                <ui:Label class="icon-configurator__section-title" text="Preview" />
+                <ui:VisualElement name="preview-content" class="icon-configurator__section-content icon-configurator__section-content--preview" />
+            </ui:VisualElement>
+            <ui:VisualElement name="icon-configurator__localization" class="icon-configurator__section icon-configurator__section--localization">
+                <ui:Label class="icon-configurator__section-title" text="Localization" />
+                <ui:VisualElement name="localization-content" class="icon-configurator__section-content" />
+            </ui:VisualElement>
+        </ui:ScrollView>
+        <ui:VisualElement name="icon-configurator__bottom-bar" class="icon-configurator__bottom-bar">
+            <ui:Label name="bottom-status-label" class="icon-configurator__bottom-status" text="Ready" />
+            <ui:Button name="apply-button" class="icon-configurator__apply-button" text="Apply" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

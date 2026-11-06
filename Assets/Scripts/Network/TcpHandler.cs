@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading;
 using LitJson;
 using Network;
-using Unity.XR.PXR;
+using ByteDance.PICO.XR;
 using UnityEngine;
 using UnityEngine.XR;
 using CommonUsages = UnityEngine.XR.CommonUsages;
