@@ -16,6 +16,7 @@ using InputDevice = UnityEngine.XR.InputDevice;
 
 namespace Robot
 {
+    [DefaultExecutionOrder(500)]
     public class TcpHandler : MonoBehaviour
     {
         public const string Tag = ">>Tcp ";
@@ -51,6 +52,8 @@ namespace Robot
         [SerializeField] private float trackingRateLogIntervalSeconds = 1f;
         [SerializeField] private bool outputEnterpriseControllerPayloadToLog = false;
         [SerializeField] private float enterpriseControllerPayloadLogIntervalSeconds = 1f;
+        [SerializeField] private PicoEyeGazeSource eyeGazeSource;
+        private EyeGazeRaycaster _eyeGazeRaycaster;
         private Thread _sendThread;
         private Thread _trackingThread;
         private ByteBuffer receiveBuffer;
@@ -68,6 +71,8 @@ namespace Robot
         private ControllerInputState _cachedRightControllerInput;
         private long _lastDirectTrackingHeadSampleSeq;
         private long _lastDirectTrackingControllerSampleSeq;
+        private long _lastDirectTrackingEyeSampleSeq;
+        private bool _lastDirectTrackingEyeEnabled;
         private float _lastHeardSend = 0;
         private float _lastReconnectTime = 0;
         private bool _reconnectEnable = false;
@@ -328,15 +333,6 @@ namespace Robot
                 _cachedRightControllerInput = rightInput;
             }
 
-            if (SendTrackingData && !ShouldSendEnterpriseTrackingDirectly())
-            {
-                if (_sendTrackingMsg.Count < 2)
-                {
-                    _trackingData.Get(ref _trackingJsonData);
-                    _sendTrackingMsg.Enqueue(_trackingJsonData.ToJson());
-                }
-            }
-
             if (State == SocketState.WORKING)
             {
                 //heartbeat
@@ -366,6 +362,32 @@ namespace Robot
             }
 
             ReceivePacketHandle();
+        }
+
+        private void LateUpdate()
+        {
+            if (eyeGazeSource == null)
+                eyeGazeSource = FindObjectOfType<PicoEyeGazeSource>(true);
+            if (eyeGazeSource != null &&
+                (_eyeGazeRaycaster == null || _eyeGazeRaycaster.Source != eyeGazeSource))
+                _eyeGazeRaycaster = eyeGazeSource.GetComponent<EyeGazeRaycaster>();
+            TrackingData.CaptureEyeTracking(eyeGazeSource, _eyeGazeRaycaster);
+
+            if (ShouldSendEnterpriseTrackingDirectly())
+            {
+                // Do not replay legacy snapshots after switching back from direct tracking.
+                while (_sendTrackingMsg.TryDequeue(out _)) { }
+            }
+            else if (SendTrackingData && _sendTrackingMsg.Count < 2)
+            {
+                _trackingData.Get(ref _trackingJsonData);
+                _sendTrackingMsg.Enqueue(_trackingJsonData.ToJson());
+            }
+        }
+
+        private void OnDisable()
+        {
+            TrackingData.CaptureEyeTracking(null, null);
         }
 
         private void ReceivePacketHandle()
@@ -453,21 +475,24 @@ namespace Robot
                     default(EnterpriseCollectionRecorder.EnterpriseControllerTcpPose);
                 long headSampleSeq = _lastDirectTrackingHeadSampleSeq;
                 long controllerSampleSeq = _lastDirectTrackingControllerSampleSeq;
+                EyeTrackingSnapshot eyeSample = TrackingData.GetEyeTrackingSnapshot();
+                bool hasHead = false;
                 bool hasNewTrackingSample = false;
 
                 LogEnterpriseDirectTrackingGateIfChanged();
                 if (TrackingData.HeadOn)
                 {
-                    if (!EnterpriseCollectionRecorder.TryGetLatestEnterpriseHeadForTcp(
+                    hasHead = EnterpriseCollectionRecorder.TryGetLatestEnterpriseHeadForTcp(
                             out headPose,
                             out headStatus,
-                            out headSampleSeq))
+                            out headSampleSeq);
+                    if (!hasHead && !eyeSample.Enabled && !_lastDirectTrackingEyeEnabled)
                     {
                         Thread.Sleep(GetClampedSleepMs(trackingThreadWaitForHeadSleepMs));
                         continue;
                     }
 
-                    hasNewTrackingSample |= headSampleSeq != _lastDirectTrackingHeadSampleSeq;
+                    hasNewTrackingSample |= hasHead && headSampleSeq != _lastDirectTrackingHeadSampleSeq;
                 }
 
                 if (TrackingData.ControllerOn)
@@ -485,6 +510,10 @@ namespace Robot
                     hasNewTrackingSample |= controllerSampleSeq != _lastDirectTrackingControllerSampleSeq;
                 }
 
+                hasNewTrackingSample |= eyeSample.Enabled != _lastDirectTrackingEyeEnabled ||
+                                        (eyeSample.Enabled &&
+                                         eyeSample.SampleSeq != _lastDirectTrackingEyeSampleSeq);
+
                 if (!hasNewTrackingSample)
                 {
                     Interlocked.Increment(ref _directStaleReadCount);
@@ -496,7 +525,7 @@ namespace Robot
                 Interlocked.Increment(ref _directNewSampleCount);
 
                 JsonData trackingValue = new JsonData();
-                if (TrackingData.HeadOn)
+                if (hasHead)
                 {
                     JsonData head = new JsonData();
                     head["pose"] = headPose;
@@ -521,6 +550,7 @@ namespace Robot
                     LogEnterpriseControllerPayloadIfNeeded(controller, controllerSampleSeq);
                 }
 
+                EyeTrackingData.AppendTo(trackingValue, eyeSample);
                 JsonData appState = new JsonData();
                 trackingValue["timeStampNs"] = Utils.GetCurrentTimestamp();
                 appState["focus"] = _cachedAppFocus;
@@ -539,17 +569,21 @@ namespace Robot
                 Interlocked.Increment(ref _pendingDirectTrackingPackets);
                 _lastDirectTrackingHeadSampleSeq = headSampleSeq;
                 _lastDirectTrackingControllerSampleSeq = controllerSampleSeq;
+                _lastDirectTrackingEyeSampleSeq = eyeSample.SampleSeq;
+                _lastDirectTrackingEyeEnabled = eyeSample.Enabled;
 
                 LogDirectTrackingStatsIfNeeded(headSampleSeq, controllerSampleSeq);
             }
         }
 
-        private bool ShouldSendEnterpriseTrackingDirectly()
+        private static bool ShouldSendEnterpriseTrackingDirectly()
         {
             return SendTrackingData &&
                    EnterpriseDirectTrackingEnabled &&
                    TrackingDataSourceCtrl.UseEnterpriseSDK &&
-                   (TrackingData.HeadOn || TrackingData.ControllerOn);
+                   (TrackingData.HeadOn || TrackingData.ControllerOn ||
+                    (TrackingData.EyeTrackingOn && !TrackingData.HandTrackingOn &&
+                     TrackingData.TrackingTypeValue == TrackingData.TrackingType.None));
         }
 
         private static JsonData BuildEnterpriseControllerJson(
@@ -704,6 +738,7 @@ namespace Robot
                             $"directEnabled={EnterpriseDirectTrackingEnabled} " +
                             $"source={TrackingDataSourceCtrl.CurrentSource} " +
                             $"head={TrackingData.HeadOn} controller={TrackingData.ControllerOn} " +
+                            $"eye={TrackingData.EyeTrackingOn} " +
                             $"hand={TrackingData.HandTrackingOn} trackingType={TrackingData.TrackingTypeValue} " +
                             $"state={_state} connectInited={_connectInited}";
             if (status == _lastDirectTrackingGateStatus)
@@ -721,6 +756,8 @@ namespace Robot
         {
             _lastDirectTrackingHeadSampleSeq = 0;
             _lastDirectTrackingControllerSampleSeq = 0;
+            _lastDirectTrackingEyeSampleSeq = 0;
+            _lastDirectTrackingEyeEnabled = false;
         }
 
         private static int GetClampedSleepMs(int sleepMs)

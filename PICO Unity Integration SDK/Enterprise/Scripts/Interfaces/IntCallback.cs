@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿﻿﻿using System;
 using UnityEngine;
 
 namespace Unity.XR.PICO.TOBSupport
@@ -12,7 +12,7 @@ namespace Unity.XR.PICO.TOBSupport
             mCallback = callback;
         }
 
-        // Current tobservicelib-release.aar exposes IIntCallback.callback(int).
+        // The ToB client exposes IIntCallback.callback(int).
         // Keep CallBack for legacy callers, but implement the current binder ABI.
         public void callback(int var1)
         {

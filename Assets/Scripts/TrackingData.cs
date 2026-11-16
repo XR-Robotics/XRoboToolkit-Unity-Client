@@ -14,8 +14,10 @@ namespace Robot
         public static bool HeadOn { get; private set; }
         public static bool ControllerOn { get; private set; }
         public static bool HandTrackingOn { get; private set; }
+        public static bool EyeTrackingOn => _eyeTrackingData.IsEnabled;
         public static TrackingType TrackingTypeValue { get; private set; }
 
+        private static readonly EyeTrackingData _eyeTrackingData = new EyeTrackingData();
         private JsonData _motionTrackingJson = new JsonData();
         private JsonData _bodyTrackingJson = new JsonData();
         private JsonData _controllerDataJson = new JsonData();
@@ -47,11 +49,21 @@ namespace Robot
             TrackingTypeValue = trackingType;
         }
 
+        public static void CaptureEyeTracking(PicoEyeGazeSource source, EyeGazeRaycaster raycaster)
+        {
+            _eyeTrackingData.Capture(source, raycaster);
+        }
+
+        public static EyeTrackingSnapshot GetEyeTrackingSnapshot()
+        {
+            return _eyeTrackingData.GetSnapshot();
+        }
+
         public static bool HasTracking
         {
             get
             {
-                return (HeadOn || ControllerOn || HandTrackingOn ||
+                return (HeadOn || ControllerOn || HandTrackingOn || EyeTrackingOn ||
                         TrackingTypeValue > TrackingType.None);
             }
         }
@@ -150,6 +162,7 @@ namespace Robot
                     totalData.Remove("Motion");
             }
 
+            EyeTrackingData.AppendTo(totalData, GetEyeTrackingSnapshot());
 
             long nsTime = Utils.GetCurrentTimestamp();
             totalData["timeStampNs"] = nsTime;
